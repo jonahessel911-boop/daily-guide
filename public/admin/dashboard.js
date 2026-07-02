@@ -201,28 +201,45 @@ document.getElementById('btn-logout').addEventListener('click', () => {
 document.getElementById('btn-test-purchase').addEventListener('click', async () => {
   const btn = document.getElementById('btn-test-purchase');
   const resultEl = document.getElementById('meta-test-result');
+  const testCode = document.getElementById('meta-test-code').value.trim();
+  if (testCode) sessionStorage.setItem('meta_test_event_code', testCode);
+
+  const eventId = `test-admin-${Date.now()}`;
+  const browserFired = window.MetaPixel?.trackPurchase(17, eventId) || false;
+
   btn.disabled = true;
   btn.textContent = 'Versturen…';
   resultEl.hidden = true;
 
   try {
-    const { data } = await api('/api/admin/test-purchase', { method: 'POST' });
-    resultEl.textContent = data.message + (data.eventId ? ` (event_id: ${data.eventId})` : '');
-    resultEl.className = `meta-test-result ${data.ok ? 'ok' : 'err'}`;
-    resultEl.hidden = false;
+    const { data } = await api('/api/admin/test-purchase', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eventId, testEventCode: testCode || null, browserFired }),
+    });
 
-    if (data.ok && data.eventId && typeof fbq === 'function') {
-      fbq('track', 'Purchase', { currency: 'EUR', value: 17 }, { eventID: data.eventId });
-    }
+    const parts = [];
+    if (browserFired) parts.push('Browser: Purchase');
+    if (data.capi?.ok) parts.push('Server: Purchase (CAPI)');
+    else if (data.capi?.skipped) parts.push('Server: overgeslagen (geen Meta token)');
+
+    resultEl.textContent = `${parts.join(' · ') || data.message} — event_id: ${data.eventId}`;
+    resultEl.className = `meta-test-result ${browserFired || data.ok ? 'ok' : 'err'}`;
+    resultEl.hidden = false;
   } catch (err) {
-    resultEl.textContent = err.message || 'Kon test niet versturen';
-    resultEl.className = 'meta-test-result err';
+    resultEl.textContent = (browserFired ? 'Browser Purchase verstuurd. ' : '') + (err.message || 'CAPI mislukt');
+    resultEl.className = `meta-test-result ${browserFired ? 'ok' : 'err'}`;
     resultEl.hidden = false;
   } finally {
     btn.disabled = false;
     btn.textContent = 'Send test purchase';
   }
 });
+
+const savedTestCode = sessionStorage.getItem('meta_test_event_code');
+if (savedTestCode) {
+  document.getElementById('meta-test-code').value = savedTestCode;
+}
 
 document.getElementById('split-body').addEventListener('input', (e) => {
   if (e.target.classList.contains('split-weight-input')) updateSplitTotal();

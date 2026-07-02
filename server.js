@@ -151,7 +151,9 @@ app.get('/api/admin/stats', requireAdmin, async (req, res) => {
 });
 
 app.post('/api/admin/test-purchase', requireAdmin, async (req, res) => {
-  const eventId = `test-admin-${Date.now()}`;
+  const eventId = req.body?.eventId || `test-admin-${Date.now()}`;
+  const testEventCode = req.body?.testEventCode || process.env.META_TEST_EVENT_CODE || null;
+
   const result = await sendPurchaseEvent({
     eventId,
     eventSourceUrl: getSuccessUrl(),
@@ -163,17 +165,19 @@ app.post('/api/admin/test-purchase', requireAdmin, async (req, res) => {
     clientIp: getClientIp(req),
     userAgent: req.headers['user-agent'],
     leadSource: 'admin_test',
+    testEventCode,
   });
 
   res.json({
     ok: Boolean(result.ok),
     eventId,
+    browserFired: Boolean(req.body?.browserFired),
     capi: result,
     message: result.ok
-      ? 'Test Purchase verstuurd naar Meta Conversions API'
+      ? 'Purchase verstuurd (browser + server CAPI)'
       : result.skipped
-        ? 'Meta niet geconfigureerd — zet META_PIXEL_ID en META_ACCESS_TOKEN in Vercel'
-        : 'Meta CAPI fout — controleer access token in Events Manager',
+        ? 'Meta CAPI niet geconfigureerd — browser Purchase wel verstuurd als pixel geladen is'
+        : 'Meta CAPI fout — browser Purchase kan wel zijn aangekomen',
   });
 });
 

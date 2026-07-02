@@ -18,3 +18,8 @@
 
 fbq('init', '4564404523788178');
 fbq('track', 'PageView');
+
+(function () {
+  const testCode = new URLSearchParams(window.location.search).get('test_event_code');
+  if (testCode) sessionStorage.setItem('meta_test_event_code', testCode);
+})();

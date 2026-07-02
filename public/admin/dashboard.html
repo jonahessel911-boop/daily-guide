@@ -9,6 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
   <script src="/meta-pixel.js"></script>
+  <script src="/meta-track.js"></script>
+  <script>if (typeof fbq === 'function') fbq('set', 'autoConfig', false, '4564404523788178');</script>
 </head>
 <body>
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=4564404523788178&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
@@ -120,7 +122,9 @@
 
     <section class="panel">
       <h2>Meta conversies</h2>
-      <p class="hint" style="margin-top:0;margin-bottom:12px;">Stuurt een test <code>Purchase</code> (€17) via Conversions API naar pixel <code>4564404523788178</code>.</p>
+      <p class="hint" style="margin-top:0;margin-bottom:12px;">Test Purchase via browser pixel + server CAPI. Open Events Manager → Test Events en plak je testcode hieronder.</p>
+      <label class="meta-test-label" for="meta-test-code">Test event code</label>
+      <input type="text" id="meta-test-code" class="meta-test-input" placeholder="bijv. TEST37197" autocomplete="off">
       <button type="button" id="btn-test-purchase" class="btn-test">Send test purchase</button>
       <p id="meta-test-result" class="meta-test-result" hidden></p>
     </section>

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Meta Pixel -->
   <script src="/meta-pixel.js"></script>
+  <script src="/meta-track.js"></script>
   <title>Bedankt! | Slaap Beter Slapen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,12 +29,10 @@
 
     function trackMetaPurchase(paymentId, amount) {
       const key = `meta_purchase_${paymentId}`;
-      if (sessionStorage.getItem(key) || typeof fbq !== 'function') return;
-      fbq('track', 'Purchase', {
-        currency: 'EUR',
-        value: amount,
-      }, { eventID: paymentId });
-      sessionStorage.setItem(key, '1');
+      if (sessionStorage.getItem(key)) return;
+      if (window.MetaPixel?.trackPurchase(amount, paymentId)) {
+        sessionStorage.setItem(key, '1');
+      }
     }
 
     if (paymentIntent) {
