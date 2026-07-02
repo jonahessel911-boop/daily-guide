@@ -48,6 +48,10 @@ body {
 }
 .error { color: #f87171; font-size: 13px; margin-top: 12px; }
 
+[hidden] {
+  display: none !important;
+}
+
 .dashboard { max-width: 1200px; margin: 0 auto; padding: 24px 20px 48px; }
 
 .dash-header {

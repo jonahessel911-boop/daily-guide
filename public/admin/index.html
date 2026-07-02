@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin — Funnel analytics</title>
+  <title>Admin login — Funnel analytics</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-  <div id="login-screen" class="login-screen">
+  <div class="login-screen">
     <form id="login-form" class="login-card">
       <h1>Admin</h1>
       <p>Funnel analytics — Sleep &amp; landers</p>
@@ -21,95 +21,6 @@
     </form>
   </div>
 
-  <div id="dashboard" class="dashboard" hidden>
-    <header class="dash-header">
-      <div>
-        <h1>Funnel analytics</h1>
-        <p class="muted">Per product · lander · land</p>
-      </div>
-      <div class="dash-actions">
-        <select id="filter-range">
-          <option value="7">Laatste 7 dagen</option>
-          <option value="30" selected>Laatste 30 dagen</option>
-          <option value="90">Laatste 90 dagen</option>
-          <option value="all">Alles</option>
-        </select>
-        <button type="button" id="btn-refresh">Vernieuwen</button>
-        <button type="button" id="btn-logout" class="btn-ghost">Uitloggen</button>
-      </div>
-    </header>
-
-    <section class="kpi-grid" id="kpi-grid">
-      <div class="kpi-card">
-        <span class="kpi-label">Lander views</span>
-        <span class="kpi-value" id="kpi-views">—</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-label">Checkout views</span>
-        <span class="kpi-value" id="kpi-checkout">—</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-label">CTR → checkout</span>
-        <span class="kpi-value" id="kpi-ctr">—</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-label">Sales</span>
-        <span class="kpi-value" id="kpi-sales">—</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-label">Omzet</span>
-        <span class="kpi-value" id="kpi-revenue">—</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-label">CR (lander → sale)</span>
-        <span class="kpi-value" id="kpi-cr">—</span>
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2>Per lander &amp; product</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Land</th>
-              <th>Lander</th>
-              <th>Views</th>
-              <th>Checkout</th>
-              <th>CTR</th>
-              <th>Sales</th>
-              <th>Omzet</th>
-              <th>CR</th>
-              <th>Checkout CR</th>
-            </tr>
-          </thead>
-          <tbody id="stats-body">
-            <tr><td colspan="10" class="empty">Laden…</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2>Geregistreerde landers</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Slug</th>
-              <th>Naam</th>
-              <th>Product</th>
-              <th>Pad</th>
-            </tr>
-          </thead>
-          <tbody id="landers-body"></tbody>
-        </table>
-      </div>
-      <p class="hint">Nieuwe lander? Voeg rij toe in Supabase <code>landers</code> + <code>data-track-lander</code> op de pagina.</p>
-    </section>
-  </div>
-
-  <script src="admin.js"></script>
+  <script src="login.js"></script>
 </body>
 </html>

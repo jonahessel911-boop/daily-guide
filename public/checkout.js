@@ -128,10 +128,20 @@ async function initPaymentStep(email, method) {
         }
       : {};
 
+  function getMetaCookies() {
+    const read = (name) => {
+      const match = document.cookie.match(
+        new RegExp('(?:^|; )' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '=([^;]*)')
+      );
+      return match ? decodeURIComponent(match[1]) : null;
+    };
+    return { fbc: read('_fbc'), fbp: read('_fbp') };
+  }
+
   const { res, data } = await Api.apiFetch('/api/create-payment', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, paymentMethod: method, analytics }),
+    body: JSON.stringify({ email, paymentMethod: method, analytics, meta: getMetaCookies() }),
   });
 
   if (!res.ok) throw new Error(data.error || 'Kon betaling niet starten');

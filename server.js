@@ -3,7 +3,8 @@ const crypto = require('crypto');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { insertEvent, recordPurchaseOnce, getStats } = require('./lib/analytics');
+const { insertEvent, getStats } = require('./lib/analytics');
+const { fulfillPurchase, getSuccessUrl } = require('./lib/fulfill-purchase');
 
 const app = express();
 const PORT = process.env.PORT || 8081;
@@ -43,6 +44,57 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+function getClientIp(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) return String(forwarded).split(',')[0].trim();
+  return req.socket?.remoteAddress || '';
+}
+
+function getEventSourceUrl(req) {
+  if (req) {
+    const base = process.env.SITE_URL || `${req.protocol}://${req.get('host')}`;
+    return `${base.replace(/\/$/, '')}/success.html`;
+  }
+  return getSuccessUrl();
+}
+
+// Stripe webhook — raw body vóór express.json()
+app.post(
+  '/api/stripe-webhook',
+  express.raw({ type: 'application/json' }),
+  async (req, res) => {
+    if (!stripe) {
+      return res.status(503).json({ error: 'Stripe niet geconfigureerd' });
+    }
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+      return res.status(503).json({ error: 'STRIPE_WEBHOOK_SECRET niet ingesteld' });
+    }
+
+    const signature = req.headers['stripe-signature'];
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(req.body, signature, process.env.STRIPE_WEBHOOK_SECRET);
+    } catch (err) {
+      console.error('Stripe webhook signature invalid:', err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    try {
+      if (event.type === 'payment_intent.succeeded') {
+        const intent = event.data.object;
+        const result = await fulfillPurchase(intent, { eventSourceUrl: getSuccessUrl() });
+        console.log('Stripe webhook purchase:', intent.id, result.duplicate ? 'duplicate' : 'fulfilled');
+      }
+    } catch (err) {
+      console.error('Stripe webhook handler error:', err.message);
+      return res.status(500).json({ error: 'Webhook handler failed' });
+    }
+
+    res.json({ received: true });
+  }
+);
+
 app.use(cors({ origin: true }));
 app.use(express.json());
 
@@ -74,7 +126,10 @@ app.post('/api/track', async (req, res) => {
 app.post('/api/admin/login', (req, res) => {
   const token = getAdminToken();
   if (!token) {
-    return res.status(503).json({ ok: false, error: 'ADMIN_PASSWORD niet ingesteld' });
+    return res.status(503).json({
+      ok: false,
+      error: 'ADMIN_PASSWORD niet ingesteld op de server (Vercel env vars)',
+    });
   }
   if (req.body?.password !== process.env.ADMIN_PASSWORD) {
     return res.status(401).json({ ok: false, error: 'Onjuist wachtwoord' });
@@ -94,7 +149,7 @@ app.post('/api/create-payment', async (req, res) => {
   }
 
   try {
-    const { email, paymentMethod = 'ideal', analytics = {} } = req.body;
+    const { email, paymentMethod = 'ideal', analytics = {}, meta = {} } = req.body;
     if (!email) {
       return res.status(400).json({ error: 'E-mailadres is verplicht' });
     }
@@ -120,6 +175,8 @@ app.post('/api/create-payment', async (req, res) => {
         country: (analytics.country || 'NL').toUpperCase(),
         lander_slug: analytics.landerSlug || '',
         session_id: analytics.sessionId || '',
+        fbc: meta.fbc || '',
+        fbp: meta.fbp || '',
       },
     };
 
@@ -157,15 +214,10 @@ app.get('/api/payment-status', async (req, res) => {
     const intent = await stripe.paymentIntents.retrieve(payment_intent);
 
     if (intent.status === 'succeeded') {
-      await recordPurchaseOnce({
-        eventType: 'purchase',
-        productSlug: intent.metadata.product_slug || 'sleep',
-        country: intent.metadata.country || 'NL',
-        landerSlug: intent.metadata.lander_slug || null,
-        sessionId: intent.metadata.session_id || `pi_${intent.id}`,
-        amountCents: intent.amount,
-        currency: (intent.currency || 'eur').toUpperCase(),
-        paymentIntentId: intent.id,
+      await fulfillPurchase(intent, {
+        eventSourceUrl: getEventSourceUrl(req),
+        clientIp: getClientIp(req),
+        userAgent: req.headers['user-agent'],
       });
     }
 
@@ -184,6 +236,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/admin', (_req, res) => {
   res.redirect('/admin/');
+});
+
+app.get('/admin/dashboard', (_req, res) => {
+  res.redirect('/admin/dashboard.html');
 });
 
 module.exports = app;
