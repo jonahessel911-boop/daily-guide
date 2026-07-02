@@ -221,6 +221,8 @@ app.post('/api/create-payment', async (req, res) => {
       ideal: ['ideal'],
       card: ['card'],
       klarna: ['klarna'],
+      apple_pay: ['card'],
+      google_pay: ['card'],
     };
 
     const intentParams = {

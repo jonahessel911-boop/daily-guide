@@ -20,8 +20,7 @@ const METHOD_ICONS = {
 let stripe;
 let elements;
 let paymentElement;
-let walletButton;
-let paymentRequest;
+let expressCheckout;
 let clientSecret;
 let selectedMethod = 'ideal';
 let customerEmail = '';
@@ -86,10 +85,13 @@ document.addEventListener('DOMContentLoaded', () => {
     showMessage('select-message', null);
 
     try {
-      await initPaymentStep(email, selectedMethod);
+      await createPaymentIntent(email, selectedMethod);
       document.getElementById('step-select').hidden = true;
       document.getElementById('step-pay').hidden = false;
       updatePayHeader(selectedMethod);
+      // Mount Stripe UI only after step-pay is visible (hidden parents break wallet buttons).
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      await mountPaymentUI(selectedMethod);
     } catch (err) {
       showMessage('select-message', err.message);
     } finally {
@@ -108,6 +110,11 @@ function selectMethod(method) {
 
   document.getElementById('pm-selected-label').textContent = METHOD_LABELS[method];
   document.getElementById('pm-selected-icon').innerHTML = METHOD_ICONS[method];
+
+  const continueText = document.getElementById('continue-text');
+  if (method === 'apple_pay') continueText.textContent = 'Doorgaan met Apple Pay';
+  else if (method === 'google_pay') continueText.textContent = 'Doorgaan met Google Pay';
+  else continueText.textContent = 'Doorgaan naar betalen';
 }
 
 function updatePayHeader(method) {
@@ -115,7 +122,7 @@ function updatePayHeader(method) {
   document.getElementById('pm-pay-icon').innerHTML = METHOD_ICONS[method];
 }
 
-async function initPaymentStep(email, method) {
+async function createPaymentIntent(email, method) {
   destroyStripeElements();
 
   const analytics =
@@ -148,24 +155,26 @@ async function initPaymentStep(email, method) {
 
   clientSecret = data.clientSecret;
   stripe = Stripe(STRIPE_PK);
+}
 
-  const appearance = {
-    theme: 'stripe',
-    variables: {
-      colorPrimary: '#2563eb',
-      colorBackground: '#ffffff',
-      colorText: '#0f172a',
-      borderRadius: '10px',
-      fontFamily: 'Inter, sans-serif',
-      spacingUnit: '4px',
-    },
-    rules: {
-      '.Input': { border: '1px solid #e2e8f0', boxShadow: 'none' },
-      '.Input:focus': { border: '1px solid #2563eb', boxShadow: '0 0 0 3px #dbeafe' },
-      '.Label': { fontWeight: '600', fontSize: '13px' },
-    },
-  };
+const STRIPE_APPEARANCE = {
+  theme: 'stripe',
+  variables: {
+    colorPrimary: '#2563eb',
+    colorBackground: '#ffffff',
+    colorText: '#0f172a',
+    borderRadius: '10px',
+    fontFamily: 'Inter, sans-serif',
+    spacingUnit: '4px',
+  },
+  rules: {
+    '.Input': { border: '1px solid #e2e8f0', boxShadow: 'none' },
+    '.Input:focus': { border: '1px solid #2563eb', boxShadow: '0 0 0 3px #dbeafe' },
+    '.Label': { fontWeight: '600', fontSize: '13px' },
+  },
+};
 
+async function mountPaymentUI(method) {
   const payArea = document.getElementById('stripe-payment-area');
   const expressArea = document.getElementById('stripe-express-area');
   const submitBtn = document.getElementById('submit-payment');
@@ -178,9 +187,9 @@ async function initPaymentStep(email, method) {
   walletUnavailable.hidden = true;
 
   if (method === 'apple_pay' || method === 'google_pay') {
-    await initWalletButton(method);
+    await mountWalletCheckout(method);
   } else {
-    elements = stripe.elements({ clientSecret, appearance, locale: 'nl' });
+    elements = stripe.elements({ clientSecret, appearance: STRIPE_APPEARANCE, locale: 'nl' });
     payArea.hidden = false;
     submitBtn.hidden = false;
 
@@ -197,100 +206,78 @@ async function initPaymentStep(email, method) {
   }
 }
 
-async function initWalletButton(method) {
+async function mountWalletCheckout(method) {
   const expressArea = document.getElementById('stripe-express-area');
   const walletUnavailable = document.getElementById('wallet-unavailable');
   const container = document.getElementById('wallet-button-container');
 
   expressArea.hidden = false;
   container.innerHTML = '';
+  walletUnavailable.hidden = true;
 
-  elements = stripe.elements();
+  elements = stripe.elements({ clientSecret, appearance: STRIPE_APPEARANCE, locale: 'nl' });
 
-  paymentRequest = stripe.paymentRequest({
-    country: 'NL',
-    currency: 'eur',
-    total: {
-      label: 'Slaap Beter Slapen — E-book Bundel',
-      amount: 1700,
+  expressCheckout = elements.create('expressCheckout', {
+    paymentMethods: {
+      applePay: method === 'apple_pay' ? 'always' : 'never',
+      googlePay: method === 'google_pay' ? 'always' : 'never',
+      link: 'never',
+      paypal: 'never',
+      amazonPay: 'never',
+      klarna: 'never',
     },
-    requestPayerEmail: true,
+    buttonType: {
+      applePay: 'buy',
+      googlePay: 'buy',
+    },
+    buttonTheme: {
+      applePay: 'black',
+      googlePay: 'black',
+    },
+    layout: {
+      maxColumns: 1,
+      maxRows: 1,
+    },
   });
 
-  const canPay = await paymentRequest.canMakePayment();
-
-  if (!canPay) {
-    walletUnavailable.textContent =
-      method === 'apple_pay'
-        ? 'Apple Pay is niet beschikbaar op dit apparaat of browser. Gebruik Safari op een Apple-apparaat, of kies een andere betaalmethode.'
-        : 'Google Pay is niet beschikbaar op dit apparaat of browser. Kies een andere betaalmethode.';
-    walletUnavailable.hidden = false;
-    return;
-  }
-
-  if (method === 'apple_pay' && !canPay.applePay) {
-    walletUnavailable.textContent =
-      'Apple Pay is niet beschikbaar. Gebruik Safari op een iPhone, iPad of Mac, of kies een andere betaalmethode.';
-    walletUnavailable.hidden = false;
-    return;
-  }
-
-  if (method === 'google_pay' && !canPay.googlePay) {
-    walletUnavailable.textContent =
-      'Google Pay is niet beschikbaar op dit apparaat. Kies een andere betaalmethode.';
-    walletUnavailable.hidden = false;
-    return;
-  }
-
-  paymentRequest.on('paymentmethod', async (ev) => {
+  expressCheckout.on('confirm', async () => {
     const messageEl = document.getElementById('payment-message');
     messageEl.hidden = true;
 
-    try {
-      const { error, paymentIntent } = await stripe.confirmCardPayment(
-        clientSecret,
-        { payment_method: ev.paymentMethod.id, receipt_email: customerEmail },
-        { handleActions: false }
-      );
+    const { error } = await stripe.confirmPayment({
+      elements,
+      clientSecret,
+      confirmParams: {
+        return_url: `${window.location.origin}/success.html`,
+        receipt_email: customerEmail,
+      },
+    });
 
-      if (error) {
-        ev.complete('fail');
-        messageEl.textContent = error.message;
-        messageEl.hidden = false;
-        return;
-      }
-
-      ev.complete('success');
-
-      if (paymentIntent.status === 'requires_action') {
-        const { error: actionError } = await stripe.confirmCardPayment(clientSecret);
-        if (actionError) {
-          messageEl.textContent = actionError.message;
-          messageEl.hidden = false;
-          return;
-        }
-      }
-
-      window.location.href = `${window.location.origin}/success.html?payment_intent=${paymentIntent.id}`;
-    } catch (err) {
-      ev.complete('fail');
-      messageEl.textContent = err.message;
+    if (error) {
+      messageEl.textContent = error.message;
       messageEl.hidden = false;
     }
   });
 
-  walletButton = elements.create('paymentRequestButton', {
-    paymentRequest,
-    style: {
-      paymentRequestButton: {
-        type: 'buy',
-        theme: method === 'apple_pay' ? 'black' : 'default',
-        height: '52px',
-      },
-    },
-  });
+  await new Promise((resolve) => {
+    expressCheckout.on('ready', ({ availablePaymentMethods }) => {
+      const available =
+        method === 'apple_pay'
+          ? availablePaymentMethods?.applePay
+          : availablePaymentMethods?.googlePay;
 
-  walletButton.mount('#wallet-button-container');
+      if (!available) {
+        walletUnavailable.textContent =
+          method === 'apple_pay'
+            ? 'Apple Pay is niet beschikbaar op dit apparaat of browser. Gebruik Safari op een Apple-apparaat, of kies een andere betaalmethode.'
+            : 'Google Pay is niet beschikbaar op dit apparaat. Kies een andere betaalmethode.';
+        walletUnavailable.hidden = false;
+      }
+      resolve();
+    });
+
+    expressCheckout.mount('#wallet-button-container');
+  });
 }
 
 async function handlePayment() {
@@ -331,11 +318,10 @@ function destroyStripeElements() {
     paymentElement.unmount();
     paymentElement = null;
   }
-  if (walletButton) {
-    walletButton.unmount();
-    walletButton = null;
+  if (expressCheckout) {
+    expressCheckout.unmount();
+    expressCheckout = null;
   }
-  paymentRequest = null;
   elements = null;
   clientSecret = null;
   const container = document.getElementById('wallet-button-container');
