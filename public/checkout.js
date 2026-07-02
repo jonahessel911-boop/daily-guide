@@ -1,6 +1,9 @@
 const STRIPE_PK =
   'pk_live_51TQqFYLGVqAZBTckWzCiVrZsmrJX5rkUxuYVjFkIMZVMVE6990yANMCjbn17Osp3ZVmgHrticwv7tHzoB0KTTWRO00dWpf0uMj';
 
+const BANCONTACT_ICON =
+  '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#005498"/><path fill="#FFD800" d="M3 15.2c2.8-3.4 6.4-4.9 10.8-3.1 1.9.8 3.2 2.1 3.7 3.6H3z"/><path fill="#fff" d="M8.8 8.8h1.3c1.6 0 2.6.9 2.6 2.3 0 1.4-1.1 2.3-2.8 2.3H8.8V8.8zm1.2 3.6h.5c.8 0 1.3-.4 1.3-1 0-.6-.5-1-1.3-1h-.5v2z"/></svg>';
+
 const METHOD_LABELS = {
   ideal: 'iDEAL',
   bancontact: 'Bancontact',
@@ -12,7 +15,7 @@ const METHOD_LABELS = {
 
 const METHOD_ICONS = {
   ideal: '<span class="pm-logo ideal-logo sm">iDEAL</span>',
-  bancontact: '<span class="pm-logo bancontact-logo sm">Bancontact</span>',
+  bancontact: BANCONTACT_ICON,
   card: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
   klarna: '<span class="pm-logo klarna-logo sm">Klarna</span>',
   apple_pay: '<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>',
