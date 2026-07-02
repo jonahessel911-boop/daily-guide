@@ -219,6 +219,7 @@ app.post('/api/create-payment', async (req, res) => {
 
     const methodTypes = {
       ideal: ['ideal'],
+      bancontact: ['bancontact'],
       card: ['card'],
       klarna: ['klarna'],
       apple_pay: ['card'],
