@@ -120,4 +120,30 @@ document.getElementById('btn-logout').addEventListener('click', () => {
   window.location.replace('/admin/');
 });
 
+document.getElementById('btn-test-purchase').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-test-purchase');
+  const resultEl = document.getElementById('meta-test-result');
+  btn.disabled = true;
+  btn.textContent = 'Versturen…';
+  resultEl.hidden = true;
+
+  try {
+    const { data } = await api('/api/admin/test-purchase', { method: 'POST' });
+    resultEl.textContent = data.message + (data.eventId ? ` (event_id: ${data.eventId})` : '');
+    resultEl.className = `meta-test-result ${data.ok ? 'ok' : 'err'}`;
+    resultEl.hidden = false;
+
+    if (data.ok && data.eventId && typeof fbq === 'function') {
+      fbq('track', 'Purchase', { currency: 'EUR', value: 17 }, { eventID: data.eventId });
+    }
+  } catch (err) {
+    resultEl.textContent = err.message || 'Kon test niet versturen';
+    resultEl.className = 'meta-test-result err';
+    resultEl.hidden = false;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Send test purchase';
+  }
+});
+
 loadStats();

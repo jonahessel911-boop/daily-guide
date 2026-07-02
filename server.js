@@ -5,6 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const { insertEvent, getStats } = require('./lib/analytics');
 const { fulfillPurchase, getSuccessUrl } = require('./lib/fulfill-purchase');
+const { sendPurchaseEvent } = require('./lib/meta-capi');
 
 const app = express();
 const PORT = process.env.PORT || 8081;
@@ -141,6 +142,33 @@ app.get('/api/admin/stats', requireAdmin, async (req, res) => {
   const { from, to } = req.query;
   const stats = await getStats({ from, to });
   res.json(stats);
+});
+
+app.post('/api/admin/test-purchase', requireAdmin, async (req, res) => {
+  const eventId = `test-admin-${Date.now()}`;
+  const result = await sendPurchaseEvent({
+    eventId,
+    eventSourceUrl: getSuccessUrl(),
+    email: 'test@the-daily-guide.com',
+    value: 17,
+    currency: 'EUR',
+    country: 'nl',
+    externalId: eventId,
+    clientIp: getClientIp(req),
+    userAgent: req.headers['user-agent'],
+    leadSource: 'admin_test',
+  });
+
+  res.json({
+    ok: Boolean(result.ok),
+    eventId,
+    capi: result,
+    message: result.ok
+      ? 'Test Purchase verstuurd naar Meta Conversions API'
+      : result.skipped
+        ? 'Meta niet geconfigureerd — zet META_PIXEL_ID en META_ACCESS_TOKEN in Vercel'
+        : 'Meta CAPI fout — controleer access token in Events Manager',
+  });
 });
 
 app.post('/api/create-payment', async (req, res) => {

@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Meta Pixel -->
+  <script src="/meta-pixel.js"></script>
   <title>Bedankt! | Slaap Beter Slapen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,6 +13,7 @@
   <link rel="stylesheet" href="checkout.css">
 </head>
 <body class="checkout-page success-page">
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=4564404523788178&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
   <div class="success-card">
     <div class="success-icon">✓</div>
     <h1>Bedankt voor je aankoop!</h1>
@@ -23,12 +26,23 @@
     const params = new URLSearchParams(window.location.search);
     const paymentIntent = params.get('payment_intent');
 
+    function trackMetaPurchase(paymentId, amount) {
+      const key = `meta_purchase_${paymentId}`;
+      if (sessionStorage.getItem(key) || typeof fbq !== 'function') return;
+      fbq('track', 'Purchase', {
+        currency: 'EUR',
+        value: amount,
+      }, { eventID: paymentId });
+      sessionStorage.setItem(key, '1');
+    }
+
     if (paymentIntent) {
       Api.apiFetch(`/api/payment-status?payment_intent=${paymentIntent}`)
         .then(({ data }) => {
           if (data.status === 'succeeded') {
             document.getElementById('success-message').textContent =
               `Je betaling van €${data.amount.toFixed(2).replace('.', ',')} is gelukt! Je e-books worden naar ${data.email || 'je e-mailadres'} gestuurd.`;
+            trackMetaPurchase(paymentIntent, data.amount);
           }
         })
         .catch(() => {});
