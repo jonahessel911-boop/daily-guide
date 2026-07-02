@@ -5,21 +5,10 @@
   min-height: 100vh;
 }
 
-.checkout-header {
-  background: var(--white);
-  border-bottom: 1px solid var(--border);
-  padding: 16px 24px;
-  text-align: center;
-}
-
-.checkout-header .logo {
-  justify-content: center;
-}
-
 .checkout-main {
   max-width: 520px;
   margin: 0 auto;
-  padding: 32px 20px 48px;
+  padding: 24px 20px 48px;
 }
 
 .checkout-book {
@@ -37,7 +26,7 @@
 .checkout-bundle-image {
   width: 100%;
   max-width: 420px;
-  margin: 0 auto 12px;
+  margin: 0 auto 16px;
   display: block;
   background: transparent;
 }
@@ -85,11 +74,11 @@
   padding: 7px 0;
 }
 
-.bundle-includes-extra {
+.bundle-includes-list .bundle-includes-extra {
   display: none;
 }
 
-.bundle-includes-card.is-expanded .bundle-includes-extra {
+.bundle-includes-card.is-expanded .bundle-includes-list .bundle-includes-extra {
   display: flex;
 }
 
@@ -678,6 +667,19 @@
   color: var(--text-muted);
   margin-bottom: 20px;
   line-height: 1.5;
+}
+
+.checkout-test-results {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.checkout-test-results img {
+  width: 100%;
+  display: block;
 }
 
 .checkout-results .before-after-gallery {

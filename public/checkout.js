@@ -118,10 +118,20 @@ function updatePayHeader(method) {
 async function initPaymentStep(email, method) {
   destroyStripeElements();
 
+  const analytics =
+    window.FunnelTrack?.getAttribution?.() != null
+      ? {
+          productSlug: window.FunnelTrack.getAttribution().product,
+          country: window.FunnelTrack.getAttribution().country.toUpperCase(),
+          landerSlug: window.FunnelTrack.getAttribution().lander,
+          sessionId: window.FunnelTrack.getSessionId(),
+        }
+      : {};
+
   const { res, data } = await Api.apiFetch('/api/create-payment', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, paymentMethod: method }),
+    body: JSON.stringify({ email, paymentMethod: method, analytics }),
   });
 
   if (!res.ok) throw new Error(data.error || 'Kon betaling niet starten');

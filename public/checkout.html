@@ -12,33 +12,26 @@
   <link rel="stylesheet" href="trust-reviews.css">
   <script src="https://js.stripe.com/v3/"></script>
 </head>
-<body class="checkout-page">
-
-  <header class="checkout-header">
-    <a href="index.html" class="logo">
-      <div class="logo-icon">🌙</div>
-      <span>Slaap Beter Slapen</span>
-    </a>
-  </header>
+<body class="checkout-page" data-track-page="checkout" data-track-product="sleep" data-track-country="nl">
 
   <main class="checkout-main">
 
     <div class="checkout-book">
-      <h1>Slaap Beter Slapen</h1>
-      <img class="checkout-bundle-image" src="assets/slaap-bundel.png" alt="Slaap Beter Slapen — bundel met 7 e-books en cursus">
-      <p class="checkout-bundle-subtitle">7 e-books + Slaap Beter Slapen™ cursus</p>
+      <img class="checkout-bundle-image" src="assets/slaap-bundel.png" alt="Bundel met 7 e-books en Wordt Uitgerust Wakker cursus">
+      <h1>De Aanbeveling van Dr Blievaden</h1>
+      <p class="checkout-bundle-subtitle">7 e-books + Wordt Uitgerust Wakker™ Door Dr. Blievaden</p>
 
       <div class="bundle-includes-card">
         <p class="bundle-includes-label">Inbegrepen in deze bundel</p>
         <ul class="bundle-includes-list" id="bundle-includes-list">
-          <li><span class="bundle-check" aria-hidden="true">✓</span> E-cursus Slaap Beter Slapen™</li>
-          <li><span class="bundle-check" aria-hidden="true">✓</span> E-book: Slaap Beter Slapen — De complete gids</li>
+          <li><span class="bundle-check" aria-hidden="true">✓</span> E-cursus: Wordt Uitgerust Wakker™ Door Dr. Blievaden</li>
+          <li><span class="bundle-check" aria-hidden="true">✓</span> E-book: De Aanbeveling van Dr Blievaden — De complete gids</li>
           <li><span class="bundle-check" aria-hidden="true">✓</span> E-book: De 7 Gouden Slaapregels</li>
-          <li class="bundle-includes-extra"><span class="bundle-check" aria-hidden="true">✓</span> E-book: Snel Inslaap Methode</li>
-          <li class="bundle-includes-extra"><span class="bundle-check" aria-hidden="true">✓</span> E-book: De Perfecte Slaapkamer</li>
-          <li class="bundle-includes-extra"><span class="bundle-check" aria-hidden="true">✓</span> E-book: Herstel Uw Circadiaan Ritme</li>
-          <li class="bundle-includes-extra"><span class="bundle-check" aria-hidden="true">✓</span> E-book: Natuurlijk Slapen Zonder Pillen</li>
-          <li class="bundle-includes-extra"><span class="bundle-check" aria-hidden="true">✓</span> E-book: Mindfulness &amp; Ontspanning voor de Nacht</li>
+          <li class="bundle-includes-extra" hidden><span class="bundle-check" aria-hidden="true">✓</span> E-book: Snel Inslaap Methode</li>
+          <li class="bundle-includes-extra" hidden><span class="bundle-check" aria-hidden="true">✓</span> E-book: De Perfecte Slaapkamer</li>
+          <li class="bundle-includes-extra" hidden><span class="bundle-check" aria-hidden="true">✓</span> E-book: Herstel Uw Circadiaan Ritme</li>
+          <li class="bundle-includes-extra" hidden><span class="bundle-check" aria-hidden="true">✓</span> E-book: Natuurlijk Slapen Zonder Pillen</li>
+          <li class="bundle-includes-extra" hidden><span class="bundle-check" aria-hidden="true">✓</span> E-book: Mindfulness &amp; Ontspanning voor de Nacht</li>
         </ul>
         <button type="button" class="bundle-includes-toggle" id="bundle-includes-toggle" aria-expanded="false">+5 meer</button>
       </div>
@@ -179,6 +172,10 @@
       <h2 class="results-main-title">Voor en Na het volgen van de Dr Blievaden Tips™</h2>
       <p class="checkout-results-intro">Gemeten na 21 dagen — tips, e-books en e-cursus.</p>
 
+      <figure class="checkout-test-results">
+        <img src="assets/testresultaten-van-blievaden.png" alt="Slaaptest resultaten — 61% naar 93% slaapefficiëntie">
+      </figure>
+
       <div class="before-after-gallery">
         <figure class="before-after">
           <img src="assets/voor-na-van-blievaden.png" alt="Voor en na — resultaat Dr. Van Blievaden">
@@ -205,7 +202,7 @@
     </section>
 
     <!-- Reviews Trustpilot-style -->
-    <section class="trust-reviews">
+    <section class="trust-reviews trust-reviews--list">
       <p class="trust-reviews__label">Vertrouwd door deelnemers</p>
 
       <div class="trust-stack" id="trust-carousel">
@@ -342,7 +339,7 @@
             <span class="trust-score">4.7</span>
           </div>
           <h4 class="trust-card__title">Sceptisch, maar overtuigd</h4>
-          <p class="trust-card__text">Was eerst sceptisch over een digitaal pakket. Maar de slaaptest-resultaten liegen niet — 73% naar 88% efficiëntie.</p>
+          <p class="trust-card__text">Was eerst sceptisch over een digitaal pakket. Maar de slaaptest-resultaten liegen niet — 61% naar 93% efficiëntie.</p>
         </article>
 
         <article class="trust-card">
@@ -385,6 +382,7 @@
   </main>
 
   <script src="api.js"></script>
+  <script src="track.js"></script>
   <script src="checkout.js"></script>
   <script src="bundle-includes.js"></script>
 </body>

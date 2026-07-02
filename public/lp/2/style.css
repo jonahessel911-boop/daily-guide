@@ -317,6 +317,29 @@ a { color: var(--blue); }
   border-top: 1px solid var(--border);
 }
 
+.trust-reviews--list {
+  margin-top: 40px;
+  padding-top: 0;
+  border-top: none;
+}
+
+.trust-reviews--list .trust-reviews__heading {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.trust-reviews--list .trust-reviews__label {
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.trust-reviews--list .cta-btn {
+  margin-top: 28px;
+}
+
 @media (max-width: 600px) {
   .article-body { font-size: 17px; }
   .section-head { font-size: 21px; }

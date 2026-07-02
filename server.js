@@ -1,7 +1,9 @@
 require('dotenv').config();
+const crypto = require('crypto');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const { insertEvent, recordPurchaseOnce, getStats } = require('./lib/analytics');
 
 const app = express();
 const PORT = process.env.PORT || 8081;
@@ -23,11 +25,67 @@ if (process.env.STRIPE_SECRET_KEY) {
   console.warn('⚠️  STRIPE_SECRET_KEY niet ingesteld. Kopieer .env.example naar .env.');
 }
 
+function getAdminToken() {
+  const pwd = process.env.ADMIN_PASSWORD;
+  if (!pwd) return null;
+  return crypto.createHmac('sha256', pwd).update('slaap-admin-v1').digest('hex');
+}
+
+function requireAdmin(req, res, next) {
+  const expected = getAdminToken();
+  if (!expected) {
+    return res.status(503).json({ ok: false, error: 'ADMIN_PASSWORD niet ingesteld in .env' });
+  }
+  const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
+  if (token !== expected) {
+    return res.status(401).json({ ok: false, error: 'Unauthorized' });
+  }
+  next();
+}
+
 app.use(cors({ origin: true }));
 app.use(express.json());
 
 app.get('/api/config', (_req, res) => {
   res.json({ publishableKey: STRIPE_PUBLISHABLE_KEY, product: PRODUCT });
+});
+
+app.post('/api/track', async (req, res) => {
+  const { eventType, productSlug, country, landerSlug, sessionId } = req.body || {};
+  const allowed = ['lander_view', 'checkout_view'];
+  if (!allowed.includes(eventType)) {
+    return res.status(400).json({ ok: false, error: 'Ongeldig event type' });
+  }
+  if (!sessionId) {
+    return res.status(400).json({ ok: false, error: 'sessionId ontbreekt' });
+  }
+
+  const result = await insertEvent({
+    eventType,
+    productSlug: productSlug || 'sleep',
+    country: country || 'NL',
+    landerSlug: landerSlug || null,
+    sessionId,
+  });
+
+  res.json(result);
+});
+
+app.post('/api/admin/login', (req, res) => {
+  const token = getAdminToken();
+  if (!token) {
+    return res.status(503).json({ ok: false, error: 'ADMIN_PASSWORD niet ingesteld' });
+  }
+  if (req.body?.password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ ok: false, error: 'Onjuist wachtwoord' });
+  }
+  res.json({ ok: true, token });
+});
+
+app.get('/api/admin/stats', requireAdmin, async (req, res) => {
+  const { from, to } = req.query;
+  const stats = await getStats({ from, to });
+  res.json(stats);
 });
 
 app.post('/api/create-payment', async (req, res) => {
@@ -36,7 +94,7 @@ app.post('/api/create-payment', async (req, res) => {
   }
 
   try {
-    const { email, paymentMethod = 'ideal' } = req.body;
+    const { email, paymentMethod = 'ideal', analytics = {} } = req.body;
     if (!email) {
       return res.status(400).json({ error: 'E-mailadres is verplicht' });
     }
@@ -58,6 +116,10 @@ app.post('/api/create-payment', async (req, res) => {
         product: PRODUCT.name,
         customer_email: email,
         payment_method: paymentMethod,
+        product_slug: analytics.productSlug || 'sleep',
+        country: (analytics.country || 'NL').toUpperCase(),
+        lander_slug: analytics.landerSlug || '',
+        session_id: analytics.sessionId || '',
       },
     };
 
@@ -93,6 +155,20 @@ app.get('/api/payment-status', async (req, res) => {
     }
 
     const intent = await stripe.paymentIntents.retrieve(payment_intent);
+
+    if (intent.status === 'succeeded') {
+      await recordPurchaseOnce({
+        eventType: 'purchase',
+        productSlug: intent.metadata.product_slug || 'sleep',
+        country: intent.metadata.country || 'NL',
+        landerSlug: intent.metadata.lander_slug || null,
+        sessionId: intent.metadata.session_id || `pi_${intent.id}`,
+        amountCents: intent.amount,
+        currency: (intent.currency || 'eur').toUpperCase(),
+        paymentIntentId: intent.id,
+      });
+    }
+
     res.json({
       status: intent.status,
       orderId: intent.metadata.order_id,
@@ -104,8 +180,16 @@ app.get('/api/payment-status', async (req, res) => {
   }
 });
 
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.listen(PORT, () => {
-  console.log(`🌙 Slaap Beter Slapen: http://localhost:${PORT}`);
+app.get('/admin', (_req, res) => {
+  res.redirect('/admin/');
 });
+
+module.exports = app;
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🌙 Slaap Beter Slapen: http://localhost:${PORT}`);
+  });
+}
