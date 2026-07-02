@@ -49,10 +49,82 @@ function rangeToDates(value) {
   return { from: from.toISOString() };
 }
 
-async function loadStats() {
+function getStatsQuery() {
   const range = document.getElementById('filter-range').value;
   const { from } = rangeToDates(range);
-  const qs = from ? `?from=${encodeURIComponent(from)}` : '';
+  return from ? `?from=${encodeURIComponent(from)}` : '';
+}
+
+let splitVariants = [];
+
+async function loadTrafficSplits() {
+  const tbody = document.getElementById('split-body');
+  try {
+    const { data } = await api(`/api/admin/traffic-splits${getStatsQuery()}`);
+
+    if (!data.ok) {
+      tbody.innerHTML = `<tr><td colspan="7" class="empty">${data.error || 'Fout'}</td></tr>`;
+      return;
+    }
+
+    const baseUrl = `${window.location.origin}/redirect`;
+    document.getElementById('redirect-url').textContent = baseUrl;
+    splitVariants = data.variants || [];
+
+    tbody.innerHTML = splitVariants
+      .map(
+        (v) => `<tr data-lander="${v.lander_slug}">
+          <td><strong>${v.lander_slug}</strong><br><span class="muted" style="font-size:12px;">${v.label}</span></td>
+          <td><code>${v.destination_path}</code></td>
+          <td>
+            <input type="number" class="split-weight-input" min="0" max="100" value="${v.weight_percent}" data-lander="${v.lander_slug}">%
+            <div class="split-bar"><div class="split-bar-fill" style="width:${v.weight_percent}%"></div></div>
+          </td>
+          <td>${v.stats?.lander_views ?? 0}</td>
+          <td>${v.stats?.purchases ?? 0}</td>
+          <td>${v.stats?.cr_lander_to_sale ?? '0.0%'}</td>
+          <td>€${v.stats?.revenue ?? '0.00'}</td>
+        </tr>`
+      )
+      .join('');
+
+    updateSplitTotal();
+  } catch (err) {
+    if (err.message !== 'Sessie verlopen') {
+      tbody.innerHTML = `<tr><td colspan="7" class="empty">${err.message}</td></tr>`;
+    }
+  }
+}
+
+function updateSplitTotal() {
+  const inputs = document.querySelectorAll('.split-weight-input');
+  let total = 0;
+  inputs.forEach((input) => {
+    total += parseInt(input.value, 10) || 0;
+    const fill = input.closest('td')?.querySelector('.split-bar-fill');
+    if (fill) fill.style.width = `${Math.min(100, parseInt(input.value, 10) || 0)}%`;
+  });
+  document.getElementById('split-total').textContent = total;
+  const warn = document.getElementById('split-total-warn');
+  const saveBtn = document.getElementById('btn-save-splits');
+  const invalid = total !== 100;
+  warn.hidden = !invalid;
+  saveBtn.disabled = invalid;
+}
+
+function collectSplitVariants() {
+  return splitVariants.map((v) => {
+    const input = document.querySelector(`.split-weight-input[data-lander="${v.lander_slug}"]`);
+    return {
+      lander_slug: v.lander_slug,
+      weight_percent: parseInt(input?.value, 10) || 0,
+      active: true,
+    };
+  });
+}
+
+async function loadStats() {
+  const qs = getStatsQuery();
 
   try {
     const { data } = await api(`/api/admin/stats${qs}`);
@@ -113,8 +185,14 @@ async function loadStats() {
   }
 }
 
-document.getElementById('btn-refresh').addEventListener('click', loadStats);
-document.getElementById('filter-range').addEventListener('change', loadStats);
+document.getElementById('btn-refresh').addEventListener('click', () => {
+  loadStats();
+  loadTrafficSplits();
+});
+document.getElementById('filter-range').addEventListener('change', () => {
+  loadStats();
+  loadTrafficSplits();
+});
 document.getElementById('btn-logout').addEventListener('click', () => {
   clearToken();
   window.location.replace('/admin/');
@@ -146,4 +224,47 @@ document.getElementById('btn-test-purchase').addEventListener('click', async () 
   }
 });
 
+document.getElementById('split-body').addEventListener('input', (e) => {
+  if (e.target.classList.contains('split-weight-input')) updateSplitTotal();
+});
+
+document.getElementById('btn-copy-redirect').addEventListener('click', async () => {
+  const url = document.getElementById('redirect-url').textContent;
+  try {
+    await navigator.clipboard.writeText(url);
+    const btn = document.getElementById('btn-copy-redirect');
+    btn.textContent = 'Gekopieerd!';
+    setTimeout(() => { btn.textContent = 'Kopieer URL'; }, 2000);
+  } catch {
+    window.prompt('Kopieer deze URL:', url);
+  }
+});
+
+document.getElementById('btn-save-splits').addEventListener('click', async () => {
+  const msg = document.getElementById('split-save-msg');
+  const btn = document.getElementById('btn-save-splits');
+  btn.disabled = true;
+  msg.hidden = true;
+
+  try {
+    const { data } = await api('/api/admin/traffic-splits', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ variants: collectSplitVariants() }),
+    });
+
+    msg.textContent = data.ok ? 'Splits opgeslagen!' : (data.error || 'Opslaan mislukt');
+    msg.className = `split-save-msg ${data.ok ? 'ok' : 'err'}`;
+    msg.hidden = false;
+    if (data.ok) loadTrafficSplits();
+  } catch (err) {
+    msg.textContent = err.message;
+    msg.className = 'split-save-msg err';
+    msg.hidden = false;
+  } finally {
+    updateSplitTotal();
+  }
+});
+
 loadStats();
+loadTrafficSplits();

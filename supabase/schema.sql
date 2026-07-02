@@ -52,3 +52,39 @@ on conflict (slug) do update set name = excluded.name, path = excluded.path;
 alter table products enable row level security;
 alter table landers enable row level security;
 alter table analytics_events enable row level security;
+
+-- Traffic split (/redirect) — zie ook supabase/traffic-splits.sql voor bestaande DB's
+create table if not exists traffic_split_routes (
+  slug text primary key,
+  name text not null,
+  path text not null,
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists traffic_split_variants (
+  id uuid primary key default gen_random_uuid(),
+  route_slug text not null references traffic_split_routes(slug) on delete cascade,
+  lander_slug text not null,
+  destination_path text not null,
+  label text not null,
+  weight_percent integer not null check (weight_percent >= 0 and weight_percent <= 100),
+  product_slug text not null default 'sleep',
+  country text not null default 'NL',
+  active boolean not null default true,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  unique (route_slug, lander_slug)
+);
+
+insert into traffic_split_routes (slug, name, path) values
+  ('main', 'Hoofd split', '/redirect')
+on conflict (slug) do nothing;
+
+insert into traffic_split_variants (route_slug, lander_slug, destination_path, label, weight_percent, sort_order) values
+  ('main', 'index', '/index.html', 'Index — Sandra verhaal', 50, 1),
+  ('main', 'lp-2', '/lp/2/', 'LP/2 — Expert vergelijking', 50, 2)
+on conflict (route_slug, lander_slug) do nothing;
+
+alter table traffic_split_routes enable row level security;
+alter table traffic_split_variants enable row level security;

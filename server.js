@@ -6,6 +6,12 @@ const path = require('path');
 const { insertEvent, getStats } = require('./lib/analytics');
 const { fulfillPurchase, getSuccessUrl } = require('./lib/fulfill-purchase');
 const { sendPurchaseEvent } = require('./lib/meta-capi');
+const {
+  handleRedirect,
+  saveVariants,
+  getAdminTrafficSplits,
+  ROUTE_SLUG,
+} = require('./lib/traffic-splits');
 
 const app = express();
 const PORT = process.env.PORT || 8081;
@@ -168,6 +174,29 @@ app.post('/api/admin/test-purchase', requireAdmin, async (req, res) => {
       : result.skipped
         ? 'Meta niet geconfigureerd — zet META_PIXEL_ID en META_ACCESS_TOKEN in Vercel'
         : 'Meta CAPI fout — controleer access token in Events Manager',
+  });
+});
+
+app.get('/api/admin/traffic-splits', requireAdmin, async (req, res) => {
+  const { from, to } = req.query;
+  const stats = await getStats({ from, to });
+  const splits = await getAdminTrafficSplits(stats.ok ? stats.rows : []);
+  res.json(splits);
+});
+
+app.put('/api/admin/traffic-splits', requireAdmin, async (req, res) => {
+  const { variants } = req.body || {};
+  if (!Array.isArray(variants) || !variants.length) {
+    return res.status(400).json({ ok: false, error: 'variants array vereist' });
+  }
+  const result = await saveVariants(ROUTE_SLUG, variants);
+  res.json(result);
+});
+
+app.get(['/redirect', '/re-direct'], (req, res) => {
+  handleRedirect(req, res).catch((err) => {
+    console.error('Redirect error:', err.message);
+    res.status(500).send('Redirect mislukt');
   });
 });
 
