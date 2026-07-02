@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../../trust-reviews.css">
 </head>
 <body>
 
@@ -226,39 +227,184 @@
       <a href="../../checkout.html" class="cta-btn block">Bekijk beschikbaarheid →</a>
     </div>
 
-    <section class="reviews-block">
-      <h3>Wat anderen zeggen</h3>
+    <section class="trust-reviews">
+      <h3 class="trust-reviews__heading">Wat anderen zeggen</h3>
+      <p class="trust-reviews__label">Vertrouwd door deelnemers</p>
 
-      <div class="review-item">
-        <div class="review-img-slot">Foto</div>
-        <div class="stars">★★★★★</div>
-        "Na 2 weken sliep ik eindelijk door. Dr. Van Blievaden's methode is echt anders."
-        <div class="name">Maria Schmidt ✓ Geverifieerd</div>
+      <div class="trust-stack" id="trust-carousel">
+        <article class="trust-card">
+          <div class="trust-card__header">
+            <img class="trust-card__avatar" src="../../assets/reviews/avatar-1.jpg" alt="Maria S.">
+            <div class="trust-card__meta">
+              <span class="trust-card__name">Maria S.</span>
+              <span class="trust-card__verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Geverifieerd</span>
+            </div>
+            <span class="trust-card__time">2 dagen geleden</span>
+          </div>
+          <div class="trust-card__rating">
+            <span class="trust-stars">★★★★★</span>
+            <span class="trust-score">4.9</span>
+          </div>
+          <h4 class="trust-card__title">Eindelijk weer doorslapen</h4>
+          <p class="trust-card__text">Na 2 weken met de methode van Dr. Van Blievaden slaap ik eindelijk weer door. Geen slaappillen meer nodig.</p>
+        </article>
+
+        <article class="trust-card">
+          <div class="trust-card__header">
+            <img class="trust-card__avatar" src="../../assets/reviews/avatar-2.jpg" alt="Karel B.">
+            <div class="trust-card__meta">
+              <span class="trust-card__name">Karel B.</span>
+              <span class="trust-card__verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Geverifieerd</span>
+            </div>
+            <span class="trust-card__time">1 week geleden</span>
+          </div>
+          <div class="trust-card__rating">
+            <span class="trust-stars">★★★★★</span>
+            <span class="trust-score">5.0</span>
+          </div>
+          <h4 class="trust-card__title">De perfecte manier om tot rust te komen</h4>
+          <p class="trust-card__text">Na een stressvolle dag helpen de tips me echt om af te schakelen. Binnen 10 minuten weg — elke avond.</p>
+        </article>
+
+        <article class="trust-card">
+          <div class="trust-card__header">
+            <img class="trust-card__avatar" src="../../assets/reviews/avatar-3.jpg" alt="Els de V.">
+            <div class="trust-card__meta">
+              <span class="trust-card__name">Els de V.</span>
+              <span class="trust-card__verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Geverifieerd</span>
+            </div>
+            <span class="trust-card__time">3 dagen geleden</span>
+          </div>
+          <div class="trust-card__rating">
+            <span class="trust-stars">★★★★★</span>
+            <span class="trust-score">5.0</span>
+          </div>
+          <h4 class="trust-card__title">E-cursus is het goud waard</h4>
+          <p class="trust-card__text">De e-books zijn duidelijk, maar de e-cursus van Dr. Blievaden maakte het verschil. Alsof je een slaapexpert thuis hebt.</p>
+        </article>
+
+        <article class="trust-card">
+          <div class="trust-card__header">
+            <img class="trust-card__avatar" src="../../assets/reviews/avatar-4.jpg" alt="Lisa W.">
+            <div class="trust-card__meta">
+              <span class="trust-card__name">Lisa W.</span>
+              <span class="trust-card__verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Geverifieerd</span>
+            </div>
+            <span class="trust-card__time">5 dagen geleden</span>
+          </div>
+          <div class="trust-card__rating">
+            <span class="trust-stars">★★★★★</span>
+            <span class="trust-score">4.8</span>
+          </div>
+          <h4 class="trust-card__title">Geen piekeren meer 's nachts</h4>
+          <p class="trust-card__text">Ik lag altijd wakker met gedachten. De 7 Gouden Slaapregels hebben dat in een week veranderd.</p>
+        </article>
+
+        <article class="trust-card">
+          <div class="trust-card__header">
+            <img class="trust-card__avatar" src="../../assets/reviews/avatar-5.jpg" alt="Frank S.">
+            <div class="trust-card__meta">
+              <span class="trust-card__name">Frank S.</span>
+              <span class="trust-card__verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Geverifieerd</span>
+            </div>
+            <span class="trust-card__time">1 week geleden</span>
+          </div>
+          <div class="trust-card__rating">
+            <span class="trust-stars">★★★★★</span>
+            <span class="trust-score">5.0</span>
+          </div>
+          <h4 class="trust-card__title">Beter dan mijn slaapcoach</h4>
+          <p class="trust-card__text">Ik betaalde €2.100 bij een coach. Deze bundel voor €17 is eerlijker gezegd beter — en praktischer.</p>
+        </article>
+
+        <article class="trust-card">
+          <div class="trust-card__header">
+            <img class="trust-card__avatar" src="../../assets/reviews/avatar-6.jpg" alt="Agnes G.">
+            <div class="trust-card__meta">
+              <span class="trust-card__name">Agnes G.</span>
+              <span class="trust-card__verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Geverifieerd</span>
+            </div>
+            <span class="trust-card__time">4 dagen geleden</span>
+          </div>
+          <div class="trust-card__rating">
+            <span class="trust-stars">★★★★★</span>
+            <span class="trust-score">5.0</span>
+          </div>
+          <h4 class="trust-card__title">Eindelijk geen melatonine meer</h4>
+          <p class="trust-card__text">Zes jaar melatonine van de drogist. Na drie dagen met deze methode lag het in de prullenbak.</p>
+        </article>
+
+        <article class="trust-card">
+          <div class="trust-card__header">
+            <img class="trust-card__avatar" src="../../assets/reviews/avatar-7.jpg" alt="Paula R.">
+            <div class="trust-card__meta">
+              <span class="trust-card__name">Paula R.</span>
+              <span class="trust-card__verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Geverifieerd</span>
+            </div>
+            <span class="trust-card__time">6 dagen geleden</span>
+          </div>
+          <div class="trust-card__rating">
+            <span class="trust-stars">★★★★★</span>
+            <span class="trust-score">4.9</span>
+          </div>
+          <h4 class="trust-card__title">7-8 uur per nacht</h4>
+          <p class="trust-card__text">Binnen een week merkte ik verschil. Nu slaap ik consistent 7 tot 8 uur. Ik voel me 10 jaar jonger.</p>
+        </article>
+
+        <article class="trust-card">
+          <div class="trust-card__header">
+            <img class="trust-card__avatar" src="../../assets/reviews/avatar-8.jpg" alt="Henk K.">
+            <div class="trust-card__meta">
+              <span class="trust-card__name">Henk K.</span>
+              <span class="trust-card__verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Geverifieerd</span>
+            </div>
+            <span class="trust-card__time">2 weken geleden</span>
+          </div>
+          <div class="trust-card__rating">
+            <span class="trust-stars">★★★★☆</span>
+            <span class="trust-score">4.7</span>
+          </div>
+          <h4 class="trust-card__title">Sceptisch, maar overtuigd</h4>
+          <p class="trust-card__text">Was eerst sceptisch over een digitaal pakket. Maar de slaaptest-resultaten liegen niet — 73% naar 88% efficiëntie.</p>
+        </article>
+
+        <article class="trust-card">
+          <div class="trust-card__header">
+            <img class="trust-card__avatar" src="../../assets/reviews/avatar-9.jpg" alt="Robert V.">
+            <div class="trust-card__meta">
+              <span class="trust-card__name">Robert V.</span>
+              <span class="trust-card__verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Geverifieerd</span>
+            </div>
+            <span class="trust-card__time">1 week geleden</span>
+          </div>
+          <div class="trust-card__rating">
+            <span class="trust-stars">★★★★★</span>
+            <span class="trust-score">5.0</span>
+          </div>
+          <h4 class="trust-card__title">Direct geleverd, direct begonnen</h4>
+          <p class="trust-card__text">Binnen 5 minuten na betaling alles in mijn inbox. Dezelfde avond begonnen — en die nacht al beter geslapen.</p>
+        </article>
+
+        <article class="trust-card">
+          <div class="trust-card__header">
+            <img class="trust-card__avatar" src="../../assets/reviews/avatar-10.jpg" alt="Christina F.">
+            <div class="trust-card__meta">
+              <span class="trust-card__name">Christina F.</span>
+              <span class="trust-card__verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Geverifieerd</span>
+            </div>
+            <span class="trust-card__time">3 dagen geleden</span>
+          </div>
+          <div class="trust-card__rating">
+            <span class="trust-stars">★★★★★</span>
+            <span class="trust-score">5.0</span>
+          </div>
+          <h4 class="trust-card__title">Aanrader voor iedereen met slaapproblemen</h4>
+          <p class="trust-card__text">Dr. Blievaden legt alles rustig en wetenschappelijk uit. Geen zweverige tips — gewoon wat werkt.</p>
+        </article>
       </div>
-
-      <div class="review-item">
-        <div class="review-img-slot">Foto</div>
-        <div class="stars">★★★★★</div>
-        "De Snel Inslaap Methode — binnen 10 minuten weg, elke avond."
-        <div class="name">Lisa Blank ✓ Geverifieerd</div>
-      </div>
-
-      <div class="review-item">
-        <div class="review-img-slot">Foto</div>
-        <div class="stars">★★★★☆</div>
-        "Mijn vrouw zegt dat ik er 10 jaar jonger uitzie. Alleen al daarvoor was het de €17 waard."
-        <div class="name">Frank Schneider ✓ Geverifieerd</div>
-      </div>
-
-      <div class="review-item">
-        <div class="review-img-slot">Foto</div>
-        <div class="stars">★★★★★</div>
-        "Eindelijk geen slaappillen meer. De 7 Gouden Slaapregels zijn zo simpel maar zo effectief."
-        <div class="name">Agnes Graebel ✓ Geverifieerd</div>
-      </div>
-
-      <a href="../../checkout.html" class="cta-btn block" style="margin-top:24px;">Claim mijn prijs nu — €17 →</a>
+      <a href="../../checkout.html" class="cta-btn block trust-reviews__cta">Claim mijn prijs nu — €17 →</a>
     </section>
+
   </article>
 
   <footer class="footer-note">
