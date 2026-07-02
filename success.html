@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bedankt! | Slaap Beter Slapen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="checkout.css">
+</head>
+<body class="checkout-page success-page">
+  <div class="success-card">
+    <div class="success-icon">✓</div>
+    <h1>Bedankt voor je aankoop!</h1>
+    <p id="success-message">Je e-books en e-cursus worden binnen enkele minuten naar je e-mailadres gestuurd. Controleer ook je spammap.</p>
+    <a href="index.html" class="btn-primary" style="max-width:100%">Terug naar home</a>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const paymentIntent = params.get('payment_intent');
+
+    if (paymentIntent) {
+      Api.apiFetch(`/api/payment-status?payment_intent=${paymentIntent}`)
+        .then(({ data }) => {
+          if (data.status === 'succeeded') {
+            document.getElementById('success-message').textContent =
+              `Je betaling van €${data.amount.toFixed(2).replace('.', ',')} is gelukt! Je e-books worden naar ${data.email || 'je e-mailadres'} gestuurd.`;
+          }
+        })
+        .catch(() => {});
+    }
+  </script>
+</body>
+</html>

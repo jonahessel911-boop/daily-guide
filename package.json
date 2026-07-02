@@ -1,0 +1,16 @@
+{
+  "name": "slaap-beter-slapen",
+  "version": "1.0.0",
+  "description": "Digitale slaapgids — sales funnel met Stripe checkout",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "stripe": "^17.7.0"
+  }
+}
