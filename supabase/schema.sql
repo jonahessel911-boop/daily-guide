@@ -53,7 +53,7 @@ alter table products enable row level security;
 alter table landers enable row level security;
 alter table analytics_events enable row level security;
 
--- Traffic split (/redirect) — zie ook supabase/traffic-splits.sql voor bestaande DB's
+-- Traffic split (/checker) — zie ook supabase/traffic-splits.sql voor bestaande DB's
 create table if not exists traffic_split_routes (
   slug text primary key,
   name text not null,
@@ -78,7 +78,7 @@ create table if not exists traffic_split_variants (
 );
 
 insert into traffic_split_routes (slug, name, path) values
-  ('main', 'Hoofd split', '/redirect')
+  ('main', 'Hoofd split', '/checker')
 on conflict (slug) do nothing;
 
 insert into traffic_split_variants (route_slug, lander_slug, destination_path, label, weight_percent, sort_order) values

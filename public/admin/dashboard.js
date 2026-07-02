@@ -67,8 +67,8 @@ async function loadTrafficSplits() {
       return;
     }
 
-    const baseUrl = `${window.location.origin}/redirect`;
-    document.getElementById('redirect-url').textContent = baseUrl;
+    const baseUrl = `${window.location.origin}${data.checker_url || '/checker'}`;
+    document.getElementById('checker-url').textContent = baseUrl;
     splitVariants = data.variants || [];
 
     tbody.innerHTML = splitVariants
@@ -245,11 +245,11 @@ document.getElementById('split-body').addEventListener('input', (e) => {
   if (e.target.classList.contains('split-weight-input')) updateSplitTotal();
 });
 
-document.getElementById('btn-copy-redirect').addEventListener('click', async () => {
-  const url = document.getElementById('redirect-url').textContent;
+document.getElementById('btn-copy-checker').addEventListener('click', async () => {
+  const url = document.getElementById('checker-url').textContent;
   try {
     await navigator.clipboard.writeText(url);
-    const btn = document.getElementById('btn-copy-redirect');
+    const btn = document.getElementById('btn-copy-checker');
     btn.textContent = 'Gekopieerd!';
     setTimeout(() => { btn.textContent = 'Kopieer URL'; }, 2000);
   } catch {

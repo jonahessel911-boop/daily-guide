@@ -24,7 +24,7 @@ create table if not exists traffic_split_variants (
 );
 
 insert into traffic_split_routes (slug, name, path) values
-  ('main', 'Hoofd split', '/redirect')
+  ('main', 'Hoofd split', '/checker')
 on conflict (slug) do update set name = excluded.name, path = excluded.path;
 
 insert into traffic_split_variants (route_slug, lander_slug, destination_path, label, weight_percent, sort_order) values

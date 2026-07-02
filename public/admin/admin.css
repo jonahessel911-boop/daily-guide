@@ -142,7 +142,7 @@ body {
   margin-bottom: 12px;
 }
 
-.redirect-url-box {
+.checker-url-box {
   background: #0f172a;
   border: 1px solid #334155;
   border-radius: 8px;
@@ -151,7 +151,7 @@ body {
   overflow-x: auto;
 }
 
-.redirect-url-box code { font-size: 13px; color: #93c5fd; background: transparent; padding: 0; }
+.checker-url-box code { font-size: 13px; color: #93c5fd; background: transparent; padding: 0; }
 
 .btn-copy {
   padding: 8px 14px;

@@ -197,10 +197,10 @@ app.put('/api/admin/traffic-splits', requireAdmin, async (req, res) => {
   res.json(result);
 });
 
-app.get(['/redirect', '/re-direct'], (req, res) => {
+app.get('/checker', (req, res) => {
   handleRedirect(req, res).catch((err) => {
-    console.error('Redirect error:', err.message);
-    res.status(500).send('Redirect mislukt');
+    console.error('Checker error:', err.message);
+    res.status(500).send('Checker mislukt');
   });
 });
 
