@@ -16,7 +16,7 @@ window.HearingDTCConfig = {
   },
 
   orderBump: {
-    enabled: true,
+    enabled: false,
     price: 9.95,
     badge: 'Vaak samen gekozen',
     title: 'Voeg de extra gebruikershandleiding + reserve dompeltips toe',

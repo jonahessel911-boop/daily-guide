@@ -355,7 +355,10 @@
   function initOrderBump() {
     const bump = cfg().orderBump;
     const wrap = document.getElementById('dtc-order-bump');
-    if (!bump?.enabled || !wrap) return;
+    if (!bump?.enabled || !wrap) {
+      if (wrap) wrap.innerHTML = '';
+      return;
+    }
 
     wrap.innerHTML = `
       <label class="dtc-order-bump">

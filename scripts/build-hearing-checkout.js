@@ -85,7 +85,6 @@ const formBlock = `        <div id="step-select">
                 <label class="pm-option"><input type="radio" name="payment-method" value="klarna"><span class="pm-option-icon"><span class="pm-logo klarna-logo sm">Klarna</span></span><span class="pm-option-label">Klarna</span></label>
               </div>
             </div>
-            <div id="dtc-order-bump"></div>
             <div id="select-message" class="payment-message" hidden></div>
             <button type="submit" id="btn-continue" class="btn-checkout">
               <span id="continue-text">Bestelling afronden</span>

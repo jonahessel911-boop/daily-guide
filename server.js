@@ -151,13 +151,26 @@ app.get('/api/postcode-lookup', async (req, res) => {
     url.searchParams.set('postcode', postcode);
     url.searchParams.set('number', number);
 
-    const response = await fetch(url, { headers: { token } });
-    const data = await response.json().catch(() => ({}));
+    const response = await fetch(url, {
+      headers: { token, Accept: 'application/json' },
+    });
+    const text = await response.text();
+    let data = {};
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch (_) {
+      console.error('Postcode API non-JSON response:', text.slice(0, 200));
+      return res.status(502).json({ error: 'Ongeldig antwoord van postcode-service' });
+    }
 
     if (!response.ok) {
       return res.status(response.status === 404 ? 404 : 400).json({
-        error: data.error || 'Adres niet gevonden',
+        error: data.error || data.message || 'Adres niet gevonden',
       });
+    }
+
+    if (!data.street || !data.city) {
+      return res.status(404).json({ error: 'Adres niet gevonden' });
     }
 
     res.json(data);

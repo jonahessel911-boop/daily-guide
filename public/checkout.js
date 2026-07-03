@@ -33,6 +33,7 @@ let customerName = '';
 let shippingInfo = null;
 let postcodeLookupTimer = null;
 let postcodeLookupRequest = 0;
+let postcodeLookupAbort = null;
 
 function isDtcCheckout() {
   return document.body.classList.contains('dtc-checkout');
@@ -139,6 +140,20 @@ function setPostcodeStatus(text, type) {
   statusEl.className = `postcode-status postcode-status--${type}`;
 }
 
+async function fetchPostcodeLookup(postalCode, number, signal) {
+  const url = `${Api.getApiBase()}/api/postcode-lookup?postcode=${encodeURIComponent(postalCode)}&number=${encodeURIComponent(number)}`;
+  const res = await fetch(url, { signal, headers: { Accept: 'application/json' } });
+  const contentType = res.headers.get('content-type') || '';
+  let data = {};
+  if (contentType.includes('application/json')) {
+    data = await res.json();
+  } else {
+    const text = await res.text();
+    throw new Error(text.includes('<!') ? 'Server niet bereikbaar' : text.slice(0, 120));
+  }
+  return { res, data };
+}
+
 async function lookupAddress() {
   const postalEl = document.getElementById('postal-code');
   const houseEl = document.getElementById('house-number');
@@ -162,30 +177,44 @@ async function lookupAddress() {
     return;
   }
 
+  if (postcodeLookupAbort) postcodeLookupAbort.abort();
+  postcodeLookupAbort = new AbortController();
+  const signal = postcodeLookupAbort.signal;
+
   const requestId = ++postcodeLookupRequest;
-  const number = buildHouseNumberParam(houseNumber, houseAddition);
   setPostcodeStatus('Adres opzoeken...', 'loading');
 
+  const numbersToTry = houseAddition
+    ? [`${houseNumber}-${houseAddition}`, houseNumber]
+    : [houseNumber];
+
   try {
-    const { res, data } = await Api.apiFetch(
-      `/api/postcode-lookup?postcode=${encodeURIComponent(postalCode)}&number=${encodeURIComponent(number)}`
-    );
+    let lastError = 'Adres niet gevonden. Controleer postcode en huisnummer.';
 
-    if (requestId !== postcodeLookupRequest) return;
+    for (const number of numbersToTry) {
+      if (signal.aborted || requestId !== postcodeLookupRequest) return;
 
-    if (!res.ok) {
-      streetEl.value = '';
-      cityEl.value = '';
-      setPostcodeStatus(data.error || 'Adres niet gevonden. Controleer postcode en huisnummer.', 'error');
-      return;
+      const { res, data } = await fetchPostcodeLookup(postalCode, number, signal);
+
+      if (requestId !== postcodeLookupRequest) return;
+
+      if (res.ok && data.street && data.city) {
+        streetEl.value = data.street;
+        cityEl.value = data.city;
+        setPostcodeStatus(null);
+        return;
+      }
+
+      lastError = data.error || lastError;
+      if (res.status !== 404 && res.status !== 400) break;
     }
 
-    streetEl.value = data.street || '';
-    cityEl.value = data.city || '';
-    setPostcodeStatus(null);
-  } catch (_) {
-    if (requestId !== postcodeLookupRequest) return;
-    setPostcodeStatus('Kon adres niet opzoeken. Probeer het opnieuw.', 'error');
+    streetEl.value = '';
+    cityEl.value = '';
+    setPostcodeStatus(lastError, 'error');
+  } catch (err) {
+    if (err.name === 'AbortError' || requestId !== postcodeLookupRequest) return;
+    setPostcodeStatus(err.message || 'Kon adres niet opzoeken. Probeer het opnieuw.', 'error');
   }
 }
 
@@ -208,12 +237,19 @@ function initPostcodeLookup() {
 
   houseEl.addEventListener('input', scheduleAddressLookup);
   additionEl?.addEventListener('input', scheduleAddressLookup);
+  additionEl?.addEventListener('change', scheduleAddressLookup);
 
-  [postalEl, houseEl, additionEl].forEach((el) => {
-    el?.addEventListener('blur', () => {
-      clearTimeout(postcodeLookupTimer);
-      lookupAddress();
-    });
+  postalEl.addEventListener('blur', () => {
+    clearTimeout(postcodeLookupTimer);
+    lookupAddress();
+  });
+  houseEl.addEventListener('blur', () => {
+    clearTimeout(postcodeLookupTimer);
+    lookupAddress();
+  });
+  additionEl?.addEventListener('blur', () => {
+    clearTimeout(postcodeLookupTimer);
+    lookupAddress();
   });
 }
 
