@@ -29,6 +29,70 @@ let expressCheckout;
 let clientSecret;
 let selectedMethod = 'ideal';
 let customerEmail = '';
+let customerName = '';
+let shippingInfo = null;
+
+function getProductSlug() {
+  const domSlug = document.body.dataset.trackProduct;
+  const urlSlug = new URLSearchParams(window.location.search).get('p');
+  const attr = window.FunnelTrack?.getAttribution?.() || {};
+  return domSlug || urlSlug || attr.product || 'sleep';
+}
+
+function hasShippingForm() {
+  return Boolean(document.getElementById('full-name'));
+}
+
+function loadShippingFromStorage() {
+  if (!hasShippingForm()) return;
+  const raw = sessionStorage.getItem('checkout_shipping');
+  if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    const fields = {
+      'full-name': data.name,
+      email: data.email,
+      phone: data.phone,
+      'postal-code': data.postalCode,
+      'house-number': data.houseNumber,
+    };
+    Object.entries(fields).forEach(([id, value]) => {
+      const el = document.getElementById(id);
+      if (el && value) el.value = value;
+    });
+  } catch (_) {
+    /* ignore */
+  }
+}
+
+function collectShippingData() {
+  if (!hasShippingForm()) return null;
+
+  return {
+    name: document.getElementById('full-name')?.value.trim() || '',
+    email: document.getElementById('email')?.value.trim() || '',
+    phone: document.getElementById('phone')?.value.trim() || '',
+    postalCode: document.getElementById('postal-code')?.value.trim().toUpperCase() || '',
+    houseNumber: document.getElementById('house-number')?.value.trim() || '',
+    country: 'Nederland',
+  };
+}
+
+function validateShipping(data) {
+  if (!data) return null;
+
+  if (!data.name) return 'Vul je naam in.';
+  if (!data.email || !data.email.includes('@')) return 'Vul een geldig e-mailadres in.';
+  if (!data.phone || data.phone.replace(/\D/g, '').length < 9) return 'Vul een geldig telefoonnummer in.';
+  if (!data.postalCode) return 'Vul je postcode in.';
+  const normalizedPostcode = data.postalCode.replace(/\s/g, '');
+  if (!/^\d{4}[A-Za-z]{2}$/i.test(normalizedPostcode)) {
+    return 'Vul een geldige Nederlandse postcode in (bijv. 1234 AB).';
+  }
+  if (!data.houseNumber) return 'Vul je huisnummer in.';
+
+  return null;
+}
 
 let productConfig = {
   slug: 'sleep',
@@ -43,8 +107,7 @@ function formatEuroPrice(amount) {
 }
 
 async function loadProductConfig() {
-  const attr = window.FunnelTrack?.getAttribution?.() || { product: 'sleep' };
-  const slug = attr.product || 'sleep';
+  const slug = getProductSlug();
 
   try {
     const { res, data } = await Api.apiFetch(`/api/config?p=${encodeURIComponent(slug)}`);
@@ -73,6 +136,7 @@ async function loadProductConfig() {
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadProductConfig();
+  loadShippingFromStorage();
   const selectForm = document.getElementById('select-form');
   const emailInput = document.getElementById('email');
   const accordionToggle = document.getElementById('pm-accordion-toggle');
@@ -118,15 +182,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   selectForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = emailInput.value.trim();
+
+    const shipping = collectShippingData();
+    const shippingError = validateShipping(shipping);
+    if (shippingError) {
+      showMessage('select-message', shippingError);
+      return;
+    }
+
+    const email = shipping?.email || emailInput.value.trim();
     if (!email || !email.includes('@')) {
       showMessage('select-message', 'Vul een geldig e-mailadres in.');
       return;
     }
 
     customerEmail = email;
+    customerName = shipping?.name || '';
+    shippingInfo = shipping;
     sessionStorage.setItem('checkout_email', email);
     sessionStorage.setItem('checkout_method', selectedMethod);
+    if (shipping) sessionStorage.setItem('checkout_shipping', JSON.stringify(shipping));
 
     setContinueLoading(true);
     showMessage('select-message', null);
@@ -175,12 +250,12 @@ async function createPaymentIntent(email, method) {
   const analytics =
     window.FunnelTrack?.getAttribution?.() != null
       ? {
-          productSlug: window.FunnelTrack.getAttribution().product,
+          productSlug: getProductSlug(),
           country: window.FunnelTrack.getAttribution().country.toUpperCase(),
           landerSlug: window.FunnelTrack.getAttribution().lander,
           sessionId: window.FunnelTrack.getSessionId(),
         }
-      : {};
+      : { productSlug: getProductSlug() };
 
   function getMetaCookies() {
     const read = (name) => {
@@ -195,7 +270,13 @@ async function createPaymentIntent(email, method) {
   const { res, data } = await Api.apiFetch('/api/create-payment', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, paymentMethod: method, analytics, meta: getMetaCookies() }),
+    body: JSON.stringify({
+      email,
+      paymentMethod: method,
+      analytics,
+      meta: getMetaCookies(),
+      shipping: shippingInfo,
+    }),
   });
 
   if (!res.ok) throw new Error(data.error || 'Kon betaling niet starten');
@@ -344,13 +425,16 @@ async function handlePayment() {
   const { error } = await stripe.confirmPayment({
     elements,
     clientSecret,
-    confirmParams: {
-      return_url: `${window.location.origin}/success.html`,
-      receipt_email: customerEmail,
-      payment_method_data: {
-        billing_details: { email: customerEmail },
+      confirmParams: {
+        return_url: `${window.location.origin}/success.html`,
+        receipt_email: customerEmail,
+        payment_method_data: {
+          billing_details: {
+            email: customerEmail,
+            name: customerName || undefined,
+          },
+        },
       },
-    },
   });
 
   if (error) {
@@ -401,5 +485,9 @@ function setPayLoading(loading) {
   if (submitBtn.hidden) return;
   submitBtn.disabled = loading;
   spinner.hidden = !loading;
-  buttonText.textContent = loading ? 'Bezig met verwerken...' : 'Begin vandaag met beter slapen';
+  buttonText.textContent = loading
+    ? 'Bezig met verwerken...'
+    : productConfig.slug === 'hearing'
+      ? 'Bestel HearFlex™'
+      : 'Begin vandaag met beter slapen';
 }

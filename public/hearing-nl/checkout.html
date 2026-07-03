@@ -31,6 +31,17 @@
     }
     .hearing-features li { margin-bottom: 8px; }
     .hearing-features li::before { content: '✓ '; color: #16a34a; font-weight: 700; }
+    .section-heading { margin-top: 24px; margin-bottom: 4px; font-size: 20px; }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 100px;
+      gap: 12px;
+    }
+    .input-readonly {
+      background: #f8fafc;
+      color: #64748b;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body class="checkout-page" data-track-page="checkout" data-track-product="hearing" data-track-country="nl" data-track-lander="lp-1">
@@ -49,15 +60,44 @@
     </div>
 
     <div id="step-select" class="payment-card">
-      <h2>Betaalmethode</h2>
-      <p class="payment-subtitle">Kies je voorkeursmethode en ga verder naar betalen</p>
+      <h2>Verzendgegevens</h2>
+      <p class="payment-subtitle">Vul je gegevens in voor verzending van je HearFlex™</p>
 
       <form id="select-form">
+        <div class="form-group">
+          <label for="full-name">Naam *</label>
+          <input type="text" id="full-name" name="full-name" required autocomplete="name" placeholder="Voor- en achternaam">
+        </div>
+
         <div class="form-group">
           <label for="email">E-mailadres *</label>
           <input type="email" id="email" name="email" required autocomplete="email" placeholder="naam@voorbeeld.nl">
           <p class="form-hint">Je ontvangt de bevestiging en verzendinfo op dit e-mailadres.</p>
         </div>
+
+        <div class="form-group">
+          <label for="phone">Telefoon *</label>
+          <input type="tel" id="phone" name="phone" required autocomplete="tel" placeholder="06 12345678">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="postal-code">Postcode *</label>
+            <input type="text" id="postal-code" name="postal-code" required autocomplete="postal-code" placeholder="1234 AB" maxlength="7">
+          </div>
+          <div class="form-group form-group--narrow">
+            <label for="house-number">Huisnr. *</label>
+            <input type="text" id="house-number" name="house-number" required placeholder="12">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="country">Land</label>
+          <input type="text" id="country" name="country" value="Nederland" readonly class="input-readonly">
+        </div>
+
+        <h2 class="section-heading">Betaalmethode</h2>
+        <p class="payment-subtitle">Kies je voorkeursmethode en ga verder naar betalen</p>
 
         <div class="pm-accordion" id="pm-accordion">
           <button type="button" class="pm-accordion-header" id="pm-accordion-toggle" aria-expanded="false">

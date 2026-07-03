@@ -229,7 +229,7 @@ app.post('/api/create-payment', async (req, res) => {
   }
 
   try {
-    const { email, paymentMethod = 'ideal', analytics = {}, meta = {} } = req.body;
+    const { email, paymentMethod = 'ideal', analytics = {}, meta = {}, shipping = {} } = req.body;
     if (!email) {
       return res.status(400).json({ error: 'E-mailadres is verplicht' });
     }
@@ -256,8 +256,12 @@ app.post('/api/create-payment', async (req, res) => {
         product: product.name,
         product_slug: productSlug,
         customer_email: email,
+        customer_name: shipping.name || '',
+        customer_phone: shipping.phone || '',
+        shipping_postal_code: shipping.postalCode || '',
+        shipping_house_number: shipping.houseNumber || '',
+        shipping_country: shipping.country || '',
         payment_method: paymentMethod,
-        product_slug: analytics.productSlug || 'sleep',
         country: (analytics.country || 'NL').toUpperCase(),
         lander_slug: analytics.landerSlug || '',
         session_id: analytics.sessionId || '',
