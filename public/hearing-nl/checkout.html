@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/meta-pixel.js"></script>
+  <title>Afrekenen | HearFlex™</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../styles.css">
+  <link rel="stylesheet" href="../../checkout.css">
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    .checkout-page { --blue: #8b1538; }
+    .checkout-book h1 { color: #8b1538; }
+    .hearing-product-img {
+      width: 100%;
+      max-width: 280px;
+      margin: 0 auto 16px;
+      display: block;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #fce7f3, #f3f4f6);
+      aspect-ratio: 4/3;
+      object-fit: cover;
+    }
+    .hearing-features {
+      list-style: none;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+    .hearing-features li { margin-bottom: 8px; }
+    .hearing-features li::before { content: '✓ '; color: #16a34a; font-weight: 700; }
+  </style>
+</head>
+<body class="checkout-page" data-track-page="checkout" data-track-product="hearing" data-track-country="nl" data-track-lander="lp-1">
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=4564404523788178&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
+
+  <main class="checkout-main">
+    <div class="checkout-book">
+      <div class="hearing-product-img" role="img" aria-label="HearFlex hoortoestel"></div>
+      <h1 id="checkout-product-name">HearFlex™ — Bijna onzichtbaar hoortoestel</h1>
+      <p class="checkout-bundle-subtitle">Innovatief hoortoestel met automatische volumeregeling</p>
+      <ul class="hearing-features">
+        <li>Bijna onzichtbaar en discreet</li>
+        <li>Dempt achtergrondgeluiden</li>
+        <li>30 dagen geld-terug-garantie</li>
+      </ul>
+    </div>
+
+    <div id="step-select" class="payment-card">
+      <h2>Betaalmethode</h2>
+      <p class="payment-subtitle">Kies je voorkeursmethode en ga verder naar betalen</p>
+
+      <form id="select-form">
+        <div class="form-group">
+          <label for="email">E-mailadres *</label>
+          <input type="email" id="email" name="email" required autocomplete="email" placeholder="naam@voorbeeld.nl">
+          <p class="form-hint">Je ontvangt de bevestiging en verzendinfo op dit e-mailadres.</p>
+        </div>
+
+        <div class="pm-accordion" id="pm-accordion">
+          <button type="button" class="pm-accordion-header" id="pm-accordion-toggle" aria-expanded="false">
+            <span class="pm-accordion-left">
+              <span class="pm-accordion-icon" id="pm-selected-icon">
+                <span class="pm-logo ideal-logo sm">iDEAL</span>
+              </span>
+              <span id="pm-selected-label">iDEAL</span>
+            </span>
+            <svg class="pm-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+
+          <div class="pm-accordion-body" id="pm-accordion-body" hidden>
+            <label class="pm-option">
+              <input type="radio" name="payment-method" value="ideal" checked>
+              <span class="pm-option-icon"><span class="pm-logo ideal-logo sm">iDEAL</span></span>
+              <span class="pm-option-label">iDEAL</span>
+              <span class="pm-radio"></span>
+            </label>
+            <label class="pm-option">
+              <input type="radio" name="payment-method" value="bancontact">
+              <span class="pm-option-icon">
+                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#005498"/><path fill="#FFD800" d="M3 15.2c2.8-3.4 6.4-4.9 10.8-3.1 1.9.8 3.2 2.1 3.7 3.6H3z"/></svg>
+              </span>
+              <span class="pm-option-label">Bancontact</span>
+              <span class="pm-radio"></span>
+            </label>
+            <label class="pm-option">
+              <input type="radio" name="payment-method" value="card">
+              <span class="pm-option-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+              </span>
+              <span class="pm-option-label">Creditcard</span>
+              <span class="pm-radio"></span>
+            </label>
+            <label class="pm-option">
+              <input type="radio" name="payment-method" value="apple_pay">
+              <span class="pm-option-icon apple-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+              </span>
+              <span class="pm-option-label">Apple Pay</span>
+              <span class="pm-radio"></span>
+            </label>
+            <label class="pm-option">
+              <input type="radio" name="payment-method" value="google_pay">
+              <span class="pm-option-icon">
+                <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/></svg>
+              </span>
+              <span class="pm-option-label">Google Pay</span>
+              <span class="pm-radio"></span>
+            </label>
+            <label class="pm-option">
+              <input type="radio" name="payment-method" value="klarna">
+              <span class="pm-option-icon"><span class="pm-logo klarna-logo sm">Klarna</span></span>
+              <span class="pm-option-label">Klarna</span>
+              <span class="pm-radio"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="total-today">
+          <span>Totaal vandaag:</span>
+          <span class="price" data-checkout-price>€149,00</span>
+        </div>
+
+        <div id="select-message" class="payment-message" hidden></div>
+
+        <button type="submit" id="btn-continue" class="btn-checkout">
+          <span id="continue-text">Doorgaan naar betalen</span>
+          <span id="continue-spinner" class="spinner" hidden></span>
+        </button>
+      </form>
+    </div>
+
+    <div id="step-pay" class="payment-card" hidden>
+      <button type="button" id="btn-back" class="btn-back">← Andere betaalmethode</button>
+      <div class="pm-selected-header" id="pm-pay-header">
+        <span class="pm-selected-header-icon" id="pm-pay-icon"></span>
+        <span id="pm-pay-label">iDEAL</span>
+      </div>
+      <div id="payment-message" class="payment-message" hidden></div>
+      <div id="stripe-payment-area" hidden><div id="payment-element"></div></div>
+      <div id="stripe-express-area" hidden>
+        <div id="wallet-button-container"></div>
+        <p id="wallet-unavailable" class="wallet-unavailable" hidden></p>
+      </div>
+      <div class="total-today">
+        <span>Totaal vandaag:</span>
+        <span class="price" data-checkout-price>€149,00</span>
+      </div>
+      <p class="payment-disclaimer">Door je betaalgegevens te verstrekken, geef je HearFlex™ toestemming om je kaart te belasten.</p>
+      <button type="button" id="submit-payment" class="btn-checkout" hidden disabled>
+        <span id="button-text">Bestel HearFlex™</span>
+        <span id="spinner" class="spinner" hidden></span>
+      </button>
+    </div>
+
+    <div class="checkout-guarantee">
+      <svg class="guarantee-seal" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="46" fill="#fbbf24" stroke="#92400e" stroke-width="2"/>
+        <text x="50" y="53" text-anchor="middle" font-size="8" font-weight="900" fill="#1a1a1a" font-family="Inter,sans-serif">MONEY BACK</text>
+      </svg>
+      <div>
+        <h3>30 dagen geld-terug-garantie</h3>
+        <p>Niet tevreden? Binnen 30 dagen je geld terug — geen vragen.</p>
+      </div>
+    </div>
+
+    <a href="lp/1/" class="back-link">← Terug naar de aanbieding</a>
+  </main>
+
+  <script src="../../api.js"></script>
+  <script src="../../track.js"></script>
+  <script src="../../checkout.js"></script>
+</body>
+</html>

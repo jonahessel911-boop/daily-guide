@@ -19,12 +19,29 @@ const PORT = process.env.PORT || 8081;
 const STRIPE_PUBLISHABLE_KEY =
   'pk_live_51TQqFYLGVqAZBTckWzCiVrZsmrJX5rkUxuYVjFkIMZVMVE6990yANMCjbn17Osp3ZVmgHrticwv7tHzoB0KTTWRO00dWpf0uMj';
 
-const PRODUCT = {
-  name: 'Slaap Beter Slapen — Compleet Pakket (e-books + e-cursus)',
-  description: '3 e-books + e-cursus Dr. Joachiem van Blievaden: Slaap Beter Slapen, De 7 Gouden Slaapregels & Snel Inslaap Methode',
-  price: 17.0,
-  originalPrice: 30.0,
+const PRODUCTS = {
+  sleep: {
+    slug: 'sleep',
+    name: 'Slaap Beter Slapen — Compleet Pakket (e-books + e-cursus)',
+    description:
+      '3 e-books + e-cursus Dr. Joachiem van Blievaden: Slaap Beter Slapen, De 7 Gouden Slaapregels & Snel Inslaap Methode',
+    price: 17.0,
+    originalPrice: 30.0,
+    orderPrefix: 'SLAAP',
+  },
+  hearing: {
+    slug: 'hearing',
+    name: 'HearFlex™ — Bijna onzichtbaar hoortoestel',
+    description: 'Innovatief hoortoestel met automatische volumeregeling en ruisonderdrukking',
+    price: 149.0,
+    originalPrice: 300.0,
+    orderPrefix: 'HEAR',
+  },
 };
+
+function getProduct(slug) {
+  return PRODUCTS[slug] || PRODUCTS.sleep;
+}
 
 let stripe = null;
 if (process.env.STRIPE_SECRET_KEY) {
@@ -105,8 +122,10 @@ app.post(
 app.use(cors({ origin: true }));
 app.use(express.json());
 
-app.get('/api/config', (_req, res) => {
-  res.json({ publishableKey: STRIPE_PUBLISHABLE_KEY, product: PRODUCT });
+app.get('/api/config', (req, res) => {
+  const slug = req.query.p || req.query.product || 'sleep';
+  const product = getProduct(slug);
+  res.json({ publishableKey: STRIPE_PUBLISHABLE_KEY, product });
 });
 
 app.post('/api/track', async (req, res) => {
@@ -215,7 +234,9 @@ app.post('/api/create-payment', async (req, res) => {
       return res.status(400).json({ error: 'E-mailadres is verplicht' });
     }
 
-    const amountCents = Math.round(PRODUCT.price * 100);
+    const productSlug = analytics.productSlug || req.body.productSlug || 'sleep';
+    const product = getProduct(productSlug);
+    const amountCents = Math.round(product.price * 100);
 
     const methodTypes = {
       ideal: ['ideal'],
@@ -231,8 +252,9 @@ app.post('/api/create-payment', async (req, res) => {
       currency: 'eur',
       receipt_email: email,
       metadata: {
-        order_id: `SLAAP-${Date.now()}`,
-        product: PRODUCT.name,
+        order_id: `${product.orderPrefix}-${Date.now()}`,
+        product: product.name,
+        product_slug: productSlug,
         customer_email: email,
         payment_method: paymentMethod,
         product_slug: analytics.productSlug || 'sleep',
@@ -255,8 +277,8 @@ app.post('/api/create-payment', async (req, res) => {
     res.json({
       clientSecret: paymentIntent.client_secret,
       orderId: paymentIntent.metadata.order_id,
-      total: PRODUCT.price,
-      product: PRODUCT,
+      total: product.price,
+      product,
     });
   } catch (err) {
     console.error('Stripe error:', err.message);

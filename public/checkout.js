@@ -30,7 +30,49 @@ let clientSecret;
 let selectedMethod = 'ideal';
 let customerEmail = '';
 
-document.addEventListener('DOMContentLoaded', () => {
+let productConfig = {
+  slug: 'sleep',
+  name: 'Slaap Beter Slapen',
+  price: 17,
+  originalPrice: 30,
+  amountCents: 1700,
+};
+
+function formatEuroPrice(amount) {
+  return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(amount);
+}
+
+async function loadProductConfig() {
+  const attr = window.FunnelTrack?.getAttribution?.() || { product: 'sleep' };
+  const slug = attr.product || 'sleep';
+
+  try {
+    const { res, data } = await Api.apiFetch(`/api/config?p=${encodeURIComponent(slug)}`);
+    if (res.ok && data.product) {
+      productConfig = {
+        ...data.product,
+        slug: data.product.slug || slug,
+        amountCents: Math.round(data.product.price * 100),
+      };
+    }
+  } catch (_) {
+    /* keep defaults */
+  }
+
+  document.querySelectorAll('[data-checkout-price]').forEach((el) => {
+    el.textContent = formatEuroPrice(productConfig.price);
+  });
+
+  const nameEl = document.getElementById('checkout-product-name');
+  if (nameEl && productConfig.name) nameEl.textContent = productConfig.name;
+
+  if (productConfig.slug === 'hearing') {
+    document.title = `Afrekenen | HearFlex™`;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadProductConfig();
   const selectForm = document.getElementById('select-form');
   const emailInput = document.getElementById('email');
   const accordionToggle = document.getElementById('pm-accordion-toggle');
