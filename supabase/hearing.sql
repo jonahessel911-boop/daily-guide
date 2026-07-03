@@ -8,7 +8,8 @@ on conflict (slug) do update set
   price_cents = excluded.price_cents;
 
 insert into landers (slug, product_slug, name, path) values
-  ('lp-1', 'hearing', 'Hearing NL — LP/1', '/hearing-nl/lp/1/')
+  ('lp-1', 'hearing', 'Hearing NL — LP/1', '/hearing-nl/lp/1/'),
+  ('adv', 'hearing', 'Hearing NL — Adv', '/hearing-nl/adv/')
 on conflict (slug) do update set
   product_slug = excluded.product_slug,
   name = excluded.name,
