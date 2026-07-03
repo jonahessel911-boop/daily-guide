@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="../../styles.css">
   <link rel="stylesheet" href="../../checkout.css">
   <link rel="stylesheet" href="../hearing-reviews.css">
+  <link rel="stylesheet" href="../hearing-checkout.css">
   <script src="https://js.stripe.com/v3/"></script>
   <style>
     .checkout-page { --blue: #8b1538; }
@@ -60,23 +61,29 @@
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=4564404523788178&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
 
   <main class="checkout-main">
+    <div class="hearing-checkout__layout">
+      <div class="hearing-checkout__main">
     <div class="checkout-book">
-      <div class="hearing-product-img" role="img" aria-label="HearFlex hoortoestel"></div>
-      <h1 id="checkout-product-name">HearFlex™ — Bijna onzichtbaar hoortoestel</h1>
+      <div class="hearing-product-gallery">
+        <img src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=600&h=600&fit=crop&q=80" alt="HearFlex™ hoortoestel">
+      </div>
+      <p class="hearing-rating"><span class="hearing-rating-stars">★★★★★</span> 4,8 <span style="color:#888;font-weight:400">(3.560)</span></p>
+      <h1 id="checkout-product-name">HearFlex™ | Comfortabele hoortoestellen</h1>
       <div class="hearing-price">
         <span class="hearing-price-now" data-checkout-price>€149,00</span>
         <span class="hearing-price-was">€300,00</span>
       </div>
-      <span class="hearing-price-badge">Bespaar 50%</span>
-      <p class="checkout-bundle-subtitle">Innovatief hoortoestel met automatische volumeregeling</p>
-      <ul class="hearing-features">
-        <li>Bijna onzichtbaar en discreet</li>
-        <li>Dempt achtergrondgeluiden</li>
-        <li>30 dagen geld-terug-garantie</li>
-      </ul>
+      <span class="hearing-price-badge">BESPAAR 50%</span>
+      <p class="checkout-bundle-subtitle">Hoor elk gesprek duidelijk met een discreet en comfortabel ontwerp dat u de hele dag kunt dragen.</p>
+      <div class="hearing-badges">
+        <span class="hearing-badge">90 dagen thuis uitproberen</span>
+        <span class="hearing-badge">1 jaar garantie</span>
+        <span class="hearing-badge">Binnen 2 min ingesteld</span>
+      </div>
       <p class="hearing-stat">
         Na het uitproberen, besluit <strong>94% van de mensen</strong> het toestel te houden omdat ze er zo tevreden mee zijn.
       </p>
+      <p class="hearing-urgency"><strong>LET OP:</strong> Door de 50% korting is de vraag momenteel uitzonderlijk hoog. Bestel nu zolang de voorraad beschikbaar is.</p>
     </div>
 
     <div id="step-select" class="payment-card">
@@ -221,17 +228,19 @@
         <text x="50" y="53" text-anchor="middle" font-size="8" font-weight="900" fill="#1a1a1a" font-family="Inter,sans-serif">MONEY BACK</text>
       </svg>
       <div>
-        <h3>30 dagen geld-terug-garantie</h3>
-        <p>Niet tevreden? Binnen 30 dagen je geld terug — geen vragen.</p>
+        <h3>90 dagen geld-terug-garantie</h3>
+        <p>Niet tevreden? Binnen 90 dagen je geld terug — geen vragen.</p>
       </div>
     </div>
 
     <a href="lp/1/" class="back-link">← Terug naar de aanbieding</a>
+      </div>
 
-    <section class="hf-reviews" aria-labelledby="hf-reviews-title">
+      <aside class="hearing-checkout__reviews" aria-labelledby="hf-reviews-title">
+    <section class="hf-reviews">
       <h2 class="hf-reviews__title" id="hf-reviews-title">Wat onze klanten zeggen</h2>
 
-      <div class="hf-reviews__grid">
+      <div class="hf-reviews__track">
         <article class="hf-review-card">
           <img class="hf-review-card__img" src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=480&h=360&fit=crop&q=80" alt="" loading="lazy">
           <div class="hf-review-card__body">
@@ -346,6 +355,8 @@
         Trustscore <strong>4,8</strong> | <strong>3.560</strong> beoordelingen
       </p>
     </section>
+      </aside>
+    </div>
   </main>
 
   <script src="../../api.js"></script>
