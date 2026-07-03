@@ -12,12 +12,12 @@ const QUESTIONS = [
     header: 'Beantwoord 3 vragen om erachter te komen of u in aanmerking komt.',
   },
   {
-    question: 'Bent u 55 jaar of ouder?',
+    question: 'Bent u 40 jaar of ouder?',
     buttons: [
       { label: 'Ja', value: 'ja' },
       { label: 'Nee', value: 'nee' },
     ],
-    hint: 'Alleen mensen van 55 jaar en ouder hebben de mogelijkheid om dit innovatieve hoortoestel te ervaren.',
+    hint: 'Alleen mensen van 40 jaar en ouder hebben de mogelijkheid om dit innovatieve hoortoestel te ervaren.',
     showHero: false,
     showContent: false,
     header: null,
@@ -65,7 +65,9 @@ const el = {
   content: document.getElementById('survey-content'),
   progressSteps: document.getElementById('progress-steps'),
   loadingBar: document.getElementById('loading-bar'),
+  loadingBarWrap: document.getElementById('loading-bar-wrap'),
   loadingStatus: document.getElementById('loading-status'),
+  loadingTitle: document.getElementById('loading-title'),
   testimonialName: document.getElementById('testimonial-name'),
   testimonialText: document.getElementById('testimonial-text'),
   testimonialCounter: document.getElementById('testimonial-counter'),
@@ -133,27 +135,35 @@ function startLoading() {
   el.phaseLoading.classList.remove('hidden');
 
   const statuses = [
-    'Uw antwoorden worden geanalyseerd…',
-    'Beschikbaarheid wordt gecontroleerd…',
-    'Uw persoonlijke aanbieding wordt samengesteld…',
+    'Controleren of u in aanmerking komt....',
+    'Beschikbaarheid controleren.....',
   ];
 
-  let progress = 0;
+  el.loadingTitle.classList.add('hidden');
+  el.loadingBarWrap.hidden = false;
+  el.loadingStatus.hidden = false;
+  el.loadingBar.style.width = '0%';
+  el.loadingStatus.textContent = statuses[0];
+
   const duration = 3200;
   const start = Date.now();
 
   const tick = () => {
     const elapsed = Date.now() - start;
-    progress = Math.min(100, (elapsed / duration) * 100);
+    const progress = Math.min(100, (elapsed / duration) * 100);
     el.loadingBar.style.width = `${progress}%`;
 
-    const statusIdx = Math.min(statuses.length - 1, Math.floor((progress / 100) * statuses.length));
-    el.loadingStatus.textContent = statuses[statusIdx];
+    el.loadingStatus.textContent = progress < 50 ? statuses[0] : statuses[1];
 
     if (progress < 100) {
       requestAnimationFrame(tick);
     } else {
-      setTimeout(showOffer, 400);
+      el.loadingBarWrap.hidden = true;
+      el.loadingStatus.hidden = true;
+      el.loadingTitle.textContent =
+        'Gefeliciteerd! U komt in aanmerking om dit gehoortoestel te proberen';
+      el.loadingTitle.classList.remove('hidden');
+      setTimeout(showOffer, 2200);
     }
   };
 
