@@ -9,7 +9,7 @@ on conflict (slug) do update set
 
 insert into landers (slug, product_slug, name, path) values
   ('lp-1', 'hearing', 'Hearing NL — LP/1', '/hearing-nl/lp/1/'),
-  ('adv', 'hearing', 'Hearing NL — Adv', '/hearing-nl/adv/')
+  ('adv-1', 'hearing', 'Hearing NL — Adv/1', '/hearing-nl/adv/1/')
 on conflict (slug) do update set
   product_slug = excluded.product_slug,
   name = excluded.name,

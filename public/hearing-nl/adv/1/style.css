@@ -79,6 +79,26 @@ a { color: var(--link); }
 
 .adv-meta strong { color: var(--text); }
 
+.adv-hero {
+  margin: 0 0 28px;
+}
+
+.adv-hero img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+}
+
+.adv-hero figcaption {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 10px;
+  text-align: center;
+  font-style: italic;
+}
+
 .adv-body p {
   margin-bottom: 18px;
 }
