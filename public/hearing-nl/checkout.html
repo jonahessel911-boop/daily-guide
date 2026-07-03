@@ -39,6 +39,24 @@
       grid-template-columns: 1fr 100px;
       gap: 12px;
     }
+    .form-row--address {
+      grid-template-columns: 1fr 72px 72px;
+    }
+    @media (max-width: 480px) {
+      .form-row--address {
+        grid-template-columns: 1fr 1fr;
+      }
+      .form-row--address .form-group:first-child {
+        grid-column: 1 / -1;
+      }
+    }
+    .postcode-status {
+      font-size: 13px;
+      margin: -4px 0 12px;
+      color: #64748b;
+    }
+    .postcode-status--loading { color: #2563eb; }
+    .postcode-status--error { color: #dc2626; }
     .input-readonly {
       background: #f8fafc;
       color: #64748b;
@@ -107,15 +125,30 @@
           <input type="tel" id="phone" name="phone" required autocomplete="tel" placeholder="06 12345678">
         </div>
 
-        <div class="form-row">
+        <div class="form-row form-row--address">
           <div class="form-group">
             <label for="postal-code">Postcode *</label>
             <input type="text" id="postal-code" name="postal-code" required autocomplete="postal-code" placeholder="1234 AB" maxlength="7">
           </div>
           <div class="form-group form-group--narrow">
             <label for="house-number">Huisnr. *</label>
-            <input type="text" id="house-number" name="house-number" required placeholder="12">
+            <input type="text" id="house-number" name="house-number" required placeholder="12" inputmode="numeric">
           </div>
+          <div class="form-group form-group--narrow">
+            <label for="house-addition">Toev.</label>
+            <input type="text" id="house-addition" name="house-addition" placeholder="A" autocomplete="address-line2">
+          </div>
+        </div>
+        <p id="postcode-lookup-status" class="postcode-status" hidden></p>
+
+        <div class="form-group">
+          <label for="street">Straat *</label>
+          <input type="text" id="street" name="street" required autocomplete="street-address" placeholder="Wordt automatisch ingevuld">
+        </div>
+
+        <div class="form-group">
+          <label for="city">Woonplaats *</label>
+          <input type="text" id="city" name="city" required autocomplete="address-level2" placeholder="Wordt automatisch ingevuld">
         </div>
 
         <div class="form-group">

@@ -31,6 +31,8 @@ let selectedMethod = 'ideal';
 let customerEmail = '';
 let customerName = '';
 let shippingInfo = null;
+let postcodeLookupTimer = null;
+let postcodeLookupRequest = 0;
 
 function getProductSlug() {
   const domSlug = document.body.dataset.trackProduct;
@@ -55,6 +57,9 @@ function loadShippingFromStorage() {
       phone: data.phone,
       'postal-code': data.postalCode,
       'house-number': data.houseNumber,
+      'house-addition': data.houseAddition,
+      street: data.street,
+      city: data.city,
     };
     Object.entries(fields).forEach(([id, value]) => {
       const el = document.getElementById(id);
@@ -74,6 +79,9 @@ function collectShippingData() {
     phone: document.getElementById('phone')?.value.trim() || '',
     postalCode: document.getElementById('postal-code')?.value.trim().toUpperCase() || '',
     houseNumber: document.getElementById('house-number')?.value.trim() || '',
+    houseAddition: document.getElementById('house-addition')?.value.trim() || '',
+    street: document.getElementById('street')?.value.trim() || '',
+    city: document.getElementById('city')?.value.trim() || '',
     country: 'Nederland',
   };
 }
@@ -90,8 +98,115 @@ function validateShipping(data) {
     return 'Vul een geldige Nederlandse postcode in (bijv. 1234 AB).';
   }
   if (!data.houseNumber) return 'Vul je huisnummer in.';
+  if (!data.street) return 'Vul je straat in of controleer postcode en huisnummer.';
+  if (!data.city) return 'Vul je woonplaats in of controleer postcode en huisnummer.';
 
   return null;
+}
+
+function formatPostcodeInput(value) {
+  const raw = value.replace(/\s/g, '').toUpperCase().slice(0, 6);
+  if (raw.length <= 4) return raw;
+  return `${raw.slice(0, 4)} ${raw.slice(4)}`;
+}
+
+function buildHouseNumberParam(houseNumber, houseAddition) {
+  if (!houseNumber) return '';
+  return houseAddition ? `${houseNumber}-${houseAddition}` : houseNumber;
+}
+
+function setPostcodeStatus(text, type) {
+  const statusEl = document.getElementById('postcode-lookup-status');
+  if (!statusEl) return;
+
+  if (!text) {
+    statusEl.hidden = true;
+    statusEl.textContent = '';
+    statusEl.className = 'postcode-status';
+    return;
+  }
+
+  statusEl.hidden = false;
+  statusEl.textContent = text;
+  statusEl.className = `postcode-status postcode-status--${type}`;
+}
+
+async function lookupAddress() {
+  const postalEl = document.getElementById('postal-code');
+  const houseEl = document.getElementById('house-number');
+  const additionEl = document.getElementById('house-addition');
+  const streetEl = document.getElementById('street');
+  const cityEl = document.getElementById('city');
+
+  if (!postalEl || !houseEl || !streetEl || !cityEl) return;
+
+  const postalCode = postalEl.value.replace(/\s/g, '').toUpperCase();
+  const houseNumber = houseEl.value.trim();
+  const houseAddition = additionEl?.value.trim() || '';
+
+  if (!postalCode || !houseNumber) {
+    setPostcodeStatus(null);
+    return;
+  }
+
+  if (!/^\d{4}[A-Z]{2}$/.test(postalCode)) {
+    setPostcodeStatus(null);
+    return;
+  }
+
+  const requestId = ++postcodeLookupRequest;
+  const number = buildHouseNumberParam(houseNumber, houseAddition);
+  setPostcodeStatus('Adres opzoeken...', 'loading');
+
+  try {
+    const { res, data } = await Api.apiFetch(
+      `/api/postcode-lookup?postcode=${encodeURIComponent(postalCode)}&number=${encodeURIComponent(number)}`
+    );
+
+    if (requestId !== postcodeLookupRequest) return;
+
+    if (!res.ok) {
+      streetEl.value = '';
+      cityEl.value = '';
+      setPostcodeStatus(data.error || 'Adres niet gevonden. Controleer postcode en huisnummer.', 'error');
+      return;
+    }
+
+    streetEl.value = data.street || '';
+    cityEl.value = data.city || '';
+    setPostcodeStatus(null);
+  } catch (_) {
+    if (requestId !== postcodeLookupRequest) return;
+    setPostcodeStatus('Kon adres niet opzoeken. Probeer het opnieuw.', 'error');
+  }
+}
+
+function scheduleAddressLookup() {
+  clearTimeout(postcodeLookupTimer);
+  postcodeLookupTimer = setTimeout(lookupAddress, 450);
+}
+
+function initPostcodeLookup() {
+  const postalEl = document.getElementById('postal-code');
+  const houseEl = document.getElementById('house-number');
+  const additionEl = document.getElementById('house-addition');
+
+  if (!postalEl || !houseEl) return;
+
+  postalEl.addEventListener('input', (e) => {
+    e.target.value = formatPostcodeInput(e.target.value);
+    scheduleAddressLookup();
+  });
+
+  houseEl.addEventListener('input', scheduleAddressLookup);
+  additionEl?.addEventListener('input', scheduleAddressLookup);
+
+  [postalEl, houseEl, additionEl].forEach((el) => {
+    el?.addEventListener('blur', () => {
+      clearTimeout(postcodeLookupTimer);
+      lookupAddress();
+    });
+  });
 }
 
 let productConfig = {
@@ -137,6 +252,7 @@ async function loadProductConfig() {
 document.addEventListener('DOMContentLoaded', async () => {
   await loadProductConfig();
   loadShippingFromStorage();
+  initPostcodeLookup();
   const selectForm = document.getElementById('select-form');
   const emailInput = document.getElementById('email');
   const accordionToggle = document.getElementById('pm-accordion-toggle');

@@ -128,6 +128,45 @@ app.get('/api/config', (req, res) => {
   res.json({ publishableKey: STRIPE_PUBLISHABLE_KEY, product });
 });
 
+app.get('/api/postcode-lookup', async (req, res) => {
+  const token = process.env.POSTCODE_API_TOKEN;
+  if (!token) {
+    return res.status(503).json({ error: 'Postcode API niet geconfigureerd' });
+  }
+
+  const postcode = String(req.query.postcode || '')
+    .replace(/\s/g, '')
+    .toUpperCase();
+  const number = String(req.query.number || '').trim();
+
+  if (!/^\d{4}[A-Z]{2}$/.test(postcode)) {
+    return res.status(400).json({ error: 'Ongeldige postcode' });
+  }
+  if (!number) {
+    return res.status(400).json({ error: 'Huisnummer is verplicht' });
+  }
+
+  try {
+    const url = new URL('https://json.api-postcode.nl');
+    url.searchParams.set('postcode', postcode);
+    url.searchParams.set('number', number);
+
+    const response = await fetch(url, { headers: { token } });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      return res.status(response.status === 404 ? 404 : 400).json({
+        error: data.error || 'Adres niet gevonden',
+      });
+    }
+
+    res.json(data);
+  } catch (err) {
+    console.error('Postcode lookup error:', err.message);
+    res.status(500).json({ error: 'Kon adres niet opzoeken' });
+  }
+});
+
 app.post('/api/track', async (req, res) => {
   const { eventType, productSlug, country, landerSlug, sessionId } = req.body || {};
   const allowed = ['lander_view', 'checkout_view'];
@@ -260,6 +299,9 @@ app.post('/api/create-payment', async (req, res) => {
         customer_phone: shipping.phone || '',
         shipping_postal_code: shipping.postalCode || '',
         shipping_house_number: shipping.houseNumber || '',
+        shipping_house_addition: shipping.houseAddition || '',
+        shipping_street: shipping.street || '',
+        shipping_city: shipping.city || '',
         shipping_country: shipping.country || '',
         payment_method: paymentMethod,
         country: (analytics.country || 'NL').toUpperCase(),
