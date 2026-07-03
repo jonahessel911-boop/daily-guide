@@ -1,47 +1,31 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="/meta-pixel.js"></script>
-  <title>Afrekenen | HearFlex™</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../checkout.css">
-  <link rel="stylesheet" href="../hearing-dtc-checkout.css">
-  <script src="https://js.stripe.com/v3/"></script>
-</head>
-<body class="dtc-checkout" data-track-page="checkout" data-track-product="hearing" data-track-country="nl" data-track-lander="lp-1">
-  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=4564404523788178&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
+#!/usr/bin/env node
+/**
+ * Generates hearing checkout HTML from shared template.
+ * Run: node scripts/build-hearing-checkout.js
+ */
+const fs = require('fs');
+const path = require('path');
 
-  <header class="dtc-discount-bar">
-    <div class="dtc-discount-bar__left">
-      <strong>⚡ Exclusieve korting</strong>
-      <span>Alleen beschikbaar op deze pagina</span>
-    </div>
-    <div class="dtc-discount-bar__timer" aria-live="polite">
-      <div class="dtc-timer-block"><span class="dtc-timer-block__val" id="dtc-timer-h">00</span><span class="dtc-timer-block__lbl">Uur</span></div>
-      <div class="dtc-timer-block"><span class="dtc-timer-block__val" id="dtc-timer-m">00</span><span class="dtc-timer-block__lbl">Min</span></div>
-      <div class="dtc-timer-block"><span class="dtc-timer-block__val" id="dtc-timer-s">00</span><span class="dtc-timer-block__lbl">Sec</span></div>
-    </div>
-  </header>
+const variants = [
+  {
+    out: 'public/hearing-nl/checkout.html',
+    lander: 'lp-1',
+    assetPrefix: '../',
+    scriptPrefix: '../../',
+    backLink: 'lp/1/',
+    backText: '← Terug naar de aanbieding',
+  },
+  {
+    out: 'public/hearing-nl/adv/1/checkout.html',
+    lander: 'adv-1',
+    assetPrefix: '../../',
+    scriptPrefix: '../../../',
+    backLink: './',
+    backText: '← Terug naar het artikel',
+  },
+];
 
-  <div class="dtc-page">
-    <div class="dtc-layout">
-      <div class="dtc-col-left" id="dtc-col-left"></div>
-      <div class="dtc-col-right">
-        <div class="dtc-checkout-card" id="dtc-checkout-card">
-          <h2 class="dtc-checkout-card__title">Rond je bestelling veilig af</h2>
-          <div class="dtc-order-summary">
-            <div class="dtc-order-summary__row"><span id="dtc-sum-product">HearFlex™</span><span>× 1</span></div>
-            <div class="dtc-order-summary__row"><span>Subtotaal</span><span id="dtc-sum-subtotal">€ 300,00</span></div>
-            <div class="dtc-order-summary__row dtc-order-summary__row--discount"><span>Korting (50%)</span><span id="dtc-sum-discount">-€ 151,00</span></div>
-            <div class="dtc-order-summary__row" id="dtc-sum-bump-row" hidden><span>Extra accessoire</span><span id="dtc-sum-bump">€ 9,95</span></div>
-            <div class="dtc-order-summary__row"><span>Verzending</span><span id="dtc-sum-shipping">Gratis</span></div>
-            <div class="dtc-order-summary__row dtc-order-summary__row--total"><span>Totaal</span><span id="dtc-sum-total">€ 149,00</span></div>
-          </div>
-        <div id="step-select">
+const formBlock = `        <div id="step-select">
           <form id="select-form">
             <div class="form-group">
               <label for="full-name">Naam *</label>
@@ -123,7 +107,55 @@
             <span id="button-text">Bestelling afronden</span>
             <span id="spinner" class="spinner" hidden></span>
           </button>
-        </div>
+        </div>`;
+
+function build(v) {
+  const a = v.assetPrefix;
+  const s = v.scriptPrefix;
+  return `<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/meta-pixel.js"></script>
+  <title>Afrekenen | HearFlex™</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="${s}checkout.css">
+  <link rel="stylesheet" href="${a}hearing-dtc-checkout.css">
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body class="dtc-checkout" data-track-page="checkout" data-track-product="hearing" data-track-country="nl" data-track-lander="${v.lander}">
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=4564404523788178&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
+
+  <header class="dtc-discount-bar">
+    <div class="dtc-discount-bar__left">
+      <strong>⚡ Exclusieve korting</strong>
+      <span>Alleen beschikbaar op deze pagina</span>
+    </div>
+    <div class="dtc-discount-bar__timer" aria-live="polite">
+      <div class="dtc-timer-block"><span class="dtc-timer-block__val" id="dtc-timer-h">00</span><span class="dtc-timer-block__lbl">Uur</span></div>
+      <div class="dtc-timer-block"><span class="dtc-timer-block__val" id="dtc-timer-m">00</span><span class="dtc-timer-block__lbl">Min</span></div>
+      <div class="dtc-timer-block"><span class="dtc-timer-block__val" id="dtc-timer-s">00</span><span class="dtc-timer-block__lbl">Sec</span></div>
+    </div>
+  </header>
+
+  <div class="dtc-page">
+    <div class="dtc-layout">
+      <div class="dtc-col-left" id="dtc-col-left"></div>
+      <div class="dtc-col-right">
+        <div class="dtc-checkout-card" id="dtc-checkout-card">
+          <h2 class="dtc-checkout-card__title">Rond je bestelling veilig af</h2>
+          <div class="dtc-order-summary">
+            <div class="dtc-order-summary__row"><span id="dtc-sum-product">HearFlex™</span><span>× 1</span></div>
+            <div class="dtc-order-summary__row"><span>Subtotaal</span><span id="dtc-sum-subtotal">€ 300,00</span></div>
+            <div class="dtc-order-summary__row dtc-order-summary__row--discount"><span>Korting (50%)</span><span id="dtc-sum-discount">-€ 151,00</span></div>
+            <div class="dtc-order-summary__row" id="dtc-sum-bump-row" hidden><span>Extra accessoire</span><span id="dtc-sum-bump">€ 9,95</span></div>
+            <div class="dtc-order-summary__row"><span>Verzending</span><span id="dtc-sum-shipping">Gratis</span></div>
+            <div class="dtc-order-summary__row dtc-order-summary__row--total"><span>Totaal</span><span id="dtc-sum-total">€ 149,00</span></div>
+          </div>
+${formBlock}
         </div>
       </div>
     </div>
@@ -135,10 +167,19 @@
     <a href="#dtc-checkout-card">Vandaag 50% korting — Bestel nu</a>
   </div>
 
-  <script src="../../api.js"></script>
-  <script src="../../track.js"></script>
-  <script src="../hearing-dtc-config.js"></script>
-  <script src="../hearing-dtc-ui.js"></script>
-  <script src="../../checkout.js"></script>
+  <script src="${s}api.js"></script>
+  <script src="${s}track.js"></script>
+  <script src="${a}hearing-dtc-config.js"></script>
+  <script src="${a}hearing-dtc-ui.js"></script>
+  <script src="${s}checkout.js"></script>
 </body>
-</html>
+</html>`;
+}
+
+const root = path.join(__dirname, '..');
+variants.forEach((v) => {
+  const outPath = path.join(root, v.out);
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  fs.writeFileSync(outPath, build(v));
+  console.log('Wrote', v.out);
+});

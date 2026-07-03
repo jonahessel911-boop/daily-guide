@@ -34,6 +34,14 @@ let shippingInfo = null;
 let postcodeLookupTimer = null;
 let postcodeLookupRequest = 0;
 
+function isDtcCheckout() {
+  return document.body.classList.contains('dtc-checkout');
+}
+
+function getOrderBumpSelected() {
+  return document.getElementById('order-bump')?.checked || false;
+}
+
 function getProductSlug() {
   const domSlug = document.body.dataset.trackProduct;
   const urlSlug = new URLSearchParams(window.location.search).get('p');
@@ -241,6 +249,15 @@ async function loadProductConfig() {
     el.textContent = formatEuroPrice(productConfig.price);
   });
 
+  if (window.HearingDTC?.updateOrderSummary) {
+    if (window.HearingDTCConfig?.product) {
+      window.HearingDTCConfig.product.price = productConfig.price;
+      window.HearingDTCConfig.product.originalPrice = productConfig.originalPrice || 300;
+      window.HearingDTCConfig.product.name = productConfig.name;
+    }
+    window.HearingDTC.updateOrderSummary();
+  }
+
   const nameEl = document.getElementById('checkout-product-name');
   if (nameEl && productConfig.name) nameEl.textContent = productConfig.name;
 
@@ -350,7 +367,9 @@ function selectMethod(method) {
   document.getElementById('pm-selected-icon').innerHTML = METHOD_ICONS[method];
 
   const continueText = document.getElementById('continue-text');
-  if (method === 'apple_pay') continueText.textContent = 'Doorgaan met Apple Pay';
+  if (isDtcCheckout()) {
+    continueText.textContent = 'Bestelling afronden';
+  } else if (method === 'apple_pay') continueText.textContent = 'Doorgaan met Apple Pay';
   else if (method === 'google_pay') continueText.textContent = 'Doorgaan met Google Pay';
   else continueText.textContent = 'Doorgaan naar betalen';
 }
@@ -392,6 +411,7 @@ async function createPaymentIntent(email, method) {
       analytics,
       meta: getMetaCookies(),
       shipping: shippingInfo,
+      orderBump: getOrderBumpSelected(),
     }),
   });
 
@@ -401,25 +421,30 @@ async function createPaymentIntent(email, method) {
   stripe = Stripe(STRIPE_PK);
 }
 
-const STRIPE_APPEARANCE = {
-  theme: 'stripe',
-  variables: {
-    colorPrimary: '#2563eb',
-    colorBackground: '#ffffff',
-    colorText: '#0f172a',
-    borderRadius: '10px',
-    fontFamily: 'Inter, sans-serif',
-    spacingUnit: '4px',
-  },
-  rules: {
-    '.Input': { border: '1px solid #e2e8f0', boxShadow: 'none' },
-    '.Input:focus': { border: '1px solid #2563eb', boxShadow: '0 0 0 3px #dbeafe' },
-    '.Label': { fontWeight: '600', fontSize: '13px' },
-  },
-};
+function getStripeAppearance() {
+  return {
+    theme: 'stripe',
+    variables: {
+      colorPrimary: isDtcCheckout() ? '#172b4d' : '#2563eb',
+      colorBackground: '#ffffff',
+      colorText: '#0f172a',
+      borderRadius: '10px',
+      fontFamily: isDtcCheckout() ? 'Plus Jakarta Sans, Inter, sans-serif' : 'Inter, sans-serif',
+      spacingUnit: '4px',
+    },
+    rules: {
+      '.Input': { border: '1px solid #e2e8f0', boxShadow: 'none' },
+      '.Input:focus': {
+        border: `1px solid ${isDtcCheckout() ? '#172b4d' : '#2563eb'}`,
+        boxShadow: isDtcCheckout() ? '0 0 0 3px rgba(23,43,77,0.1)' : '0 0 0 3px #dbeafe',
+      },
+      '.Label': { fontWeight: '600', fontSize: '13px' },
+    },
+  };
+}
 
 async function mountPaymentUI(method) {
-  const payArea = document.getElementById('stripe-payment-area');
+  const appearance = getStripeAppearance();
   const expressArea = document.getElementById('stripe-express-area');
   const submitBtn = document.getElementById('submit-payment');
   const walletUnavailable = document.getElementById('wallet-unavailable');
@@ -433,7 +458,7 @@ async function mountPaymentUI(method) {
   if (method === 'apple_pay' || method === 'google_pay') {
     await mountWalletCheckout(method);
   } else {
-    elements = stripe.elements({ clientSecret, appearance: STRIPE_APPEARANCE, locale: 'nl' });
+    elements = stripe.elements({ clientSecret, appearance, locale: 'nl' });
     payArea.hidden = false;
     submitBtn.hidden = false;
 
@@ -459,7 +484,7 @@ async function mountWalletCheckout(method) {
   container.innerHTML = '';
   walletUnavailable.hidden = true;
 
-  elements = stripe.elements({ clientSecret, appearance: STRIPE_APPEARANCE, locale: 'nl' });
+  elements = stripe.elements({ clientSecret, appearance: getStripeAppearance(), locale: 'nl' });
 
   expressCheckout = elements.create('expressCheckout', {
     paymentMethods: {
@@ -591,7 +616,11 @@ function setContinueLoading(loading) {
   const text = document.getElementById('continue-text');
   btn.disabled = loading;
   spinner.hidden = !loading;
-  text.textContent = loading ? 'Even geduld...' : 'Doorgaan naar betalen';
+  text.textContent = loading
+    ? 'Even geduld...'
+    : isDtcCheckout()
+      ? 'Bestelling afronden'
+      : 'Doorgaan naar betalen';
 }
 
 function setPayLoading(loading) {
@@ -603,7 +632,7 @@ function setPayLoading(loading) {
   spinner.hidden = !loading;
   buttonText.textContent = loading
     ? 'Bezig met verwerken...'
-    : productConfig.slug === 'hearing'
-      ? 'Bestel HearFlex™'
+    : isDtcCheckout() || productConfig.slug === 'hearing'
+      ? 'Bestelling afronden'
       : 'Begin vandaag met beter slapen';
 }

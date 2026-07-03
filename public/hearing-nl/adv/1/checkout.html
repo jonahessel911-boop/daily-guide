@@ -7,393 +7,138 @@
   <title>Afrekenen | HearFlex™</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../../checkout.css">
-  <link rel="stylesheet" href="../../hearing-reviews.css">
-  <link rel="stylesheet" href="../../hearing-checkout.css">
+  <link rel="stylesheet" href="../../hearing-dtc-checkout.css">
   <script src="https://js.stripe.com/v3/"></script>
-  <style>
-    .checkout-page { --blue: #8b1538; }
-    .checkout-book h1 { color: #8b1538; }
-    .hearing-product-img {
-      width: 100%;
-      max-width: 280px;
-      margin: 0 auto 16px;
-      display: block;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #fce7f3, #f3f4f6);
-      aspect-ratio: 4/3;
-      object-fit: cover;
-    }
-    .hearing-features {
-      list-style: none;
-      font-size: 14px;
-      margin-top: 12px;
-    }
-    .hearing-features li { margin-bottom: 8px; }
-    .hearing-features li::before { content: '✓ '; color: #16a34a; font-weight: 700; }
-    .section-heading { margin-top: 24px; margin-bottom: 4px; font-size: 20px; }
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 100px;
-      gap: 12px;
-    }
-    .form-row--address {
-      grid-template-columns: 1fr 72px 72px;
-    }
-    @media (max-width: 480px) {
-      .form-row--address {
-        grid-template-columns: 1fr 1fr;
-      }
-      .form-row--address .form-group:first-child {
-        grid-column: 1 / -1;
-      }
-    }
-    .postcode-status {
-      font-size: 13px;
-      margin: -4px 0 12px;
-      color: #64748b;
-    }
-    .postcode-status--loading { color: #2563eb; }
-    .postcode-status--error { color: #dc2626; }
-    .input-readonly {
-      background: #f8fafc;
-      color: #64748b;
-      cursor: not-allowed;
-    }
-    .hearing-stat {
-      margin-top: 16px;
-      padding: 14px 16px;
-      background: #fdf2f4;
-      border: 1px solid #f5c6d0;
-      border-radius: 10px;
-      font-size: 14px;
-      line-height: 1.5;
-      color: #4a1d2e;
-    }
-    .hearing-stat strong { color: #8b1538; }
-  </style>
 </head>
-<body class="checkout-page hearing-checkout" data-track-page="checkout" data-track-product="hearing" data-track-country="nl" data-track-lander="adv-1">
+<body class="dtc-checkout" data-track-page="checkout" data-track-product="hearing" data-track-country="nl" data-track-lander="adv-1">
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=4564404523788178&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
 
-  <main class="checkout-main">
-    <div class="hearing-checkout__layout">
-      <div class="hearing-checkout__main">
-    <div class="checkout-book">
-      <div class="hearing-product-gallery">
-        <img src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=600&h=600&fit=crop&q=80" alt="HearFlex™ hoortoestel">
-      </div>
-      <p class="hearing-rating"><span class="hearing-rating-stars">★★★★★</span> 4,8 <span style="color:#888;font-weight:400">(3.560)</span></p>
-      <h1 id="checkout-product-name">HearFlex™ | Comfortabele hoortoestellen</h1>
-      <div class="hearing-price">
-        <span class="hearing-price-now" data-checkout-price>€149,00</span>
-        <span class="hearing-price-was">€300,00</span>
-      </div>
-      <span class="hearing-price-badge">BESPAAR 50%</span>
-      <p class="checkout-bundle-subtitle">Hoor elk gesprek duidelijk met een discreet en comfortabel ontwerp dat u de hele dag kunt dragen.</p>
-      <div class="hearing-badges">
-        <span class="hearing-badge">90 dagen thuis uitproberen</span>
-        <span class="hearing-badge">1 jaar garantie</span>
-        <span class="hearing-badge">Binnen 2 min ingesteld</span>
-      </div>
-      <p class="hearing-stat">
-        Na het uitproberen, besluit <strong>94% van de mensen</strong> het toestel te houden omdat ze er zo tevreden mee zijn.
-      </p>
-      <p class="hearing-urgency"><strong>LET OP:</strong> Door de 50% korting is de vraag momenteel uitzonderlijk hoog. Bestel nu zolang de voorraad beschikbaar is.</p>
+  <header class="dtc-discount-bar">
+    <div class="dtc-discount-bar__left">
+      <strong>⚡ Exclusieve korting</strong>
+      <span>Alleen beschikbaar op deze pagina</span>
     </div>
+    <div class="dtc-discount-bar__timer" aria-live="polite">
+      <div class="dtc-timer-block"><span class="dtc-timer-block__val" id="dtc-timer-h">00</span><span class="dtc-timer-block__lbl">Uur</span></div>
+      <div class="dtc-timer-block"><span class="dtc-timer-block__val" id="dtc-timer-m">00</span><span class="dtc-timer-block__lbl">Min</span></div>
+      <div class="dtc-timer-block"><span class="dtc-timer-block__val" id="dtc-timer-s">00</span><span class="dtc-timer-block__lbl">Sec</span></div>
+    </div>
+  </header>
 
-    <div id="step-select" class="payment-card">
-      <h2>Verzendgegevens</h2>
-      <p class="payment-subtitle">Vul je gegevens in voor verzending van je HearFlex™</p>
-
-      <form id="select-form">
-        <div class="form-group">
-          <label for="full-name">Naam *</label>
-          <input type="text" id="full-name" name="full-name" required autocomplete="name" placeholder="Voor- en achternaam">
-        </div>
-
-        <div class="form-group">
-          <label for="email">E-mailadres *</label>
-          <input type="email" id="email" name="email" required autocomplete="email" placeholder="naam@voorbeeld.nl">
-          <p class="form-hint">Je ontvangt de bevestiging en verzendinfo op dit e-mailadres.</p>
-        </div>
-
-        <div class="form-group">
-          <label for="phone">Telefoon *</label>
-          <input type="tel" id="phone" name="phone" required autocomplete="tel" placeholder="06 12345678">
-        </div>
-
-        <div class="form-row form-row--address">
-          <div class="form-group">
-            <label for="postal-code">Postcode *</label>
-            <input type="text" id="postal-code" name="postal-code" required autocomplete="postal-code" placeholder="1234 AB" maxlength="7">
+  <div class="dtc-page">
+    <div class="dtc-layout">
+      <div class="dtc-col-left" id="dtc-col-left"></div>
+      <div class="dtc-col-right">
+        <div class="dtc-checkout-card" id="dtc-checkout-card">
+          <h2 class="dtc-checkout-card__title">Rond je bestelling veilig af</h2>
+          <div class="dtc-order-summary">
+            <div class="dtc-order-summary__row"><span id="dtc-sum-product">HearFlex™</span><span>× 1</span></div>
+            <div class="dtc-order-summary__row"><span>Subtotaal</span><span id="dtc-sum-subtotal">€ 300,00</span></div>
+            <div class="dtc-order-summary__row dtc-order-summary__row--discount"><span>Korting (50%)</span><span id="dtc-sum-discount">-€ 151,00</span></div>
+            <div class="dtc-order-summary__row" id="dtc-sum-bump-row" hidden><span>Extra accessoire</span><span id="dtc-sum-bump">€ 9,95</span></div>
+            <div class="dtc-order-summary__row"><span>Verzending</span><span id="dtc-sum-shipping">Gratis</span></div>
+            <div class="dtc-order-summary__row dtc-order-summary__row--total"><span>Totaal</span><span id="dtc-sum-total">€ 149,00</span></div>
           </div>
-          <div class="form-group form-group--narrow">
-            <label for="house-number">Huisnr. *</label>
-            <input type="text" id="house-number" name="house-number" required placeholder="12" inputmode="numeric">
+        <div id="step-select">
+          <form id="select-form">
+            <div class="form-group">
+              <label for="full-name">Naam *</label>
+              <input type="text" id="full-name" name="full-name" required autocomplete="name" placeholder="Voor- en achternaam">
+            </div>
+            <div class="form-group">
+              <label for="email">E-mailadres *</label>
+              <input type="email" id="email" name="email" required autocomplete="email" placeholder="naam@voorbeeld.nl">
+              <p class="form-hint">Je ontvangt de bevestiging op dit e-mailadres.</p>
+            </div>
+            <div class="form-group">
+              <label for="phone">Telefoon *</label>
+              <input type="tel" id="phone" name="phone" required autocomplete="tel" placeholder="06 12345678">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="postal-code">Postcode *</label>
+                <input type="text" id="postal-code" name="postal-code" required autocomplete="postal-code" placeholder="1234 AB" maxlength="7">
+              </div>
+              <div class="form-group">
+                <label for="house-number">Huisnr. *</label>
+                <input type="text" id="house-number" name="house-number" required placeholder="12" inputmode="numeric">
+              </div>
+              <div class="form-group">
+                <label for="house-addition">Toev.</label>
+                <input type="text" id="house-addition" name="house-addition" placeholder="A">
+              </div>
+            </div>
+            <p id="postcode-lookup-status" class="postcode-status" hidden></p>
+            <div class="form-group">
+              <label for="street">Straat *</label>
+              <input type="text" id="street" name="street" required autocomplete="street-address" placeholder="Wordt automatisch ingevuld">
+            </div>
+            <div class="form-group">
+              <label for="city">Woonplaats *</label>
+              <input type="text" id="city" name="city" required autocomplete="address-level2" placeholder="Wordt automatisch ingevuld">
+            </div>
+            <div class="form-group">
+              <label for="country">Land</label>
+              <input type="text" id="country" name="country" value="Nederland" readonly class="input-readonly">
+            </div>
+            <h2 class="section-heading">Betaalmethode</h2>
+            <div class="pm-accordion" id="pm-accordion">
+              <button type="button" class="pm-accordion-header" id="pm-accordion-toggle" aria-expanded="false">
+                <span class="pm-accordion-left">
+                  <span class="pm-accordion-icon" id="pm-selected-icon"><span class="pm-logo ideal-logo sm">iDEAL</span></span>
+                  <span id="pm-selected-label">iDEAL</span>
+                </span>
+                <svg class="pm-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="pm-accordion-body" id="pm-accordion-body" hidden>
+                <label class="pm-option"><input type="radio" name="payment-method" value="ideal" checked><span class="pm-option-icon"><span class="pm-logo ideal-logo sm">iDEAL</span></span><span class="pm-option-label">iDEAL</span></label>
+                <label class="pm-option"><input type="radio" name="payment-method" value="bancontact"><span class="pm-option-icon"><svg viewBox="0 0 24 24" width="22" height="22"><rect width="24" height="24" rx="5" fill="#005498"/><path fill="#FFD800" d="M3 15.2c2.8-3.4 6.4-4.9 10.8-3.1 1.9.8 3.2 2.1 3.7 3.6H3z"/></svg></span><span class="pm-option-label">Bancontact</span></label>
+                <label class="pm-option"><input type="radio" name="payment-method" value="card"><span class="pm-option-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span><span class="pm-option-label">Creditcard</span></label>
+                <label class="pm-option"><input type="radio" name="payment-method" value="apple_pay"><span class="pm-option-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg></span><span class="pm-option-label">Apple Pay</span></label>
+                <label class="pm-option"><input type="radio" name="payment-method" value="google_pay"><span class="pm-option-icon"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/></svg></span><span class="pm-option-label">Google Pay</span></label>
+                <label class="pm-option"><input type="radio" name="payment-method" value="klarna"><span class="pm-option-icon"><span class="pm-logo klarna-logo sm">Klarna</span></span><span class="pm-option-label">Klarna</span></label>
+              </div>
+            </div>
+            <div id="dtc-order-bump"></div>
+            <div id="select-message" class="payment-message" hidden></div>
+            <button type="submit" id="btn-continue" class="btn-checkout">
+              <span id="continue-text">Bestelling afronden</span>
+              <span id="continue-spinner" class="spinner" hidden></span>
+            </button>
+            <p class="dtc-checkout-microcopy">Veilig betalen · 90 dagen garantie · Vandaag met korting</p>
+          </form>
+        </div>
+        <div id="step-pay" hidden>
+          <button type="button" id="btn-back" class="btn-back">← Andere betaalmethode</button>
+          <div class="pm-selected-header" id="pm-pay-header"><span id="pm-pay-icon"></span> <span id="pm-pay-label">iDEAL</span></div>
+          <div id="payment-message" class="payment-message" hidden></div>
+          <div id="stripe-payment-area" hidden><div id="payment-element"></div></div>
+          <div id="stripe-express-area" hidden>
+            <div id="wallet-button-container"></div>
+            <p id="wallet-unavailable" class="wallet-unavailable" hidden></p>
           </div>
-          <div class="form-group form-group--narrow">
-            <label for="house-addition">Toev.</label>
-            <input type="text" id="house-addition" name="house-addition" placeholder="A" autocomplete="address-line2">
-          </div>
-        </div>
-        <p id="postcode-lookup-status" class="postcode-status" hidden></p>
-
-        <div class="form-group">
-          <label for="street">Straat *</label>
-          <input type="text" id="street" name="street" required autocomplete="street-address" placeholder="Wordt automatisch ingevuld">
-        </div>
-
-        <div class="form-group">
-          <label for="city">Woonplaats *</label>
-          <input type="text" id="city" name="city" required autocomplete="address-level2" placeholder="Wordt automatisch ingevuld">
-        </div>
-
-        <div class="form-group">
-          <label for="country">Land</label>
-          <input type="text" id="country" name="country" value="Nederland" readonly class="input-readonly">
-        </div>
-
-        <h2 class="section-heading">Betaalmethode</h2>
-        <p class="payment-subtitle">Kies je voorkeursmethode en ga verder naar betalen</p>
-
-        <div class="pm-accordion" id="pm-accordion">
-          <button type="button" class="pm-accordion-header" id="pm-accordion-toggle" aria-expanded="false">
-            <span class="pm-accordion-left">
-              <span class="pm-accordion-icon" id="pm-selected-icon">
-                <span class="pm-logo ideal-logo sm">iDEAL</span>
-              </span>
-              <span id="pm-selected-label">iDEAL</span>
-            </span>
-            <svg class="pm-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          <button type="button" id="submit-payment" class="btn-checkout" hidden disabled>
+            <span id="button-text">Bestelling afronden</span>
+            <span id="spinner" class="spinner" hidden></span>
           </button>
-
-          <div class="pm-accordion-body" id="pm-accordion-body" hidden>
-            <label class="pm-option">
-              <input type="radio" name="payment-method" value="ideal" checked>
-              <span class="pm-option-icon"><span class="pm-logo ideal-logo sm">iDEAL</span></span>
-              <span class="pm-option-label">iDEAL</span>
-              <span class="pm-radio"></span>
-            </label>
-            <label class="pm-option">
-              <input type="radio" name="payment-method" value="bancontact">
-              <span class="pm-option-icon">
-                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#005498"/><path fill="#FFD800" d="M3 15.2c2.8-3.4 6.4-4.9 10.8-3.1 1.9.8 3.2 2.1 3.7 3.6H3z"/></svg>
-              </span>
-              <span class="pm-option-label">Bancontact</span>
-              <span class="pm-radio"></span>
-            </label>
-            <label class="pm-option">
-              <input type="radio" name="payment-method" value="card">
-              <span class="pm-option-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-              </span>
-              <span class="pm-option-label">Creditcard</span>
-              <span class="pm-radio"></span>
-            </label>
-            <label class="pm-option">
-              <input type="radio" name="payment-method" value="apple_pay">
-              <span class="pm-option-icon apple-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
-              </span>
-              <span class="pm-option-label">Apple Pay</span>
-              <span class="pm-radio"></span>
-            </label>
-            <label class="pm-option">
-              <input type="radio" name="payment-method" value="google_pay">
-              <span class="pm-option-icon">
-                <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/></svg>
-              </span>
-              <span class="pm-option-label">Google Pay</span>
-              <span class="pm-radio"></span>
-            </label>
-            <label class="pm-option">
-              <input type="radio" name="payment-method" value="klarna">
-              <span class="pm-option-icon"><span class="pm-logo klarna-logo sm">Klarna</span></span>
-              <span class="pm-option-label">Klarna</span>
-              <span class="pm-radio"></span>
-            </label>
-          </div>
         </div>
-
-        <div class="total-today">
-          <span>Totaal vandaag:</span>
-          <span class="price" data-checkout-price>€149,00</span>
         </div>
-
-        <div id="select-message" class="payment-message" hidden></div>
-
-        <button type="submit" id="btn-continue" class="btn-checkout">
-          <span id="continue-text">Doorgaan naar betalen</span>
-          <span id="continue-spinner" class="spinner" hidden></span>
-        </button>
-      </form>
-    </div>
-
-    <div id="step-pay" class="payment-card" hidden>
-      <button type="button" id="btn-back" class="btn-back">← Andere betaalmethode</button>
-      <div class="pm-selected-header" id="pm-pay-header">
-        <span class="pm-selected-header-icon" id="pm-pay-icon"></span>
-        <span id="pm-pay-label">iDEAL</span>
-      </div>
-      <div id="payment-message" class="payment-message" hidden></div>
-      <div id="stripe-payment-area" hidden><div id="payment-element"></div></div>
-      <div id="stripe-express-area" hidden>
-        <div id="wallet-button-container"></div>
-        <p id="wallet-unavailable" class="wallet-unavailable" hidden></p>
-      </div>
-      <div class="total-today">
-        <span>Totaal vandaag:</span>
-        <span class="price" data-checkout-price>€149,00</span>
-      </div>
-      <p class="payment-disclaimer">Door je betaalgegevens te verstrekken, geef je HearFlex™ toestemming om je kaart te belasten.</p>
-      <button type="button" id="submit-payment" class="btn-checkout" hidden disabled>
-        <span id="button-text">Bestel HearFlex™</span>
-        <span id="spinner" class="spinner" hidden></span>
-      </button>
-    </div>
-
-    <div class="checkout-guarantee">
-      <svg class="guarantee-seal" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="46" fill="#fbbf24" stroke="#92400e" stroke-width="2"/>
-        <text x="50" y="53" text-anchor="middle" font-size="8" font-weight="900" fill="#1a1a1a" font-family="Inter,sans-serif">MONEY BACK</text>
-      </svg>
-      <div>
-        <h3>90 dagen geld-terug-garantie</h3>
-        <p>Niet tevreden? Binnen 90 dagen je geld terug — geen vragen.</p>
       </div>
     </div>
+    <div class="dtc-col-below" id="dtc-col-below"></div>
+    <div id="dtc-footer"></div>
+  </div>
 
-    <a href="./" class="back-link">← Terug naar het artikel</a>
-      </div>
-
-      <aside class="hearing-checkout__reviews" aria-labelledby="hf-reviews-title">
-    <section class="hf-reviews">
-      <h2 class="hf-reviews__title" id="hf-reviews-title">Wat onze klanten zeggen</h2>
-
-      <div class="hf-reviews__track">
-        <article class="hf-review-card">
-          <img class="hf-review-card__img" src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=480&h=360&fit=crop&q=80" alt="" loading="lazy">
-          <div class="hf-review-card__body">
-            <div class="hf-review-card__meta">
-              <div class="hf-review-card__author">
-                <span>Ronald J.</span>
-                <span class="hf-review-card__flag" aria-hidden="true">🇳🇱</span>
-                <span class="hf-review-card__verified" aria-label="Geverifieerd">✓</span>
-              </div>
-              <div class="hf-review-card__trust">
-                <span class="hf-tp-logo">Trustpilot</span>
-                <span class="hf-tp-stars" aria-label="5 sterren">★★★★★</span>
-              </div>
-            </div>
-            <p class="hf-review-card__text">Mijn vrouw zegt dat ik eindelijk gestopt ben met schreeuwen naar de televisie. Het volume staat nu veel lager en we kunnen weer normaal samen tv kijken zonder discussie. Dat alleen al maakt deze hoortoestellen elke euro waard!!</p>
-          </div>
-        </article>
-
-        <article class="hf-review-card">
-          <img class="hf-review-card__img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=480&h=360&fit=crop&q=80" alt="" loading="lazy">
-          <div class="hf-review-card__body">
-            <div class="hf-review-card__meta">
-              <div class="hf-review-card__author">
-                <span>Ken M.</span>
-                <span class="hf-review-card__flag" aria-hidden="true">🇳🇱</span>
-                <span class="hf-review-card__verified" aria-label="Geverifieerd">✓</span>
-              </div>
-              <div class="hf-review-card__trust">
-                <span class="hf-tp-logo">Trustpilot</span>
-                <span class="hf-tp-stars" aria-label="5 sterren">★★★★★</span>
-              </div>
-            </div>
-            <p class="hf-review-card__text">Geweldig!! Makkelijk in te stellen en eenvoudig in gebruik. Ik raak steeds meer gewend aan het aanpassen van de standen en het volume in verschillende situaties. De wereld van geluid komt weer terug en mijn tinnitus lijkt ook minder te worden!</p>
-          </div>
-        </article>
-
-        <article class="hf-review-card">
-          <img class="hf-review-card__img" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=480&h=360&fit=crop&q=80" alt="" loading="lazy">
-          <div class="hf-review-card__body">
-            <div class="hf-review-card__meta">
-              <div class="hf-review-card__author">
-                <span>Rodney M.</span>
-                <span class="hf-review-card__flag" aria-hidden="true">🇳🇱</span>
-                <span class="hf-review-card__verified" aria-label="Geverifieerd">✓</span>
-              </div>
-              <div class="hf-review-card__trust">
-                <span class="hf-tp-logo">Trustpilot</span>
-                <span class="hf-tp-stars" aria-label="5 sterren">★★★★★</span>
-              </div>
-            </div>
-            <p class="hf-review-card__text">Ze zijn bijna onzichtbaar wanneer ik ze draag, wat ik persoonlijk erg fijn vind. Het geluid klinkt helder en natuurlijk, zelfs in drukkere omgevingen. Ook het opladen gaat ontzettend eenvoudig, gewoon 's nachts in de case leggen en de volgende dag weer klaar voor gebruik.</p>
-          </div>
-        </article>
-
-        <article class="hf-review-card">
-          <img class="hf-review-card__img" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=480&h=360&fit=crop&q=80" alt="" loading="lazy">
-          <div class="hf-review-card__body">
-            <div class="hf-review-card__meta">
-              <div class="hf-review-card__author">
-                <span>Edward P.</span>
-                <span class="hf-review-card__flag" aria-hidden="true">🇳🇱</span>
-                <span class="hf-review-card__verified" aria-label="Geverifieerd">✓</span>
-              </div>
-              <div class="hf-review-card__trust">
-                <span class="hf-tp-logo">Trustpilot</span>
-                <span class="hf-tp-stars" aria-label="5 sterren">★★★★★</span>
-              </div>
-            </div>
-            <p class="hf-review-card__text">Dit zijn de beste hoortoestellen die ik ooit heb gehad. Wisselen tussen de standen gaat snel en eenvoudig. Vooral tijdens het winkelen of in drukke straten merk ik echt verschil.</p>
-          </div>
-        </article>
-
-        <article class="hf-review-card">
-          <img class="hf-review-card__img" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=480&h=360&fit=crop&q=80" alt="" loading="lazy">
-          <div class="hf-review-card__body">
-            <div class="hf-review-card__meta">
-              <div class="hf-review-card__author">
-                <span>Rebecca T.</span>
-                <span class="hf-review-card__flag" aria-hidden="true">🇳🇱</span>
-                <span class="hf-review-card__verified" aria-label="Geverifieerd">✓</span>
-              </div>
-              <div class="hf-review-card__trust">
-                <span class="hf-tp-logo">Trustpilot</span>
-                <span class="hf-tp-stars" aria-label="5 sterren">★★★★★</span>
-              </div>
-            </div>
-            <p class="hf-review-card__text">Ik draag ze elke dag sinds ze binnenkwamen en ze blijven zelfs na uren gebruik comfortabel zitten. De geluidskwaliteit klinkt vol en natuurlijk.</p>
-          </div>
-        </article>
-
-        <article class="hf-review-card">
-          <img class="hf-review-card__img" src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=480&h=360&fit=crop&q=80" alt="" loading="lazy">
-          <div class="hf-review-card__body">
-            <div class="hf-review-card__meta">
-              <div class="hf-review-card__author">
-                <span>William A.</span>
-                <span class="hf-review-card__flag" aria-hidden="true">🇳🇱</span>
-                <span class="hf-review-card__verified" aria-label="Geverifieerd">✓</span>
-              </div>
-              <div class="hf-review-card__trust">
-                <span class="hf-tp-logo">Trustpilot</span>
-                <span class="hf-tp-stars" aria-label="5 sterren">★★★★★</span>
-              </div>
-            </div>
-            <p class="hf-review-card__text">Ik was sceptisch omdat ik al van alles had geprobeerd, maar na een paar dagen merkte ik echt verschil. Gesprekken aan tafel gaan eindelijk weer vanzelf, zonder dat ik constant moet vragen of mensen iets willen herhalen.</p>
-          </div>
-        </article>
-      </div>
-
-      <p class="hf-reviews__score">
-        <span class="hf-tp-logo">Trustpilot</span>
-        Trustscore <strong>4,8</strong> | <strong>3.560</strong> beoordelingen
-      </p>
-    </section>
-      </aside>
-    </div>
-  </main>
+  <div class="dtc-mobile-cta" id="dtc-mobile-cta">
+    <a href="#dtc-checkout-card">Vandaag 50% korting — Bestel nu</a>
+  </div>
 
   <script src="../../../api.js"></script>
   <script src="../../../track.js"></script>
+  <script src="../../hearing-dtc-config.js"></script>
+  <script src="../../hearing-dtc-ui.js"></script>
   <script src="../../../checkout.js"></script>
 </body>
 </html>

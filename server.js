@@ -275,7 +275,9 @@ app.post('/api/create-payment', async (req, res) => {
 
     const productSlug = analytics.productSlug || req.body.productSlug || 'sleep';
     const product = getProduct(productSlug);
-    const amountCents = Math.round(product.price * 100);
+    const orderBump = Boolean(req.body.orderBump);
+    const bumpCents = orderBump && productSlug === 'hearing' ? 995 : 0;
+    const amountCents = Math.round(product.price * 100) + bumpCents;
 
     const methodTypes = {
       ideal: ['ideal'],
@@ -303,6 +305,7 @@ app.post('/api/create-payment', async (req, res) => {
         shipping_street: shipping.street || '',
         shipping_city: shipping.city || '',
         shipping_country: shipping.country || '',
+        order_bump: orderBump ? 'yes' : 'no',
         payment_method: paymentMethod,
         country: (analytics.country || 'NL').toUpperCase(),
         lander_slug: analytics.landerSlug || '',
