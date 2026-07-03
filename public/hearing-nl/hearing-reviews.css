@@ -1,0 +1,177 @@
+/* HearFlex customer reviews — elvya-style */
+
+.hearing-checkout .checkout-main {
+  max-width: 960px;
+  padding-bottom: 64px;
+}
+
+.hearing-checkout .checkout-book,
+.hearing-checkout .payment-card,
+.hearing-checkout .checkout-guarantee,
+.hearing-checkout .back-link {
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hearing-checkout .checkout-book .hearing-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px 0 4px;
+}
+
+.hearing-checkout .hearing-price-now {
+  font-size: 32px;
+  font-weight: 900;
+  color: #8b1538;
+}
+
+.hearing-checkout .hearing-price-was {
+  font-size: 18px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.hearing-checkout .hearing-price-badge {
+  display: inline-block;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+
+.hf-reviews {
+  margin-top: 40px;
+  padding-top: 8px;
+}
+
+.hf-reviews__title {
+  text-align: center;
+  font-size: clamp(22px, 4vw, 28px);
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 24px;
+  letter-spacing: -0.02em;
+}
+
+.hf-reviews__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 820px) {
+  .hf-reviews__grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}
+
+.hf-review-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid #eee;
+}
+
+.hf-review-card__img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  display: block;
+  background: #f3f4f6;
+}
+
+.hf-review-card__body {
+  padding: 14px 14px 16px;
+}
+
+.hf-review-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.hf-review-card__author {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  min-width: 0;
+}
+
+.hf-review-card__flag {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.hf-review-card__verified {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.hf-review-card__trust {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.hf-tp-logo {
+  font-size: 10px;
+  font-weight: 700;
+  color: #00b67a;
+  letter-spacing: -0.02em;
+}
+
+.hf-tp-stars {
+  color: #00b67a;
+  font-size: 12px;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.hf-review-card__text {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #333;
+  margin: 0;
+}
+
+.hf-reviews__score {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14px;
+  color: #555;
+}
+
+.hf-reviews__score strong {
+  color: #1a1a1a;
+  font-weight: 800;
+}
+
+.hf-reviews__score .hf-tp-logo {
+  font-size: 13px;
+  margin-right: 4px;
+}

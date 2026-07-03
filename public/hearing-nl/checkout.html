@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../styles.css">
   <link rel="stylesheet" href="../../checkout.css">
+  <link rel="stylesheet" href="../hearing-reviews.css">
   <script src="https://js.stripe.com/v3/"></script>
   <style>
     .checkout-page { --blue: #8b1538; }
@@ -55,13 +56,18 @@
     .hearing-stat strong { color: #8b1538; }
   </style>
 </head>
-<body class="checkout-page" data-track-page="checkout" data-track-product="hearing" data-track-country="nl" data-track-lander="lp-1">
+<body class="checkout-page hearing-checkout" data-track-page="checkout" data-track-product="hearing" data-track-country="nl" data-track-lander="lp-1">
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=4564404523788178&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
 
   <main class="checkout-main">
     <div class="checkout-book">
       <div class="hearing-product-img" role="img" aria-label="HearFlex hoortoestel"></div>
       <h1 id="checkout-product-name">HearFlex™ — Bijna onzichtbaar hoortoestel</h1>
+      <div class="hearing-price">
+        <span class="hearing-price-now" data-checkout-price>€149,00</span>
+        <span class="hearing-price-was">€300,00</span>
+      </div>
+      <span class="hearing-price-badge">Bespaar 50%</span>
       <p class="checkout-bundle-subtitle">Innovatief hoortoestel met automatische volumeregeling</p>
       <ul class="hearing-features">
         <li>Bijna onzichtbaar en discreet</li>
@@ -221,6 +227,125 @@
     </div>
 
     <a href="lp/1/" class="back-link">← Terug naar de aanbieding</a>
+
+    <section class="hf-reviews" aria-labelledby="hf-reviews-title">
+      <h2 class="hf-reviews__title" id="hf-reviews-title">Wat onze klanten zeggen</h2>
+
+      <div class="hf-reviews__grid">
+        <article class="hf-review-card">
+          <img class="hf-review-card__img" src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=480&h=360&fit=crop&q=80" alt="" loading="lazy">
+          <div class="hf-review-card__body">
+            <div class="hf-review-card__meta">
+              <div class="hf-review-card__author">
+                <span>Ronald J.</span>
+                <span class="hf-review-card__flag" aria-hidden="true">🇳🇱</span>
+                <span class="hf-review-card__verified" aria-label="Geverifieerd">✓</span>
+              </div>
+              <div class="hf-review-card__trust">
+                <span class="hf-tp-logo">Trustpilot</span>
+                <span class="hf-tp-stars" aria-label="5 sterren">★★★★★</span>
+              </div>
+            </div>
+            <p class="hf-review-card__text">Mijn vrouw zegt dat ik eindelijk gestopt ben met schreeuwen naar de televisie. Het volume staat nu veel lager en we kunnen weer normaal samen tv kijken zonder discussie. Dat alleen al maakt deze hoortoestellen elke euro waard!!</p>
+          </div>
+        </article>
+
+        <article class="hf-review-card">
+          <img class="hf-review-card__img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=480&h=360&fit=crop&q=80" alt="" loading="lazy">
+          <div class="hf-review-card__body">
+            <div class="hf-review-card__meta">
+              <div class="hf-review-card__author">
+                <span>Ken M.</span>
+                <span class="hf-review-card__flag" aria-hidden="true">🇳🇱</span>
+                <span class="hf-review-card__verified" aria-label="Geverifieerd">✓</span>
+              </div>
+              <div class="hf-review-card__trust">
+                <span class="hf-tp-logo">Trustpilot</span>
+                <span class="hf-tp-stars" aria-label="5 sterren">★★★★★</span>
+              </div>
+            </div>
+            <p class="hf-review-card__text">Geweldig!! Makkelijk in te stellen en eenvoudig in gebruik. Ik raak steeds meer gewend aan het aanpassen van de standen en het volume in verschillende situaties. De wereld van geluid komt weer terug en mijn tinnitus lijkt ook minder te worden!</p>
+          </div>
+        </article>
+
+        <article class="hf-review-card">
+          <img class="hf-review-card__img" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=480&h=360&fit=crop&q=80" alt="" loading="lazy">
+          <div class="hf-review-card__body">
+            <div class="hf-review-card__meta">
+              <div class="hf-review-card__author">
+                <span>Rodney M.</span>
+                <span class="hf-review-card__flag" aria-hidden="true">🇳🇱</span>
+                <span class="hf-review-card__verified" aria-label="Geverifieerd">✓</span>
+              </div>
+              <div class="hf-review-card__trust">
+                <span class="hf-tp-logo">Trustpilot</span>
+                <span class="hf-tp-stars" aria-label="5 sterren">★★★★★</span>
+              </div>
+            </div>
+            <p class="hf-review-card__text">Ze zijn bijna onzichtbaar wanneer ik ze draag, wat ik persoonlijk erg fijn vind. Het geluid klinkt helder en natuurlijk, zelfs in drukkere omgevingen. Ook het opladen gaat ontzettend eenvoudig, gewoon 's nachts in de case leggen en de volgende dag weer klaar voor gebruik.</p>
+          </div>
+        </article>
+
+        <article class="hf-review-card">
+          <img class="hf-review-card__img" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=480&h=360&fit=crop&q=80" alt="" loading="lazy">
+          <div class="hf-review-card__body">
+            <div class="hf-review-card__meta">
+              <div class="hf-review-card__author">
+                <span>Edward P.</span>
+                <span class="hf-review-card__flag" aria-hidden="true">🇳🇱</span>
+                <span class="hf-review-card__verified" aria-label="Geverifieerd">✓</span>
+              </div>
+              <div class="hf-review-card__trust">
+                <span class="hf-tp-logo">Trustpilot</span>
+                <span class="hf-tp-stars" aria-label="5 sterren">★★★★★</span>
+              </div>
+            </div>
+            <p class="hf-review-card__text">Dit zijn de beste hoortoestellen die ik ooit heb gehad. Wisselen tussen de standen gaat snel en eenvoudig. Vooral tijdens het winkelen of in drukke straten merk ik echt verschil.</p>
+          </div>
+        </article>
+
+        <article class="hf-review-card">
+          <img class="hf-review-card__img" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=480&h=360&fit=crop&q=80" alt="" loading="lazy">
+          <div class="hf-review-card__body">
+            <div class="hf-review-card__meta">
+              <div class="hf-review-card__author">
+                <span>Rebecca T.</span>
+                <span class="hf-review-card__flag" aria-hidden="true">🇳🇱</span>
+                <span class="hf-review-card__verified" aria-label="Geverifieerd">✓</span>
+              </div>
+              <div class="hf-review-card__trust">
+                <span class="hf-tp-logo">Trustpilot</span>
+                <span class="hf-tp-stars" aria-label="5 sterren">★★★★★</span>
+              </div>
+            </div>
+            <p class="hf-review-card__text">Ik draag ze elke dag sinds ze binnenkwamen en ze blijven zelfs na uren gebruik comfortabel zitten. De geluidskwaliteit klinkt vol en natuurlijk.</p>
+          </div>
+        </article>
+
+        <article class="hf-review-card">
+          <img class="hf-review-card__img" src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=480&h=360&fit=crop&q=80" alt="" loading="lazy">
+          <div class="hf-review-card__body">
+            <div class="hf-review-card__meta">
+              <div class="hf-review-card__author">
+                <span>William A.</span>
+                <span class="hf-review-card__flag" aria-hidden="true">🇳🇱</span>
+                <span class="hf-review-card__verified" aria-label="Geverifieerd">✓</span>
+              </div>
+              <div class="hf-review-card__trust">
+                <span class="hf-tp-logo">Trustpilot</span>
+                <span class="hf-tp-stars" aria-label="5 sterren">★★★★★</span>
+              </div>
+            </div>
+            <p class="hf-review-card__text">Ik was sceptisch omdat ik al van alles had geprobeerd, maar na een paar dagen merkte ik echt verschil. Gesprekken aan tafel gaan eindelijk weer vanzelf, zonder dat ik constant moet vragen of mensen iets willen herhalen.</p>
+          </div>
+        </article>
+      </div>
+
+      <p class="hf-reviews__score">
+        <span class="hf-tp-logo">Trustpilot</span>
+        Trustscore <strong>4,8</strong> | <strong>3.560</strong> beoordelingen
+      </p>
+    </section>
   </main>
 
   <script src="../../api.js"></script>
