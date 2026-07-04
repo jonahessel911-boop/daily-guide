@@ -394,6 +394,19 @@
     © 2026 Slaap Beter Slapen · Advertorial
   </footer>
 
+  <div class="lp-sticky-cta" id="sticky-cta">
+    <a href="../../checkout.html" class="lp-sticky-cta__btn">Claim mijn Beter Slapen Gids</a>
+  </div>
+
   <script src="../../track.js"></script>
+  <script>
+    (function () {
+      const sticky = document.getElementById('sticky-cta');
+      if (!sticky) return;
+      window.addEventListener('scroll', () => {
+        sticky.classList.toggle('visible', window.scrollY > 600);
+      }, { passive: true });
+    })();
+  </script>
 </body>
 </html>

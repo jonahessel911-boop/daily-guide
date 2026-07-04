@@ -1,17 +1,25 @@
 /**
- * HearFlex DTC checkout — content config
+ * HearDirect DTC checkout — content config
  * Pas teksten, prijzen en afbeeldingen hier aan.
  */
+const HEAR_DIRECT_IMG = '/hearing-nl/assets/product';
+const HEAR_DIRECT_REVIEWS = '/hearing-nl/assets/reviews';
+const HEAR_DIRECT_LOGO = '/hearing/assets/heardirect-logo.png';
+
 window.HearingDTCConfig = {
+  brand: {
+    logo: HEAR_DIRECT_LOGO,
+    logoAlt: 'HearDirect',
+  },
   product: {
-    name: 'HearFlex™ | Comfortabele hoortoestellen',
+    name: 'HearDirect™ | Comfortabele hoortoestellen',
     shortDescription:
       'Hoor elk gesprek duidelijk met een discreet en comfortabel ontwerp dat je de hele dag kunt dragen.',
     price: 149,
     originalPrice: 300,
     discountPercent: 50,
     rating: 4.8,
-    reviewCount: 3560, // placeholder — vervang met echte data
+    reviewCount: 3560,
     shippingLabel: 'Gratis',
   },
 
@@ -25,20 +33,24 @@ window.HearingDTCConfig = {
 
   productImages: [
     {
-      src: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=800&h=800&fit=crop&q=80',
-      alt: 'HearFlex hoortoestel',
+      src: `${HEAR_DIRECT_IMG}/heardirect-open-case.webp`,
+      alt: 'HearDirect™ witte oplaadcase met hoortoestellen',
     },
     {
-      src: 'https://images.unsplash.com/photo-1590658268037-6bf12f032a24?w=800&h=800&fit=crop&q=80',
-      alt: 'HearFlex oplaadcase',
+      src: `${HEAR_DIRECT_IMG}/heardirect-charging.webp`,
+      alt: 'HearDirect™ hoortoestellen in oplaadcase',
     },
     {
-      src: 'https://images.unsplash.com/photo-1583394294404-90dc3fbe4f71?w=800&h=800&fit=crop&q=80',
-      alt: 'HearFlex in gebruik',
+      src: `${HEAR_DIRECT_IMG}/heardirect-finger.webp`,
+      alt: 'HearDirect™ hoortoestel — discreet en compact',
     },
     {
-      src: 'https://images.unsplash.com/photo-1559757175-5700bbe6b7aa?w=800&h=800&fit=crop&q=80',
-      alt: 'HearFlex detail',
+      src: `${HEAR_DIRECT_IMG}/heardirect-box.webp`,
+      alt: 'HearDirect™ verpakking — digitale gehoorapparaten',
+    },
+    {
+      src: `${HEAR_DIRECT_IMG}/heardirect-contents.webp`,
+      alt: 'HearDirect™ complete set — alles in de doos',
     },
   ],
 
@@ -48,25 +60,27 @@ window.HearingDTCConfig = {
     { icon: 'setup', label: 'Binnen 2 minuten ingesteld' },
   ],
 
+  reviewBanner: `${HEAR_DIRECT_IMG}/heardirect-finger.gif`,
+
   reviews: [
     {
       name: 'Ronald J.',
-      image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=480&h=360&fit=crop&q=80',
+      image: `${HEAR_DIRECT_REVIEWS}/review-1-ronald.webp`,
       text: 'Mijn vrouw zegt dat ik eindelijk gestopt ben met schreeuwen naar de televisie. Het volume staat nu veel lager en we kunnen weer normaal samen tv kijken.',
     },
     {
       name: 'Ken M.',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=480&h=360&fit=crop&q=80',
+      image: `${HEAR_DIRECT_REVIEWS}/review-2-woman.webp`,
       text: 'Makkelijk in te stellen en eenvoudig in gebruik. De wereld van geluid komt weer terug en mijn tinnitus lijkt ook minder te worden.',
     },
     {
       name: 'Rodney M.',
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=480&h=360&fit=crop&q=80',
+      image: `${HEAR_DIRECT_REVIEWS}/review-3-table.webp`,
       text: 'Ze zijn bijna onzichtbaar wanneer ik ze draag. Het geluid klinkt helder en natuurlijk, zelfs in drukkere omgevingen.',
     },
     {
       name: 'Edward P.',
-      image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=480&h=360&fit=crop&q=80',
+      image: `${HEAR_DIRECT_REVIEWS}/review-4-man.webp`,
       text: 'Dit zijn de beste hoortoestellen die ik ooit heb gehad. Vooral tijdens het winkelen merk ik echt verschil.',
     },
   ],
@@ -101,13 +115,12 @@ window.HearingDTCConfig = {
       extras: ['Winkelhuur & personeel', 'Commissie audicien', 'Jaarlijkse batterijen'],
     },
     ours: {
-      label: 'HearFlex™ — direct online',
+      label: 'HearDirect™ — direct vanuit de fabrikant',
       price: 149,
       highlights: ['Zelfde kerntechnologie', '90 dagen proefperiode', 'Oplaadbaar — geen batterijen'],
     },
   },
 
-  // placeholder stats — vervang met geverifieerde data
   resultStats: [
     { value: 94, label: 'Houdt het toestel na proefperiode' },
     { value: 89, label: 'Merkt duidelijker gesprekken' },
@@ -124,7 +137,7 @@ window.HearingDTCConfig = {
   faqItems: [
     {
       q: 'Hoe werkt het product?',
-      a: 'HearFlex™ versterkt spraak en dempt achtergrondgeluid via een digitale chip. Je past het volume eenvoudig aan en laadt het toestel op in de meegeleverde case.',
+      a: 'HearDirect™ versterkt spraak en dempt achtergrondgeluid via een digitale chip. Je past het volume eenvoudig aan en laadt het toestel op in de meegeleverde case.',
     },
     {
       q: 'Heb ik technische kennis nodig?',
@@ -144,17 +157,17 @@ window.HearingDTCConfig = {
     },
     {
       q: 'Wat zit er in de doos?',
-      a: 'HearFlex™ hoortoestellen, oplaadcase, oplaadkabel, verschillende dompeltips en een gebruikershandleiding.',
+      a: 'HearDirect™ hoortoestellen, oplaadcase, USB-kabel, reinigingsborstel, siliconen oordopjes (3 paar), gebruikershandleiding en snelstartgids.',
     },
     {
       q: 'Hoe neem ik contact op met support?',
-      a: 'Stuur een e-mail naar support@hearflex.nl. We reageren doorgaans binnen 1 werkdag.',
+      a: 'Stuur een e-mail naar support@heardirect.nl. We reageren doorgaans binnen 1 werkdag.',
     },
   ],
 
   footer: {
     supportTitle: 'Uitstekende klantenservice',
-    email: 'support@hearflex.nl',
+    email: 'support@heardirect.nl',
     location: 'Nederland',
     links: [
       { label: 'Privacybeleid', href: '#' },

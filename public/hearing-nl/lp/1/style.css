@@ -30,23 +30,6 @@ a { color: inherit; text-decoration: none; }
   text-align: center;
 }
 
-.logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--brand);
-  letter-spacing: -0.02em;
-}
-
-.logo-icon {
-  width: 28px;
-  height: 28px;
-  background: linear-gradient(90deg, var(--brand) 20%, transparent 20%, transparent 40%, var(--brand) 40%, var(--brand) 60%, transparent 60%, transparent 80%, var(--brand) 80%);
-  border-radius: 4px;
-}
-
 /* Survey */
 .survey-wrap {
   max-width: 640px;
@@ -411,7 +394,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .compare-card.traditional h3 { color: #dc2626; }
-.compare-card.hearflex h3 { color: var(--blue); }
+.compare-card.heardirect h3 { color: var(--blue); }
 
 .compare-row {
   display: flex;
@@ -440,7 +423,7 @@ a { color: inherit; text-decoration: none; }
   background: #fef2f2;
 }
 
-.compare-card.hearflex .compare-total {
+.compare-card.heardirect .compare-total {
   background: #eff6ff;
 }
 
@@ -449,7 +432,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .compare-card.traditional .compare-total .amount { color: #dc2626; }
-.compare-card.hearflex .compare-total .amount { color: var(--blue); }
+.compare-card.heardirect .compare-total .amount { color: var(--blue); }
 
 /* Guarantee */
 .guarantee-box {

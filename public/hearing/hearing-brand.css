@@ -1,0 +1,28 @@
+/* HearDirect brand logo — shared across NL/BE hearing pages */
+
+.hd-logo {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.hd-logo img {
+  display: block;
+  height: 32px;
+  width: auto;
+  max-width: 140px;
+}
+
+.dtc-pre-header .hd-logo img {
+  height: 36px;
+}
+
+.dtc-pay-header .hd-logo img {
+  height: 32px;
+}
+
+.site-header .hd-logo img {
+  height: 36px;
+}

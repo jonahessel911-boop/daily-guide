@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js",
+    "dev": "PORT=3000 node server.js",
+    "stop": "lsof -ti:3000,8081 | xargs kill -9 2>/dev/null || true",
+    "restart": "npm run stop && npm run dev",
     "test:postmark": "node scripts/test-postmark.js"
   },
   "dependencies": {

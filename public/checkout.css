@@ -397,16 +397,27 @@
   margin-bottom: 8px;
 }
 
+#stripe-express-area {
+  padding: 4px 0 8px;
+}
+
 #payment-element {
   margin: 0;
 }
 
 #wallet-button-container {
   min-height: 52px;
+  margin: 12px 0 4px;
 }
 
-#wallet-button-container .StripeElement {
-  width: 100%;
+#wallet-button-container .StripeElement,
+#wallet-button-container iframe {
+  width: 100% !important;
+  min-height: 50px;
+}
+
+.wallet-step #submit-payment {
+  display: none !important;
 }
 
 .wallet-unavailable {
@@ -483,7 +494,8 @@
   margin: 12px 0;
 }
 
-.spinner {
+.spinner:not([hidden]) {
+  display: inline-block;
   width: 18px;
   height: 18px;
   border: 2px solid rgba(255, 255, 255, 0.3);

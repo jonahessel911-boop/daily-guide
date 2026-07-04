@@ -26,17 +26,44 @@ let stripe;
 let elements;
 let paymentElement;
 let expressCheckout;
+let paymentRequest;
+let paymentRequestButton;
 let clientSecret;
 let selectedMethod = 'ideal';
+
+function getCheckoutCountry() {
+  const attr = document.body.dataset.trackCountry;
+  const urlC = new URLSearchParams(window.location.search).get('c');
+  return (attr || urlC || 'nl').toLowerCase();
+}
+
+function isBelgiumCheckout() {
+  return getCheckoutCountry() === 'be';
+}
+
+function defaultPaymentMethod() {
+  return isBelgiumCheckout() ? 'bancontact' : 'ideal';
+}
+
+function stripeCountryCode() {
+  return isBelgiumCheckout() ? 'BE' : 'NL';
+}
 let customerEmail = '';
 let customerName = '';
 let shippingInfo = null;
 let postcodeLookupTimer = null;
 let postcodeLookupRequest = 0;
-let postcodeLookupAbort = null;
 
 function isDtcCheckout() {
   return document.body.classList.contains('dtc-checkout');
+}
+
+function isDtcPayPage() {
+  return document.body.classList.contains('dtc-pay');
+}
+
+function dtcConfirmLabel() {
+  return isDtcPayPage() ? 'Bevestig uw bestelling!' : 'Bestelling afronden';
 }
 
 function getOrderBumpSelected() {
@@ -63,7 +90,6 @@ function loadShippingFromStorage() {
     const fields = {
       'full-name': data.name,
       email: data.email,
-      phone: data.phone,
       'postal-code': data.postalCode,
       'house-number': data.houseNumber,
       'house-addition': data.houseAddition,
@@ -72,7 +98,9 @@ function loadShippingFromStorage() {
     };
     Object.entries(fields).forEach(([id, value]) => {
       const el = document.getElementById(id);
-      if (el && value) el.value = value;
+      if (el && value) {
+        el.value = id === 'postal-code' ? normalizePostcode(value) : value;
+      }
     });
   } catch (_) {
     /* ignore */
@@ -85,13 +113,12 @@ function collectShippingData() {
   return {
     name: document.getElementById('full-name')?.value.trim() || '',
     email: document.getElementById('email')?.value.trim() || '',
-    phone: document.getElementById('phone')?.value.trim() || '',
-    postalCode: document.getElementById('postal-code')?.value.trim().toUpperCase() || '',
+    postalCode: normalizePostcode(document.getElementById('postal-code')?.value),
     houseNumber: document.getElementById('house-number')?.value.trim() || '',
     houseAddition: document.getElementById('house-addition')?.value.trim() || '',
     street: document.getElementById('street')?.value.trim() || '',
     city: document.getElementById('city')?.value.trim() || '',
-    country: 'Nederland',
+    country: isBelgiumCheckout() ? 'België' : 'Nederland',
   };
 }
 
@@ -100,11 +127,14 @@ function validateShipping(data) {
 
   if (!data.name) return 'Vul je naam in.';
   if (!data.email || !data.email.includes('@')) return 'Vul een geldig e-mailadres in.';
-  if (!data.phone || data.phone.replace(/\D/g, '').length < 9) return 'Vul een geldig telefoonnummer in.';
   if (!data.postalCode) return 'Vul je postcode in.';
-  const normalizedPostcode = data.postalCode.replace(/\s/g, '');
-  if (!/^\d{4}[A-Za-z]{2}$/i.test(normalizedPostcode)) {
-    return 'Vul een geldige Nederlandse postcode in (bijv. 1234 AB).';
+  const normalizedPostcode = normalizePostcode(data.postalCode);
+  if (isBelgiumCheckout()) {
+    if (!/^\d{4}$/.test(normalizedPostcode)) {
+      return 'Vul een geldige Belgische postcode in (bijv. 1000).';
+    }
+  } else if (!/^\d{4}[A-Za-z]{2}$/i.test(normalizedPostcode)) {
+    return 'Vul een geldige Nederlandse postcode in (bijv. 1234AB).';
   }
   if (!data.houseNumber) return 'Vul je huisnummer in.';
   if (!data.street) return 'Vul je straat in of controleer postcode en huisnummer.';
@@ -113,15 +143,14 @@ function validateShipping(data) {
   return null;
 }
 
-function formatPostcodeInput(value) {
-  const raw = value.replace(/\s/g, '').toUpperCase().slice(0, 6);
-  if (raw.length <= 4) return raw;
-  return `${raw.slice(0, 4)} ${raw.slice(4)}`;
+function normalizePostcode(value) {
+  const raw = String(value || '').replace(/\s+/g, '').toUpperCase();
+  if (isBelgiumCheckout()) return raw.replace(/\D/g, '').slice(0, 4);
+  return raw.slice(0, 6);
 }
 
-function buildHouseNumberParam(houseNumber, houseAddition) {
-  if (!houseNumber) return '';
-  return houseAddition ? `${houseNumber}-${houseAddition}` : houseNumber;
+function formatPostcodeInput(value) {
+  return normalizePostcode(value);
 }
 
 function setPostcodeStatus(text, type) {
@@ -140,95 +169,107 @@ function setPostcodeStatus(text, type) {
   statusEl.className = `postcode-status postcode-status--${type}`;
 }
 
-async function fetchPostcodeLookup(postalCode, number, signal) {
-  const url = `${Api.getApiBase()}/api/postcode-lookup?postcode=${encodeURIComponent(postalCode)}&number=${encodeURIComponent(number)}`;
-  const res = await fetch(url, { signal, headers: { Accept: 'application/json' } });
-  const contentType = res.headers.get('content-type') || '';
-  let data = {};
-  if (contentType.includes('application/json')) {
-    data = await res.json();
-  } else {
-    const text = await res.text();
-    throw new Error(text.includes('<!') ? 'Server niet bereikbaar' : text.slice(0, 120));
-  }
+function applyAddressResult(data, streetEl, cityEl) {
+  const street = data.street || data.straat || '';
+  const city = data.city || data.woonplaats || data.municipality || '';
+  if (!street || !city) return false;
+  streetEl.value = street;
+  cityEl.value = city;
+  streetEl.dispatchEvent(new Event('input', { bubbles: true }));
+  cityEl.dispatchEvent(new Event('input', { bubbles: true }));
+  return true;
+}
+
+async function fetchPostcodeLookup(postalCode, houseNumber, houseAddition) {
+  const postcode = normalizePostcode(postalCode);
+  const params = new URLSearchParams({
+    postcode,
+    number: String(houseNumber),
+  });
+  if (houseAddition) params.set('toevoeging', houseAddition);
+
+  const url = `/api/postcode-lookup?${params}`;
+  const { res, data } = await Api.apiFetch(url, { headers: { Accept: 'application/json' } });
   return { res, data };
 }
 
 async function lookupAddress() {
+  if (isBelgiumCheckout()) return false;
+
   const postalEl = document.getElementById('postal-code');
   const houseEl = document.getElementById('house-number');
   const additionEl = document.getElementById('house-addition');
   const streetEl = document.getElementById('street');
   const cityEl = document.getElementById('city');
 
-  if (!postalEl || !houseEl || !streetEl || !cityEl) return;
+  if (!postalEl || !houseEl || !streetEl || !cityEl) return false;
 
-  const postalCode = postalEl.value.replace(/\s/g, '').toUpperCase();
+  postalEl.value = normalizePostcode(postalEl.value);
+  const postalCode = postalEl.value;
   const houseNumber = houseEl.value.trim();
   const houseAddition = additionEl?.value.trim() || '';
 
   if (!postalCode || !houseNumber) {
     setPostcodeStatus(null);
-    return;
+    return false;
   }
 
   if (!/^\d{4}[A-Z]{2}$/.test(postalCode)) {
     setPostcodeStatus(null);
-    return;
+    return false;
   }
-
-  if (postcodeLookupAbort) postcodeLookupAbort.abort();
-  postcodeLookupAbort = new AbortController();
-  const signal = postcodeLookupAbort.signal;
 
   const requestId = ++postcodeLookupRequest;
   setPostcodeStatus('Adres opzoeken...', 'loading');
 
-  const numbersToTry = houseAddition
-    ? [`${houseNumber}-${houseAddition}`, houseNumber]
-    : [houseNumber];
-
   try {
-    let lastError = 'Adres niet gevonden. Controleer postcode en huisnummer.';
+    if (requestId !== postcodeLookupRequest) return false;
 
-    for (const number of numbersToTry) {
-      if (signal.aborted || requestId !== postcodeLookupRequest) return;
+    const { res, data } = await fetchPostcodeLookup(postalCode, houseNumber, houseAddition);
 
-      const { res, data } = await fetchPostcodeLookup(postalCode, number, signal);
+    if (requestId !== postcodeLookupRequest) return false;
 
-      if (requestId !== postcodeLookupRequest) return;
-
-      if (res.ok && data.street && data.city) {
-        streetEl.value = data.street;
-        cityEl.value = data.city;
-        setPostcodeStatus(null);
-        return;
-      }
-
-      lastError = data.error || lastError;
-      if (res.status !== 404 && res.status !== 400) break;
+    if (res.ok && applyAddressResult(data, streetEl, cityEl)) {
+      setPostcodeStatus(null);
+      return true;
     }
 
     streetEl.value = '';
     cityEl.value = '';
-    setPostcodeStatus(lastError, 'error');
+    setPostcodeStatus(data.error || 'Adres niet gevonden. Controleer postcode en huisnummer.', 'error');
+    return false;
   } catch (err) {
-    if (err.name === 'AbortError' || requestId !== postcodeLookupRequest) return;
+    if (requestId !== postcodeLookupRequest) return false;
     setPostcodeStatus(err.message || 'Kon adres niet opzoeken. Probeer het opnieuw.', 'error');
+    return false;
   }
+}
+
+async function ensureAddressFromPostcode() {
+  const streetEl = document.getElementById('street');
+  const cityEl = document.getElementById('city');
+  if (streetEl?.value.trim() && cityEl?.value.trim()) return true;
+  return lookupAddress();
 }
 
 function scheduleAddressLookup() {
   clearTimeout(postcodeLookupTimer);
-  postcodeLookupTimer = setTimeout(lookupAddress, 450);
+  postcodeLookupTimer = setTimeout(lookupAddress, 600);
 }
 
 function initPostcodeLookup() {
+  if (isBelgiumCheckout()) return;
+
   const postalEl = document.getElementById('postal-code');
   const houseEl = document.getElementById('house-number');
   const additionEl = document.getElementById('house-addition');
 
   if (!postalEl || !houseEl) return;
+
+  const triggerLookup = () => {
+    clearTimeout(postcodeLookupTimer);
+    lookupAddress();
+  };
 
   postalEl.addEventListener('input', (e) => {
     e.target.value = formatPostcodeInput(e.target.value);
@@ -237,20 +278,13 @@ function initPostcodeLookup() {
 
   houseEl.addEventListener('input', scheduleAddressLookup);
   additionEl?.addEventListener('input', scheduleAddressLookup);
-  additionEl?.addEventListener('change', scheduleAddressLookup);
 
   postalEl.addEventListener('blur', () => {
-    clearTimeout(postcodeLookupTimer);
-    lookupAddress();
+    postalEl.value = normalizePostcode(postalEl.value);
+    triggerLookup();
   });
-  houseEl.addEventListener('blur', () => {
-    clearTimeout(postcodeLookupTimer);
-    lookupAddress();
-  });
-  additionEl?.addEventListener('blur', () => {
-    clearTimeout(postcodeLookupTimer);
-    lookupAddress();
-  });
+  houseEl.addEventListener('blur', triggerLookup);
+  additionEl?.addEventListener('blur', triggerLookup);
 }
 
 let productConfig = {
@@ -298,14 +332,88 @@ async function loadProductConfig() {
   if (nameEl && productConfig.name) nameEl.textContent = productConfig.name;
 
   if (productConfig.slug === 'hearing') {
-    document.title = `Afrekenen | HearFlex™`;
+    document.title = 'Afrekenen | HearDirect™';
   }
+}
+
+function getCheckoutAmountCents() {
+  const bump = getOrderBumpSelected() && getProductSlug() === 'hearing' ? 995 : 0;
+  return productConfig.amountCents + bump;
+}
+
+function usesCheckoutSession(method) {
+  return method === 'ideal' || method === 'bancontact' || method === 'card' || method === 'klarna';
+}
+
+function isWalletPaymentMethod(method) {
+  return method === 'apple_pay' || method === 'google_pay';
+}
+
+function redirectPaymentLabel(method) {
+  const labels = {
+    ideal: 'Doorverwijzen naar iDEAL...',
+    bancontact: 'Doorverwijzen naar Bancontact...',
+    card: 'Doorverwijzen naar creditcard betaling...',
+    klarna: 'Doorverwijzen naar Klarna...',
+  };
+  return labels[method] || 'Doorverwijzen naar beveiligde betaling...';
+}
+
+let pendingAutoConfirm = false;
+
+function getCheckoutAnalytics() {
+  return window.FunnelTrack?.getAttribution?.() != null
+    ? {
+        productSlug: getProductSlug(),
+        country: window.FunnelTrack.getAttribution().country.toUpperCase(),
+        landerSlug: window.FunnelTrack.getAttribution().lander,
+        sessionId: window.FunnelTrack.getSessionId(),
+      }
+    : { productSlug: getProductSlug() };
+}
+
+function getMetaCookies() {
+  const read = (name) => {
+    const match = document.cookie.match(
+      new RegExp('(?:^|; )' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '=([^;]*)')
+    );
+    return match ? decodeURIComponent(match[1]) : null;
+  };
+  return { fbc: read('_fbc'), fbp: read('_fbp') };
+}
+
+async function createCheckoutSession(email, method) {
+  const continueText = document.getElementById('continue-text');
+  if (continueText) continueText.textContent = redirectPaymentLabel(method);
+
+  const { res, data } = await Api.apiFetch('/api/create-checkout-session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email,
+      paymentMethod: method,
+      cancelUrl: window.location.href,
+      successUrl: `${window.location.origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+      analytics: getCheckoutAnalytics(),
+      meta: getMetaCookies(),
+      shipping: shippingInfo,
+      orderBump: getOrderBumpSelected(),
+    }),
+  });
+
+  if (!res.ok || !data.url) {
+    throw new Error(data.error || 'Kon niet doorverwijzen naar Stripe');
+  }
+
+  window.location.assign(data.url);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadProductConfig();
   loadShippingFromStorage();
   initPostcodeLookup();
+  await ensureAddressFromPostcode();
+
   const selectForm = document.getElementById('select-form');
   const emailInput = document.getElementById('email');
   const accordionToggle = document.getElementById('pm-accordion-toggle');
@@ -313,17 +421,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnBack = document.getElementById('btn-back');
   const btnSubmit = document.getElementById('submit-payment');
 
-  const savedEmail = sessionStorage.getItem('checkout_email');
-  if (savedEmail) emailInput.value = savedEmail;
+  if (!selectForm) return;
 
+  const savedEmail = sessionStorage.getItem('checkout_email');
+  if (savedEmail && emailInput) emailInput.value = savedEmail;
+
+  const availableMethods = [...document.querySelectorAll('input[name="payment-method"]')].map(
+    (radio) => radio.value
+  );
   const savedMethod = sessionStorage.getItem('checkout_method');
-  if (savedMethod && METHOD_LABELS[savedMethod]) {
+  if (savedMethod && availableMethods.includes(savedMethod)) {
     selectMethod(savedMethod);
   } else {
-    selectMethod('ideal');
+    selectMethod(defaultPaymentMethod());
   }
 
-  accordionToggle.addEventListener('click', () => {
+  accordionToggle?.addEventListener('click', () => {
     const open = accordionBody.hidden;
     accordionBody.hidden = !open;
     accordionToggle.setAttribute('aria-expanded', String(open));
@@ -335,31 +448,40 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (radio.checked) {
         selectMethod(radio.value);
         accordionBody.hidden = true;
-        accordionToggle.setAttribute('aria-expanded', 'false');
-        accordionToggle.classList.remove('open');
+        accordionToggle?.setAttribute('aria-expanded', 'false');
+        accordionToggle?.classList.remove('open');
       }
     });
   });
 
-  btnBack.addEventListener('click', () => {
+  btnBack?.addEventListener('click', () => {
     destroyStripeElements();
-    document.getElementById('step-pay').hidden = true;
+    pendingAutoConfirm = false;
+    const stepPay = document.getElementById('step-pay');
+    stepPay.hidden = true;
+    stepPay.classList.remove('wallet-step');
     document.getElementById('step-select').hidden = false;
+    setContinueLoading(false);
   });
 
-  btnSubmit.addEventListener('click', () => handlePayment());
+  btnSubmit?.addEventListener('click', () => handlePayment());
 
   selectForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    const addressOk = await ensureAddressFromPostcode();
     const shipping = collectShippingData();
     const shippingError = validateShipping(shipping);
     if (shippingError) {
       showMessage('select-message', shippingError);
       return;
     }
+    if (!isBelgiumCheckout() && !addressOk && (!shipping.street || !shipping.city)) {
+      showMessage('select-message', 'Kon straat en woonplaats niet ophalen. Controleer postcode en huisnummer.');
+      return;
+    }
 
-    const email = shipping?.email || emailInput.value.trim();
+    const email = shipping?.email || emailInput?.value.trim();
     if (!email || !email.includes('@')) {
       showMessage('select-message', 'Vul een geldig e-mailadres in.');
       return;
@@ -376,13 +498,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     showMessage('select-message', null);
 
     try {
-      await createPaymentIntent(email, selectedMethod);
-      document.getElementById('step-select').hidden = true;
-      document.getElementById('step-pay').hidden = false;
-      updatePayHeader(selectedMethod);
-      // Mount Stripe UI only after step-pay is visible (hidden parents break wallet buttons).
-      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-      await mountPaymentUI(selectedMethod);
+      if (usesCheckoutSession(selectedMethod)) {
+        await createCheckoutSession(email, selectedMethod);
+        return;
+      }
+
+      if (isWalletPaymentMethod(selectedMethod)) {
+        if (!stripe) stripe = Stripe(STRIPE_PK);
+        clientSecret = null;
+        document.getElementById('step-select').hidden = true;
+        const stepPay = document.getElementById('step-pay');
+        stepPay.hidden = false;
+        stepPay.classList.add('wallet-step');
+        updatePayHeader(selectedMethod);
+        stepPay.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        await mountWalletCheckout(selectedMethod);
+        return;
+      }
+
+      throw new Error('Onbekende betaalmethode. Kies een andere optie.');
     } catch (err) {
       showMessage('select-message', err.message);
     } finally {
@@ -403,10 +538,12 @@ function selectMethod(method) {
   document.getElementById('pm-selected-icon').innerHTML = METHOD_ICONS[method];
 
   const continueText = document.getElementById('continue-text');
-  if (isDtcCheckout()) {
-    continueText.textContent = 'Bestelling afronden';
-  } else if (method === 'apple_pay') continueText.textContent = 'Doorgaan met Apple Pay';
+  if (!continueText) return;
+  if (method === 'apple_pay') continueText.textContent = 'Doorgaan met Apple Pay';
   else if (method === 'google_pay') continueText.textContent = 'Doorgaan met Google Pay';
+  else if (method === 'card') continueText.textContent = 'Doorgaan met creditcard';
+  else if (method === 'klarna') continueText.textContent = 'Doorgaan met Klarna';
+  else if (isDtcCheckout()) continueText.textContent = dtcConfirmLabel();
   else continueText.textContent = 'Doorgaan naar betalen';
 }
 
@@ -415,27 +552,9 @@ function updatePayHeader(method) {
   document.getElementById('pm-pay-icon').innerHTML = METHOD_ICONS[method];
 }
 
-async function createPaymentIntent(email, method) {
-  destroyStripeElements();
-
-  const analytics =
-    window.FunnelTrack?.getAttribution?.() != null
-      ? {
-          productSlug: getProductSlug(),
-          country: window.FunnelTrack.getAttribution().country.toUpperCase(),
-          landerSlug: window.FunnelTrack.getAttribution().lander,
-          sessionId: window.FunnelTrack.getSessionId(),
-        }
-      : { productSlug: getProductSlug() };
-
-  function getMetaCookies() {
-    const read = (name) => {
-      const match = document.cookie.match(
-        new RegExp('(?:^|; )' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '=([^;]*)')
-      );
-      return match ? decodeURIComponent(match[1]) : null;
-    };
-    return { fbc: read('_fbc'), fbp: read('_fbp') };
+async function createPaymentIntent(email, method, options = {}) {
+  if (!options.preserveElements) {
+    destroyStripeElements();
   }
 
   const { res, data } = await Api.apiFetch('/api/create-payment', {
@@ -444,7 +563,7 @@ async function createPaymentIntent(email, method) {
     body: JSON.stringify({
       email,
       paymentMethod: method,
-      analytics,
+      analytics: getCheckoutAnalytics(),
       meta: getMetaCookies(),
       shipping: shippingInfo,
       orderBump: getOrderBumpSelected(),
@@ -454,7 +573,207 @@ async function createPaymentIntent(email, method) {
   if (!res.ok) throw new Error(data.error || 'Kon betaling niet starten');
 
   clientSecret = data.clientSecret;
-  stripe = Stripe(STRIPE_PK);
+  if (!stripe) stripe = Stripe(STRIPE_PK);
+}
+
+async function handleWalletConfirm(method) {
+  const messageEl = document.getElementById('payment-message');
+  messageEl.hidden = true;
+
+  const { error: submitError } = await elements.submit();
+  if (submitError) {
+    messageEl.textContent = submitError.message;
+    messageEl.hidden = false;
+    return;
+  }
+
+  if (!clientSecret) {
+    try {
+      await createPaymentIntent(customerEmail, method, { preserveElements: true });
+    } catch (err) {
+      messageEl.textContent = err.message;
+      messageEl.hidden = false;
+      return;
+    }
+  }
+
+  const { error } = await stripe.confirmPayment({
+    elements,
+    clientSecret,
+    confirmParams: {
+      return_url: `${window.location.origin}/success.html`,
+      receipt_email: customerEmail,
+      payment_method_data: {
+        billing_details: {
+          email: customerEmail,
+          name: customerName || undefined,
+        },
+      },
+    },
+  });
+
+  if (error) {
+    messageEl.textContent = error.message;
+    messageEl.hidden = false;
+  }
+}
+
+async function tryMountPaymentRequestButton(method, amount) {
+  const container = document.getElementById('wallet-button-container');
+  const walletUnavailable = document.getElementById('wallet-unavailable');
+
+  paymentRequest = stripe.paymentRequest({
+    country: stripeCountryCode(),
+    currency: 'eur',
+    total: { label: productConfig.name || 'HearDirect™', amount },
+    requestPayerEmail: true,
+    requestPayerName: true,
+  });
+
+  const canPay = await paymentRequest.canMakePayment();
+  if (!canPay) return false;
+  if (method === 'apple_pay' && !canPay.applePay) return false;
+  if (method === 'google_pay' && !canPay.googlePay) return false;
+
+  const prElements = stripe.elements();
+  paymentRequestButton = prElements.create('paymentRequestButton', {
+    paymentRequest,
+    style: {
+      paymentRequestButton: {
+        type: 'buy',
+        theme: 'dark',
+        height: '50px',
+      },
+    },
+  });
+
+  paymentRequest.on('paymentmethod', async (ev) => {
+    const messageEl = document.getElementById('payment-message');
+    messageEl.hidden = true;
+    try {
+      if (!clientSecret) {
+        await createPaymentIntent(customerEmail, method, { preserveElements: true });
+      }
+
+      const { error, paymentIntent } = await stripe.confirmCardPayment(
+        clientSecret,
+        { payment_method: ev.paymentMethod.id },
+        { handleActions: true }
+      );
+
+      if (error) {
+        ev.complete('fail');
+        messageEl.textContent = error.message;
+        messageEl.hidden = false;
+        return;
+      }
+
+      ev.complete('success');
+      if (paymentIntent?.status === 'succeeded') {
+        window.location.href = `${window.location.origin}/success.html?payment_intent=${paymentIntent.id}`;
+      }
+    } catch (err) {
+      ev.complete('fail');
+      messageEl.textContent = err.message || 'Betaling mislukt';
+      messageEl.hidden = false;
+    }
+  });
+
+  container.innerHTML = '';
+  paymentRequestButton.mount('#wallet-button-container');
+  walletUnavailable.hidden = true;
+  return true;
+}
+
+async function mountWalletCheckout(method) {
+  const payArea = document.getElementById('stripe-payment-area');
+  const expressArea = document.getElementById('stripe-express-area');
+  const submitBtn = document.getElementById('submit-payment');
+  const walletUnavailable = document.getElementById('wallet-unavailable');
+  const container = document.getElementById('wallet-button-container');
+
+  if (payArea) payArea.hidden = true;
+  if (submitBtn) {
+    submitBtn.hidden = true;
+    submitBtn.disabled = true;
+  }
+  expressArea.hidden = false;
+  container.innerHTML = '';
+  walletUnavailable.hidden = true;
+
+  const amount = getCheckoutAmountCents();
+  const productLabel = productConfig.name || 'HearDirect™';
+
+  const prMounted = await tryMountPaymentRequestButton(method, amount);
+  if (prMounted) return;
+
+  elements = stripe.elements({
+    mode: 'payment',
+    amount,
+    currency: 'eur',
+    appearance: getStripeAppearance(),
+    locale: 'nl',
+  });
+
+  expressCheckout = elements.create('expressCheckout', {
+    paymentMethods: {
+      applePay: method === 'apple_pay' ? 'always' : 'never',
+      googlePay: method === 'google_pay' ? 'always' : 'never',
+      link: 'never',
+      paypal: 'never',
+      amazonPay: 'never',
+      klarna: 'never',
+    },
+    business: { name: productLabel },
+    lineItems: [{ name: productLabel, amount }],
+    emailRequired: false,
+    buttonType: {
+      applePay: 'buy',
+      googlePay: 'buy',
+    },
+    buttonTheme: {
+      applePay: 'black',
+      googlePay: 'black',
+    },
+    buttonHeight: 50,
+    layout: {
+      maxColumns: 1,
+      maxRows: 1,
+    },
+  });
+
+  let walletReady = false;
+
+  expressCheckout.on('availablepaymentmethodschange', ({ availablePaymentMethods }) => {
+    const available =
+      method === 'apple_pay'
+        ? availablePaymentMethods?.applePay
+        : availablePaymentMethods?.googlePay;
+    if (available) {
+      walletReady = true;
+      walletUnavailable.hidden = true;
+    }
+  });
+
+  expressCheckout.on('confirm', () => handleWalletConfirm(method));
+
+  expressCheckout.mount('#wallet-button-container');
+
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  const hasWalletUi =
+    walletReady ||
+    container.querySelector('button') ||
+    container.querySelector('iframe') ||
+    container.offsetHeight > 44;
+
+  if (!hasWalletUi) {
+    walletUnavailable.textContent =
+      method === 'apple_pay'
+        ? 'Apple Pay kon niet worden geladen. Gebruik Safari op een iPhone, iPad of Mac met Apple Pay ingesteld, of kies een andere betaalmethode.'
+        : 'Google Pay kon niet worden geladen. Gebruik Chrome met Google Pay ingesteld, of kies een andere betaalmethode.';
+    walletUnavailable.hidden = false;
+  }
 }
 
 function getStripeAppearance() {
@@ -481,9 +800,14 @@ function getStripeAppearance() {
 
 async function mountPaymentUI(method) {
   const appearance = getStripeAppearance();
+  const payArea = document.getElementById('stripe-payment-area');
   const expressArea = document.getElementById('stripe-express-area');
   const submitBtn = document.getElementById('submit-payment');
   const walletUnavailable = document.getElementById('wallet-unavailable');
+
+  if (!payArea || !expressArea || !submitBtn) {
+    throw new Error('Betaalformulier kon niet worden geladen. Vernieuw de pagina.');
+  }
 
   payArea.hidden = true;
   expressArea.hidden = true;
@@ -509,80 +833,6 @@ async function mountPaymentUI(method) {
       submitBtn.disabled = false;
     });
   }
-}
-
-async function mountWalletCheckout(method) {
-  const expressArea = document.getElementById('stripe-express-area');
-  const walletUnavailable = document.getElementById('wallet-unavailable');
-  const container = document.getElementById('wallet-button-container');
-
-  expressArea.hidden = false;
-  container.innerHTML = '';
-  walletUnavailable.hidden = true;
-
-  elements = stripe.elements({ clientSecret, appearance: getStripeAppearance(), locale: 'nl' });
-
-  expressCheckout = elements.create('expressCheckout', {
-    paymentMethods: {
-      applePay: method === 'apple_pay' ? 'always' : 'never',
-      googlePay: method === 'google_pay' ? 'always' : 'never',
-      link: 'never',
-      paypal: 'never',
-      amazonPay: 'never',
-      klarna: 'never',
-    },
-    buttonType: {
-      applePay: 'buy',
-      googlePay: 'buy',
-    },
-    buttonTheme: {
-      applePay: 'black',
-      googlePay: 'black',
-    },
-    layout: {
-      maxColumns: 1,
-      maxRows: 1,
-    },
-  });
-
-  expressCheckout.on('confirm', async () => {
-    const messageEl = document.getElementById('payment-message');
-    messageEl.hidden = true;
-
-    const { error } = await stripe.confirmPayment({
-      elements,
-      clientSecret,
-      confirmParams: {
-        return_url: `${window.location.origin}/success.html`,
-        receipt_email: customerEmail,
-      },
-    });
-
-    if (error) {
-      messageEl.textContent = error.message;
-      messageEl.hidden = false;
-    }
-  });
-
-  await new Promise((resolve) => {
-    expressCheckout.on('ready', ({ availablePaymentMethods }) => {
-      const available =
-        method === 'apple_pay'
-          ? availablePaymentMethods?.applePay
-          : availablePaymentMethods?.googlePay;
-
-      if (!available) {
-        walletUnavailable.textContent =
-          method === 'apple_pay'
-            ? 'Apple Pay is niet beschikbaar op dit apparaat of browser. Gebruik Safari op een Apple-apparaat, of kies een andere betaalmethode.'
-            : 'Google Pay is niet beschikbaar op dit apparaat. Kies een andere betaalmethode.';
-        walletUnavailable.hidden = false;
-      }
-      resolve();
-    });
-
-    expressCheckout.mount('#wallet-button-container');
-  });
 }
 
 async function handlePayment() {
@@ -618,6 +868,10 @@ async function handlePayment() {
     messageEl.textContent = error.message;
     messageEl.hidden = false;
     setPayLoading(false);
+    const payText = document.getElementById('button-text');
+    if (payText && (isDtcPayPage() || isDtcCheckout())) {
+      payText.textContent = dtcConfirmLabel();
+    }
   }
 }
 
@@ -630,10 +884,17 @@ function destroyStripeElements() {
     expressCheckout.unmount();
     expressCheckout = null;
   }
+  if (paymentRequestButton) {
+    paymentRequestButton.unmount();
+    paymentRequestButton = null;
+  }
+  paymentRequest = null;
   elements = null;
   clientSecret = null;
   const container = document.getElementById('wallet-button-container');
   if (container) container.innerHTML = '';
+  const walletUnavailable = document.getElementById('wallet-unavailable');
+  if (walletUnavailable) walletUnavailable.hidden = true;
 }
 
 function showMessage(id, text) {
@@ -650,12 +911,13 @@ function setContinueLoading(loading) {
   const btn = document.getElementById('btn-continue');
   const spinner = document.getElementById('continue-spinner');
   const text = document.getElementById('continue-text');
+  if (!btn || !spinner || !text) return;
   btn.disabled = loading;
   spinner.hidden = !loading;
   text.textContent = loading
     ? 'Even geduld...'
     : isDtcCheckout()
-      ? 'Bestelling afronden'
+      ? dtcConfirmLabel()
       : 'Doorgaan naar betalen';
 }
 
@@ -663,12 +925,16 @@ function setPayLoading(loading) {
   const submitBtn = document.getElementById('submit-payment');
   const spinner = document.getElementById('spinner');
   const buttonText = document.getElementById('button-text');
-  if (submitBtn.hidden) return;
+  if (!submitBtn || !spinner || !buttonText || submitBtn.hidden) return;
   submitBtn.disabled = loading;
   spinner.hidden = !loading;
   buttonText.textContent = loading
     ? 'Bezig met verwerken...'
-    : isDtcCheckout() || productConfig.slug === 'hearing'
-      ? 'Bestelling afronden'
-      : 'Begin vandaag met beter slapen';
+    : isDtcPayPage() || (isDtcCheckout() && productConfig.slug === 'hearing')
+      ? 'Bevestig uw bestelling!'
+      : isDtcCheckout()
+        ? 'Bestelling afronden'
+        : productConfig.slug === 'hearing'
+          ? 'Bevestig uw bestelling!'
+          : 'Begin vandaag met beter slapen';
 }

@@ -26,24 +26,35 @@
   <script>
     const params = new URLSearchParams(window.location.search);
     const paymentIntent = params.get('payment_intent');
+    const sessionId = params.get('session_id');
 
     function trackMetaPurchase(paymentId, amount) {
       const key = `meta_purchase_${paymentId}`;
-      if (sessionStorage.getItem(key)) return;
+      if (!paymentId || sessionStorage.getItem(key)) return;
       if (window.MetaPixel?.trackPurchase(amount, paymentId)) {
         sessionStorage.setItem(key, '1');
       }
     }
 
-    if (paymentIntent) {
-      Api.apiFetch(`/api/payment-status?payment_intent=${paymentIntent}`)
-        .then(({ data }) => {
-          if (data.status === 'succeeded') {
-            document.getElementById('success-message').textContent =
-              `Je betaling van €${data.amount.toFixed(2).replace('.', ',')} is gelukt! Je e-books worden naar ${data.email || 'je e-mailadres'} gestuurd.`;
-            trackMetaPurchase(paymentIntent, data.amount);
-          }
-        })
+    function showSuccess(data) {
+      if (data.status !== 'succeeded' && data.status !== 'paid') return;
+      const amount = `€${data.amount.toFixed(2).replace('.', ',')}`;
+      const email = data.email || 'je e-mailadres';
+      const isHearing = data.productSlug === 'hearing';
+      document.getElementById('success-message').textContent = isHearing
+        ? `Je betaling van ${amount} is gelukt! Je HearDirect™ bestelling wordt naar ${email} bevestigd en zo snel mogelijk verzonden.`
+        : `Je betaling van ${amount} is gelukt! Je e-books worden naar ${email} gestuurd.`;
+      document.title = isHearing ? 'Bedankt! | HearDirect™' : 'Bedankt! | Slaap Beter Slapen';
+      trackMetaPurchase(sessionId || paymentIntent, data.amount);
+    }
+
+    if (sessionId) {
+      Api.apiFetch(`/api/checkout-status?session_id=${encodeURIComponent(sessionId)}`)
+        .then(({ data }) => showSuccess({ ...data, status: data.status === 'paid' ? 'paid' : data.status }))
+        .catch(() => {});
+    } else if (paymentIntent) {
+      Api.apiFetch(`/api/payment-status?payment_intent=${encodeURIComponent(paymentIntent)}`)
+        .then(({ data }) => showSuccess({ ...data, status: data.status }))
         .catch(() => {});
     }
   </script>

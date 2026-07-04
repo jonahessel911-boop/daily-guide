@@ -153,6 +153,8 @@ body {
 
 .checker-url-box code { font-size: 13px; color: #93c5fd; background: transparent; padding: 0; }
 
+.panel-hearing { border-color: #10b981; }
+
 .btn-copy {
   padding: 8px 14px;
   border-radius: 8px;

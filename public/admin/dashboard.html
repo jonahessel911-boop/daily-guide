@@ -35,8 +35,8 @@
     <section class="panel panel-split">
       <div class="split-header">
         <div>
-          <h2>Traffic split</h2>
-          <p class="hint" style="margin:0;">Gebruik deze URL in je ads — verdeelt traffic automatisch.</p>
+          <h2>Sleep traffic split</h2>
+          <p class="hint" style="margin:0;">Gebruik deze URL in je sleep ads — verdeelt traffic automatisch.</p>
         </div>
         <button type="button" id="btn-copy-checker" class="btn-copy">Kopieer URL</button>
       </div>
@@ -65,6 +65,78 @@
       <div class="split-actions">
         <button type="button" id="btn-save-splits" class="btn-save">Splits opslaan</button>
         <span id="split-save-msg" class="split-save-msg" hidden></span>
+      </div>
+    </section>
+
+    <section class="panel panel-hearing">
+      <div class="split-header">
+        <div>
+          <h2>Hearing traffic split (NL)</h2>
+          <p class="hint" style="margin:0;">URL voor hearing ads in Nederland — verdeelt tussen adv/1 en adv/2.</p>
+        </div>
+        <button type="button" id="btn-copy-hearing-checker" class="btn-copy">Kopieer URL</button>
+      </div>
+      <div class="checker-url-box">
+        <code id="hearing-checker-url">https://www.the-daily-guide.com/hearing-checker</code>
+      </div>
+      <p class="split-total">Totaal: <strong id="hearing-split-total">—</strong>% <span id="hearing-split-total-warn" class="split-warn" hidden> (moet 100% zijn)</span></p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Lander</th>
+              <th>Pagina</th>
+              <th>Traffic %</th>
+              <th>Views</th>
+              <th>Sales</th>
+              <th>CR</th>
+              <th>Omzet</th>
+            </tr>
+          </thead>
+          <tbody id="hearing-split-body">
+            <tr><td colspan="7" class="empty">Laden…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="split-actions">
+        <button type="button" id="btn-save-hearing-splits" class="btn-save">Splits opslaan</button>
+        <span id="hearing-split-save-msg" class="split-save-msg" hidden></span>
+      </div>
+    </section>
+
+    <section class="panel panel-hearing-be">
+      <div class="split-header">
+        <div>
+          <h2>Hearing traffic split (BE)</h2>
+          <p class="hint" style="margin:0;">URL voor hearing ads in België — verdeelt tussen adv/1 en adv/2.</p>
+        </div>
+        <button type="button" id="btn-copy-hearing-be-checker" class="btn-copy">Kopieer URL</button>
+      </div>
+      <div class="checker-url-box">
+        <code id="hearing-be-checker-url">https://www.the-daily-guide.com/hearing-checker-be</code>
+      </div>
+      <p class="split-total">Totaal: <strong id="hearing-be-split-total">—</strong>% <span id="hearing-be-split-total-warn" class="split-warn" hidden> (moet 100% zijn)</span></p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Lander</th>
+              <th>Pagina</th>
+              <th>Traffic %</th>
+              <th>Views</th>
+              <th>Sales</th>
+              <th>CR</th>
+              <th>Omzet</th>
+            </tr>
+          </thead>
+          <tbody id="hearing-be-split-body">
+            <tr><td colspan="7" class="empty">Laden…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="split-actions">
+        <button type="button" id="btn-save-hearing-be-splits" class="btn-save">Splits opslaan</button>
+        <span id="hearing-be-split-save-msg" class="split-save-msg" hidden></span>
       </div>
     </section>
 

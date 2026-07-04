@@ -46,7 +46,7 @@ const TESTIMONIALS = [
   },
   {
     name: 'Dhr Janssen',
-    text: 'Mijn vrouw zei al maanden dat ik te zacht praat. Met HearFlex hoor ik zelf ook wat beter en praat ik weer normaal. Geen grote apparaatjes, niemand die het ziet. Echt een aanrader voor iedereen die twijfelt.',
+    text: 'Mijn vrouw zei al maanden dat ik te zacht praat. Met HearDirect hoor ik zelf ook wat beter en praat ik weer normaal. Geen grote apparaatjes, niemand die het ziet. Echt een aanrader voor iedereen die twijfelt.',
   },
 ];
 

@@ -1,4 +1,6 @@
+const portOverride = process.env.PORT;
 require('dotenv').config({ override: true });
+if (portOverride) process.env.PORT = portOverride;
 const crypto = require('crypto');
 const express = require('express');
 const cors = require('cors');
@@ -31,8 +33,8 @@ const PRODUCTS = {
   },
   hearing: {
     slug: 'hearing',
-    name: 'HearFlex™ — Bijna onzichtbaar hoortoestel',
-    description: 'Innovatief hoortoestel met automatische volumeregeling en ruisonderdrukking',
+    name: 'HearDirect™ — Comfortabele hoortoestellen',
+    description: 'HearDirect™ digitale hoortoestellen met oplaadcase',
     price: 149.0,
     originalPrice: 300.0,
     orderPrefix: 'HEAR',
@@ -43,11 +45,68 @@ function getProduct(slug) {
   return PRODUCTS[slug] || PRODUCTS.sleep;
 }
 
+function buildOrderMetadata({
+  product,
+  productSlug,
+  email,
+  shipping = {},
+  paymentMethod,
+  analytics = {},
+  meta = {},
+  orderBump,
+  orderId,
+}) {
+  return {
+    order_id: orderId,
+    product: product.name,
+    product_slug: productSlug,
+    customer_email: email,
+    customer_name: shipping.name || '',
+    customer_phone: shipping.phone || '',
+    shipping_postal_code: shipping.postalCode || '',
+    shipping_house_number: shipping.houseNumber || '',
+    shipping_house_addition: shipping.houseAddition || '',
+    shipping_street: shipping.street || '',
+    shipping_city: shipping.city || '',
+    shipping_country: shipping.country || '',
+    order_bump: orderBump ? 'yes' : 'no',
+    payment_method: paymentMethod,
+    country: (analytics.country || 'NL').toUpperCase(),
+    lander_slug: analytics.landerSlug || '',
+    session_id: analytics.sessionId || '',
+    fbc: meta.fbc || '',
+    fbp: meta.fbp || '',
+  };
+}
+
+const CHECKOUT_METHOD_TYPES = {
+  ideal: ['ideal'],
+  bancontact: ['bancontact'],
+  card: ['card'],
+  klarna: ['klarna'],
+};
+
 let stripe = null;
 if (process.env.STRIPE_SECRET_KEY) {
   stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 } else {
   console.warn('⚠️  STRIPE_SECRET_KEY niet ingesteld. Kopieer .env.example naar .env.');
+}
+
+async function ensurePaymentMethodDomains() {
+  if (!stripe) return;
+  const domains = ['www.the-daily-guide.com', 'the-daily-guide.com'];
+  for (const domain of domains) {
+    try {
+      const list = await stripe.paymentMethodDomains.list({ domain_name: domain, limit: 1 });
+      if (!list.data.length) {
+        await stripe.paymentMethodDomains.create({ domain_name: domain });
+        console.log(`✓ Payment method domain registered: ${domain}`);
+      }
+    } catch (err) {
+      console.warn(`Payment domain ${domain}:`, err.message);
+    }
+  }
 }
 
 function getAdminToken() {
@@ -107,8 +166,31 @@ app.post(
     try {
       if (event.type === 'payment_intent.succeeded') {
         const intent = event.data.object;
-        const result = await fulfillPurchase(intent, { eventSourceUrl: getSuccessUrl() });
-        console.log('Stripe webhook purchase:', intent.id, result.duplicate ? 'duplicate' : 'fulfilled');
+        const result = await fulfillPurchase(intent, { eventSourceUrl: getSuccessUrl(), stripe });
+        console.log(
+          'Stripe webhook purchase:',
+          intent.id,
+          result.duplicate ? 'duplicate' : 'fulfilled',
+          result.purchaseResult?.ok ? 'recorded' : 'record_failed'
+        );
+      }
+
+      if (event.type === 'checkout.session.completed') {
+        const session = event.data.object;
+        if (session.payment_intent) {
+          const intent = await stripe.paymentIntents.retrieve(
+            typeof session.payment_intent === 'string'
+              ? session.payment_intent
+              : session.payment_intent.id
+          );
+          const result = await fulfillPurchase(intent, { eventSourceUrl: getSuccessUrl(), stripe });
+          console.log(
+            'Stripe webhook checkout session:',
+            session.id,
+            intent.id,
+            result.purchaseResult?.ok ? 'recorded' : 'record_failed'
+          );
+        }
       }
     } catch (err) {
       console.error('Stripe webhook handler error:', err.message);
@@ -135,9 +217,10 @@ app.get('/api/postcode-lookup', async (req, res) => {
   }
 
   const postcode = String(req.query.postcode || '')
-    .replace(/\s/g, '')
+    .replace(/\s+/g, '')
     .toUpperCase();
   const number = String(req.query.number || '').trim();
+  const toevoeging = String(req.query.toevoeging || req.query.addition || '').trim();
 
   if (!/^\d{4}[A-Z]{2}$/.test(postcode)) {
     return res.status(400).json({ error: 'Ongeldige postcode' });
@@ -146,34 +229,57 @@ app.get('/api/postcode-lookup', async (req, res) => {
     return res.status(400).json({ error: 'Huisnummer is verplicht' });
   }
 
+  const numbersToTry = toevoeging
+    ? [`${number}-${toevoeging}`, number]
+    : [number];
+
   try {
-    const url = new URL('https://json.api-postcode.nl');
-    url.searchParams.set('postcode', postcode);
-    url.searchParams.set('number', number);
+    let lastError = 'Adres niet gevonden';
 
-    const response = await fetch(url, {
-      headers: { token, Accept: 'application/json' },
-    });
-    const text = await response.text();
-    let data = {};
-    try {
-      data = text ? JSON.parse(text) : {};
-    } catch (_) {
-      console.error('Postcode API non-JSON response:', text.slice(0, 200));
-      return res.status(502).json({ error: 'Ongeldig antwoord van postcode-service' });
-    }
+    for (const houseNumber of numbersToTry) {
+      const url = new URL('https://json.api-postcode.nl');
+      url.searchParams.set('postcode', postcode);
+      url.searchParams.set('number', houseNumber);
+      if (toevoeging) url.searchParams.set('toevoeging', toevoeging);
 
-    if (!response.ok) {
-      return res.status(response.status === 404 ? 404 : 400).json({
-        error: data.error || data.message || 'Adres niet gevonden',
+      const response = await fetch(url, {
+        headers: { token, Accept: 'application/json' },
+      });
+      const text = await response.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (_) {
+        console.error('Postcode API non-JSON response:', text.slice(0, 200));
+        return res.status(502).json({ error: 'Ongeldig antwoord van postcode-service' });
+      }
+
+      if (!response.ok) {
+        lastError = data.error || data.message || lastError;
+        if (response.status === 404 || response.status === 400) continue;
+        return res.status(response.status).json({ error: lastError });
+      }
+
+      const street = data.street || data.straat || '';
+      const city = data.city || data.woonplaats || data.municipality || '';
+
+      if (!street || !city) {
+        lastError = 'Adres niet gevonden';
+        continue;
+      }
+
+      return res.json({
+        street,
+        city,
+        province: data.province || '',
+        postcode: data.postcode || data.zip_code || postcode,
+        house_number: data.house_number || houseNumber,
+        latitude: data.latitude,
+        longitude: data.longitude,
       });
     }
 
-    if (!data.street || !data.city) {
-      return res.status(404).json({ error: 'Adres niet gevonden' });
-    }
-
-    res.json(data);
+    return res.status(404).json({ error: lastError });
   } catch (err) {
     console.error('Postcode lookup error:', err.message);
     res.status(500).json({ error: 'Kon adres niet opzoeken' });
@@ -253,25 +359,41 @@ app.post('/api/admin/test-purchase', requireAdmin, async (req, res) => {
 });
 
 app.get('/api/admin/traffic-splits', requireAdmin, async (req, res) => {
-  const { from, to } = req.query;
+  const { from, to, route } = req.query;
+  const routeSlug = route || ROUTE_SLUG;
   const stats = await getStats({ from, to });
-  const splits = await getAdminTrafficSplits(stats.ok ? stats.rows : []);
+  const splits = await getAdminTrafficSplits(routeSlug, stats.ok ? stats.rows : []);
   res.json(splits);
 });
 
 app.put('/api/admin/traffic-splits', requireAdmin, async (req, res) => {
-  const { variants } = req.body || {};
+  const { variants, route } = req.body || {};
+  const routeSlug = route || ROUTE_SLUG;
   if (!Array.isArray(variants) || !variants.length) {
     return res.status(400).json({ ok: false, error: 'variants array vereist' });
   }
-  const result = await saveVariants(ROUTE_SLUG, variants);
+  const result = await saveVariants(routeSlug, variants);
   res.json(result);
 });
 
 app.get('/checker', (req, res) => {
-  handleRedirect(req, res).catch((err) => {
+  handleRedirect(req, res, 'main').catch((err) => {
     console.error('Checker error:', err.message);
     res.status(500).send('Checker mislukt');
+  });
+});
+
+app.get('/hearing-checker', (req, res) => {
+  handleRedirect(req, res, 'hearing').catch((err) => {
+    console.error('Hearing checker error:', err.message);
+    res.status(500).send('Hearing checker mislukt');
+  });
+});
+
+app.get('/hearing-checker-be', (req, res) => {
+  handleRedirect(req, res, 'hearing-be').catch((err) => {
+    console.error('Hearing BE checker error:', err.message);
+    res.status(500).send('Hearing BE checker mislukt');
   });
 });
 
@@ -292,43 +414,32 @@ app.post('/api/create-payment', async (req, res) => {
     const bumpCents = orderBump && productSlug === 'hearing' ? 995 : 0;
     const amountCents = Math.round(product.price * 100) + bumpCents;
 
-    const methodTypes = {
-      ideal: ['ideal'],
-      bancontact: ['bancontact'],
-      card: ['card'],
-      klarna: ['klarna'],
-      apple_pay: ['card'],
-      google_pay: ['card'],
-    };
+    const methodTypes = CHECKOUT_METHOD_TYPES;
+
+    const orderId = `${product.orderPrefix}-${Date.now()}`;
+    const metadata = buildOrderMetadata({
+      product,
+      productSlug,
+      email,
+      shipping,
+      paymentMethod,
+      analytics,
+      meta,
+      orderBump,
+      orderId,
+    });
 
     const intentParams = {
       amount: amountCents,
       currency: 'eur',
       receipt_email: email,
-      metadata: {
-        order_id: `${product.orderPrefix}-${Date.now()}`,
-        product: product.name,
-        product_slug: productSlug,
-        customer_email: email,
-        customer_name: shipping.name || '',
-        customer_phone: shipping.phone || '',
-        shipping_postal_code: shipping.postalCode || '',
-        shipping_house_number: shipping.houseNumber || '',
-        shipping_house_addition: shipping.houseAddition || '',
-        shipping_street: shipping.street || '',
-        shipping_city: shipping.city || '',
-        shipping_country: shipping.country || '',
-        order_bump: orderBump ? 'yes' : 'no',
-        payment_method: paymentMethod,
-        country: (analytics.country || 'NL').toUpperCase(),
-        lander_slug: analytics.landerSlug || '',
-        session_id: analytics.sessionId || '',
-        fbc: meta.fbc || '',
-        fbp: meta.fbp || '',
-      },
+      description: `${product.name} (${orderId})`,
+      metadata,
     };
 
-    if (methodTypes[paymentMethod]) {
+    if (paymentMethod === 'apple_pay' || paymentMethod === 'google_pay') {
+      intentParams.payment_method_types = ['card'];
+    } else if (methodTypes[paymentMethod]) {
       intentParams.payment_method_types = methodTypes[paymentMethod];
     } else {
       intentParams.automatic_payment_methods = { enabled: true };
@@ -348,6 +459,126 @@ app.post('/api/create-payment', async (req, res) => {
   }
 });
 
+app.post('/api/create-checkout-session', async (req, res) => {
+  if (!stripe) {
+    return res.status(500).json({ error: 'Stripe is niet geconfigureerd. Stel STRIPE_SECRET_KEY in via .env' });
+  }
+
+  try {
+    const { email, paymentMethod = 'ideal', analytics = {}, meta = {}, shipping = {}, cancelUrl, successUrl } =
+      req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'E-mailadres is verplicht' });
+    }
+    if (paymentMethod === 'apple_pay' || paymentMethod === 'google_pay') {
+      return res.status(400).json({ error: 'Apple Pay en Google Pay worden op de pagina afgehandeld.' });
+    }
+    if (!cancelUrl || !successUrl) {
+      return res.status(400).json({ error: 'cancelUrl en successUrl zijn verplicht' });
+    }
+
+    const productSlug = analytics.productSlug || req.body.productSlug || 'sleep';
+    const product = getProduct(productSlug);
+    const orderBump = Boolean(req.body.orderBump);
+    const bumpCents = orderBump && productSlug === 'hearing' ? 995 : 0;
+    const amountCents = Math.round(product.price * 100) + bumpCents;
+    const paymentTypes = CHECKOUT_METHOD_TYPES[paymentMethod] || ['ideal'];
+    const orderId = `${product.orderPrefix}-${Date.now()}`;
+    const metadata = buildOrderMetadata({
+      product,
+      productSlug,
+      email,
+      shipping,
+      paymentMethod,
+      analytics,
+      meta,
+      orderBump,
+      orderId,
+    });
+
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      customer_email: email,
+      payment_method_types: paymentTypes,
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency: 'eur',
+            unit_amount: amountCents,
+            product_data: {
+              name: product.name,
+              description: product.description || product.name,
+            },
+          },
+        },
+      ],
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata,
+      payment_intent_data: {
+        metadata,
+        receipt_email: email,
+        description: `${product.name} (${orderId})`,
+      },
+      locale: 'nl',
+    });
+
+    res.json({
+      url: session.url,
+      sessionId: session.id,
+      orderId,
+      total: product.price,
+      product,
+    });
+  } catch (err) {
+    console.error('Stripe checkout session error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/checkout-status', async (req, res) => {
+  if (!stripe) {
+    return res.status(500).json({ error: 'Stripe niet geconfigureerd' });
+  }
+
+  try {
+    const { session_id: sessionId } = req.query;
+    if (!sessionId) {
+      return res.status(400).json({ error: 'session_id ontbreekt' });
+    }
+
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    let fulfillResult = null;
+    let intent = null;
+
+    if (session.payment_status === 'paid' && session.payment_intent) {
+      intent = await stripe.paymentIntents.retrieve(
+        typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent.id
+      );
+      fulfillResult = await fulfillPurchase(intent, {
+        eventSourceUrl: getEventSourceUrl(req),
+        clientIp: getClientIp(req),
+        userAgent: req.headers['user-agent'],
+        stripe,
+      });
+    }
+
+    res.json({
+      status: session.payment_status,
+      orderId: session.metadata?.order_id || intent?.metadata?.order_id,
+      amount: (session.amount_total || 0) / 100,
+      email: session.customer_details?.email || session.metadata?.customer_email,
+      product: session.metadata?.product,
+      productSlug: session.metadata?.product_slug,
+      recorded: Boolean(fulfillResult?.purchaseResult?.ok),
+      duplicate: Boolean(fulfillResult?.duplicate),
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/payment-status', async (req, res) => {
   if (!stripe) {
     return res.status(500).json({ error: 'Stripe niet geconfigureerd' });
@@ -361,11 +592,13 @@ app.get('/api/payment-status', async (req, res) => {
 
     const intent = await stripe.paymentIntents.retrieve(payment_intent);
 
+    let fulfillResult = null;
     if (intent.status === 'succeeded') {
-      await fulfillPurchase(intent, {
+      fulfillResult = await fulfillPurchase(intent, {
         eventSourceUrl: getEventSourceUrl(req),
         clientIp: getClientIp(req),
         userAgent: req.headers['user-agent'],
+        stripe,
       });
     }
 
@@ -374,6 +607,10 @@ app.get('/api/payment-status', async (req, res) => {
       orderId: intent.metadata.order_id,
       amount: intent.amount / 100,
       email: intent.metadata.customer_email,
+      product: intent.metadata.product,
+      productSlug: intent.metadata.product_slug,
+      recorded: Boolean(fulfillResult?.purchaseResult?.ok),
+      duplicate: Boolean(fulfillResult?.duplicate),
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -392,8 +629,20 @@ app.get('/admin/dashboard', (_req, res) => {
 
 module.exports = app;
 
+if (stripe) {
+  ensurePaymentMethodDomains().catch(() => {});
+}
+
 if (require.main === module) {
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`🌙 Slaap Beter Slapen: http://localhost:${PORT}`);
+    ensurePaymentMethodDomains().catch(() => {});
+  });
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`\n❌ Poort ${PORT} is al in gebruik. Stop de oude server met: npm run stop\n   Of herstart met: npm run restart\n`);
+      process.exit(1);
+    }
+    throw err;
   });
 }

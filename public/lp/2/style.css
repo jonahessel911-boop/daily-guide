@@ -2,6 +2,8 @@
 :root {
   --blue: #2563eb;
   --blue-dark: #1d4ed8;
+  --navy: #172b4d;
+  --navy-dark: #0f1f38;
   --text: #1a1a1a;
   --text-muted: #555;
   --border: #e5e5e5;
@@ -41,7 +43,13 @@ a { color: var(--blue); }
 .article-wrap {
   max-width: 720px;
   margin: 0 auto;
-  padding: 32px 20px 60px;
+  padding: 32px 20px 96px;
+}
+
+@media (min-width: 768px) {
+  .article-wrap {
+    padding-bottom: 60px;
+  }
 }
 
 .article-title {
@@ -343,4 +351,50 @@ a { color: var(--blue); }
 @media (max-width: 600px) {
   .article-body { font-size: 17px; }
   .section-head { font-size: 21px; }
+}
+
+/* Sticky floating CTA (mobile) */
+.lp-sticky-cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: none;
+  background: #fff;
+  border-top: 1px solid var(--border);
+  padding: 12px 14px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.lp-sticky-cta.visible {
+  display: block;
+}
+
+.lp-sticky-cta__btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: var(--navy);
+  color: #fff !important;
+  text-decoration: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  padding: 15px 18px;
+  border-radius: 8px;
+  line-height: 1.3;
+  transition: background 0.15s;
+}
+
+.lp-sticky-cta__btn:hover {
+  background: var(--navy-dark);
+  color: #fff !important;
+}
+
+@media (min-width: 768px) {
+  .lp-sticky-cta {
+    display: none !important;
+  }
 }
