@@ -196,7 +196,7 @@ function buildPre(v) {
   <link rel="stylesheet" href="${a}hearing-dtc-checkout.css">
 </head>
 <body class="dtc-pre" data-track-page="lander" data-track-product="hearing" data-track-country="${v.country}" data-track-lander="${v.lander}" data-pay-url="${pay}">
-  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=4564404523788178&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1545607877104793&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
 
   <header class="dtc-discount-bar">
     <div class="dtc-discount-bar__left">
@@ -261,7 +261,7 @@ function buildPay(v) {
   <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body class="dtc-checkout dtc-pay" data-track-page="checkout" data-track-product="hearing" data-track-country="${v.country}" data-track-lander="${v.lander}">
-  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=4564404523788178&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1545607877104793&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
 
   <header class="dtc-pay-header">
     ${hearingLogoHtml('dtc-pay-header__logo hd-logo')}
