@@ -119,6 +119,18 @@
   border-color: var(--border);
 }
 
+[data-track-product="dispocam"] .dtc-gallery__main--contain {
+  height: auto;
+}
+
+[data-track-product="dispocam"] .dtc-gallery__main--contain img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: unset;
+  object-fit: contain;
+  max-height: min(420px, 58vh);
+}
+
 [data-track-product="dispocam"] .dtc-gallery__thumb.is-active {
   border-color: var(--text-primary);
 }

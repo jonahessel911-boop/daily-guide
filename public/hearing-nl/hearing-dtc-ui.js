@@ -504,11 +504,15 @@
   function setGalleryImage(i) {
     const images = cfg().productImages || [];
     const main = document.getElementById('dtc-gallery-main');
+    const mainBtn = document.getElementById('dtc-gallery-main-btn');
     if (!main || !images[i]) return;
 
     selectedImage = i;
     main.src = images[i].src;
     main.alt = images[i].alt;
+    if (mainBtn) {
+      mainBtn.classList.toggle('dtc-gallery__main--contain', images[i].fit === 'contain');
+    }
     document.querySelectorAll('.dtc-gallery__thumb').forEach((t) => {
       t.classList.toggle('is-active', Number(t.dataset.index) === i);
     });

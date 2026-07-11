@@ -65,6 +65,15 @@ window.HearingDTCConfig = {
       src: `${DISPOCAM_IMG}/dispocam-benefits.png`,
       alt: 'DispoCam — camera met voordelen: direct op je telefoon, 1.000 foto\'s, film-look en 60 dagen garantie',
     },
+    {
+      src: `${DISPOCAM_IMG}/dispocam-setup.png`,
+      alt: 'DispoCam koppelen in 1 minuut — QR scannen en direct gekoppeld op je telefoon',
+    },
+    {
+      src: `${DISPOCAM_IMG}/dispocam-phone-gallery.png`,
+      alt: 'DispoCam — foto\'s direct beschikbaar op je telefoon, met retro film-look',
+      fit: 'contain',
+    },
   ],
 
   trustIcons: [
