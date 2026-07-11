@@ -8,7 +8,7 @@ const DISPOCAM_REVIEWS = '/dispocam/assets/reviews';
 
 window.HearingDTCConfig = {
   brand: {
-    name: 'DispoCam™',
+    name: 'DispoCam',
     logo: null,
     logoAlt: 'DispoCam',
   },
@@ -18,12 +18,22 @@ window.HearingDTCConfig = {
   deliveryBanner:
     'Alles wat je mist van vroeger, zonder alles wat je haatte.',
 
-  benefitsTitle: 'Waarom DispoCam™',
+  benefitsTitle: 'De DispoCam',
   howItWorksTitle: 'Van doos tot gebruik',
 
+  sectionOrder: [
+    'filmLook',
+    'benefits',
+    'reviews',
+    'priceComparison',
+    'howItWorks',
+    'guarantee',
+    'faq',
+  ],
+
   product: {
-    name: 'DispoCam™ | De wegwerpcamera van vroeger. Zonder het wachten.',
-    offerLabel: '1× DispoCam™',
+    name: 'DispoCam | De wegwerpcamera van vroeger. Zonder het wachten.',
+    offerLabel: '1× DispoCam',
     shortDescription:
       'Schiet zoals in de jaren \'90 — geen scherm, pure nostalgie. Maar je foto\'s staan er direct. Geen filmrolletje, geen ontwikkelkosten, geen weken wachten.',
     price: 69,
@@ -45,15 +55,15 @@ window.HearingDTCConfig = {
   productImages: [
     {
       src: `${DISPOCAM_IMG}/dispocam-front.png`,
-      alt: 'DispoCam™ — retro digitale camera, vooraanzicht',
+      alt: 'DispoCam — retro digitale camera, vooraanzicht',
     },
     {
       src: `${DISPOCAM_IMG}/dispocam-contents.png`,
-      alt: 'DispoCam™ complete set — camera, doos, USB-kabel en polsband',
+      alt: 'DispoCam complete set — camera, doos, USB-kabel, polsband en QR-kaart',
     },
     {
-      src: `${DISPOCAM_IMG}/dispocam-lifestyle.png`,
-      alt: 'DispoCam™ camera in gebruik — vastgehouden in de hand',
+      src: `${DISPOCAM_IMG}/dispocam-benefits.png`,
+      alt: 'DispoCam — camera met voordelen: direct op je telefoon, 1.000 foto\'s, film-look en 60 dagen garantie',
     },
   ],
 
@@ -132,53 +142,76 @@ window.HearingDTCConfig = {
     },
   ],
 
-  benefitsVisual: {
-    src: '/dispocam/assets/why-dispocam.png',
-    alt: 'Waarom DispoCam — retro film-look, direct terugkijken, 1.000 foto\'s per lading, vol in 30 minuten, deel met je mensen',
-  },
+  benefitsList: [
+    'Foto gemaakt? Real-time beschikbaar op je telefoon, zonder kabel of gedoe',
+    '1.000 foto\'s met 1 accu, daarna in 30 minuten weer 100% opgeladen',
+    'Deel je foto\'s direct met iedereen die erbij was',
+    'Geen scherm, geen afleiding: schiet zoals in de jaren \'90 en kijk terug op je telefoon',
+    'Echte film-look op elke foto, zonder filters of bewerking',
+    'In 1 minuut gekoppeld: uitpakken, QR scannen, klaar',
+    'Eén camera, 10 jaar plezier. Geen rolletjes of ontwikkelkosten',
+    '60 dagen niet-goed-geld-terug en 1 jaar garantie',
+  ],
 
   benefits: [],
 
-  priceComparison: {
-    traditional: {
-      label: 'Wegwerpcamera, elke keer opnieuw',
-      price: 40,
-      extras: [
-        '€25 per camera + €15 ontwikkelen per 27 foto\'s',
-        'Weken wachten op je foto\'s',
-        'Eenmalig gebruik — daarna weg',
+  comparisonTable: {
+    title: 'Waarom de DispoCam?',
+    left: {
+      label: 'Normale disposable camera',
+      items: [
+        'Weken wachten op ontwikkelen',
+        '27 foto\'s per rolletje',
+        '€15 ontwikkelkosten, elke keer',
+        'Delen? Eerst laten scannen',
+        'Eenmalig gebruik — daarna afval',
+        'Geen garantie',
       ],
     },
-    ours: {
-      label: 'DispoCam™, één keer',
-      price: 69,
-      highlights: [
+    right: {
+      label: 'DispoCam',
+      items: [
+        'Direct op je telefoon',
         '1.000 foto\'s per lading',
-        'Direct terugkijken',
-        'Herbruikbaar, jaren mee',
+        'In 30 minuten opgeladen',
+        'Deel direct met vrienden en familie',
+        'In 1 minuut ingesteld, 10 jaar bruikbaar',
+        '60 dagen niet-goed-geld-terug',
       ],
     },
   },
 
+  priceComparison: null,
+
   resultStats: [],
 
-  howItWorks: [
-    {
-      step: 1,
-      title: 'Bestel online',
-      text: 'Vul je gegevens in en rond je bestelling veilig af.',
-    },
-    {
-      step: 2,
-      title: 'Uitpakken & klikken',
-      text: 'Opgeladen geleverd. Geen instellingen, geen app verplicht — richten en klikken.',
-    },
-    {
-      step: 3,
-      title: 'Terugkijken & delen',
-      text: 'Bekijk je foto\'s direct en deel ze met vrienden.',
-    },
-  ],
+  howItWorks: [],
+
+  howItWorksVisual: {
+    title: 'Hoe werkt het',
+    intro:
+      'Geen handleiding van 40 pagina\'s. Drie stappen en je bent klaar om te schieten — net als vroeger, alleen dan digitaal.',
+    image: '/dispocam/assets/how-it-works.png',
+    imageAlt: 'DispoCam setup in drie stappen — uitpakken, scannen, klaar',
+    tagline: 'Stel in 1 minuut in, gebruik 10 jaar',
+    steps: [
+      {
+        step: 1,
+        title: 'Uitpakken',
+        text: 'Camera, kabel en QR-kaart — alles zit in de doos. Opgeladen en klaar om te gebruiken.',
+      },
+      {
+        step: 2,
+        title: 'Scannen',
+        text: 'Scan de QR-code met je telefoon. Binnen seconden gekoppeld — geen account, geen gedoe.',
+      },
+      {
+        step: 3,
+        title: 'Klaar',
+        text: 'Maak foto\'s, bekijk ze direct op je telefoon en deel ze met wie erbij was.',
+      },
+    ],
+  },
 
   faqItems: [
     {
@@ -203,7 +236,7 @@ window.HearingDTCConfig = {
     },
     {
       q: 'Kan ik het retourneren?',
-      a: 'Ja. Je hebt 30 dagen om DispoCam™ thuis uit te proberen. Niet tevreden? Dan krijg je je geld terug.',
+      a: 'Ja. Je hebt 30 dagen om DispoCam thuis uit te proberen. Niet tevreden? Dan krijg je je geld terug.',
     },
     {
       q: 'Is er garantie?',
@@ -211,7 +244,7 @@ window.HearingDTCConfig = {
     },
     {
       q: 'Wat zit er in de doos?',
-      a: 'DispoCam™ camera, USB-C kabel, polsband, QR-kaart voor overzetten naar je telefoon en een korte handleiding.',
+      a: 'DispoCam camera, USB-C kabel, polsband, QR-kaart voor overzetten naar je telefoon en een korte handleiding.',
     },
   ],
 

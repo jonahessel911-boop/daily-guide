@@ -1,24 +1,645 @@
-/* DispoCam brand overrides */
+/* DispoCam — warm cream/beige brand (scoped to dispocam pages only) */
 
-:root {
-  --dtc-navy: #1a1a2e;
-  --dtc-navy-dark: #0f0f1a;
+[data-track-product="dispocam"] {
+  --bg-page: #faf7f2;
+  --bg-section: #f2ede3;
+  --bg-dark: #1c1a17;
+  --text-primary: #1c1a17;
+  --text-muted: #6b645a;
+  --accent: #2a2622;
+  --accent-hover: #3a352f;
+  --border: #e3dcce;
+
+  /* Remap shared DTC tokens */
+  --dtc-navy: var(--accent);
+  --dtc-navy-dark: var(--accent-hover);
+  --dtc-text: var(--text-primary);
+  --dtc-muted: var(--text-muted);
+  --dtc-border: var(--border);
+  --dtc-bg: var(--bg-page);
+  --dtc-green: var(--text-primary);
+  --dtc-red: var(--text-muted);
+  --dtc-red-bg: var(--bg-section);
+  --dtc-shadow: none;
+  --dtc-radius: 14px;
+  --dtc-radius-sm: 10px;
 }
 
-.dtc-brand-text {
+/* ── Base ── */
+
+[data-track-product="dispocam"].dtc-pre,
+[data-track-product="dispocam"].dtc-checkout {
+  background: var(--bg-page);
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"].dtc-pay {
+  background: var(--bg-page);
+}
+
+[data-track-product="dispocam"] .dtc-section__title,
+[data-track-product="dispocam"] .dtc-summary__title,
+[data-track-product="dispocam"] .dtc-footer h3 {
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-summary__desc,
+[data-track-product="dispocam"] .dtc-film-slider__intro,
+[data-track-product="dispocam"] .dtc-reviews__score {
+  color: var(--text-muted);
+}
+
+/* ── Top bar & sticky CTA ── */
+
+[data-track-product="dispocam"] .dtc-discount-bar {
+  background: var(--bg-dark);
+  color: #fff;
+}
+
+[data-track-product="dispocam"] .dtc-pre-header {
+  background: var(--bg-page);
+  border-bottom: 1px solid var(--border);
+}
+
+[data-track-product="dispocam"] .dtc-brand-text {
   font-size: 22px;
   font-weight: 800;
-  color: var(--dtc-navy);
+  color: var(--text-primary);
   text-decoration: none;
   letter-spacing: -0.02em;
 }
 
-.dtc-pay-header .dtc-brand-text {
+[data-track-product="dispocam"] .dtc-pay-header .dtc-brand-text {
   font-size: 18px;
 }
 
-.dtc-pre-header__logo.dtc-brand-text,
-.dtc-pay-header__logo.dtc-brand-text {
+[data-track-product="dispocam"] .dtc-pre-header__logo.dtc-brand-text,
+[data-track-product="dispocam"] .dtc-pay-header__logo.dtc-brand-text {
   display: inline-flex;
   align-items: center;
+}
+
+[data-track-product="dispocam"] .dtc-pre-header__cta,
+[data-track-product="dispocam"] .dtc-main-cta,
+[data-track-product="dispocam"] .dtc-compare__highlight,
+[data-track-product="dispocam"] .dtc-checkout .btn-checkout,
+[data-track-product="dispocam"] .dtc-pay .btn-checkout {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  box-shadow: none;
+  animation: none;
+}
+
+[data-track-product="dispocam"] .dtc-pre-header__cta:hover,
+[data-track-product="dispocam"] .dtc-main-cta:hover,
+[data-track-product="dispocam"] .dtc-compare__highlight:hover,
+[data-track-product="dispocam"] .dtc-checkout .btn-checkout:hover:not(:disabled),
+[data-track-product="dispocam"] .dtc-pay .btn-checkout:hover:not(:disabled) {
+  background: var(--accent-hover);
+  color: #fff;
+}
+
+[data-track-product="dispocam"] .dtc-mobile-cta {
+  background: var(--bg-dark);
+  box-shadow: 0 -4px 20px rgba(28, 26, 23, 0.15);
+}
+
+[data-track-product="dispocam"] .dtc-mobile-cta a {
+  color: #fff;
+  animation: none;
+}
+
+/* ── Product gallery ── */
+
+[data-track-product="dispocam"] .dtc-gallery__main,
+[data-track-product="dispocam"] .dtc-gallery__thumb,
+[data-track-product="dispocam"] .dtc-offer-card__img {
+  background: var(--bg-section);
+  border-color: var(--border);
+}
+
+[data-track-product="dispocam"] .dtc-gallery__thumb.is-active {
+  border-color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-gallery-lightbox__close,
+[data-track-product="dispocam"] .dtc-gallery-lightbox__nav,
+[data-track-product="dispocam"] .dtc-gallery-lightbox__counter {
+  background: rgba(250, 247, 242, 0.14);
+  color: #fff;
+}
+
+[data-track-product="dispocam"] .dtc-gallery-lightbox__close:hover,
+[data-track-product="dispocam"] .dtc-gallery-lightbox__nav:hover {
+  background: rgba(250, 247, 242, 0.24);
+}
+
+/* ── Pricing & badges ── */
+
+[data-track-product="dispocam"] .dtc-summary__price,
+[data-track-product="dispocam"] .dtc-shipping-promise,
+[data-track-product="dispocam"] .dtc-film-slider__footer,
+[data-track-product="dispocam"] .dtc-social-feed__cta {
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-summary__badge {
+  background: var(--accent);
+  color: #fff;
+}
+
+[data-track-product="dispocam"] .dtc-stars,
+[data-track-product="dispocam"] .dtc-review-card__stars,
+[data-track-product="dispocam"] .dtc-pay-review__stars {
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-review-card__verified {
+  color: var(--text-primary);
+}
+
+/* ── Cards (no borders, cream fill) ── */
+
+[data-track-product="dispocam"] .dtc-benefit-card,
+[data-track-product="dispocam"] .dtc-review-card,
+[data-track-product="dispocam"] .dtc-review-card--avatar,
+[data-track-product="dispocam"] .dtc-compare__card,
+[data-track-product="dispocam"] .dtc-compare__card--old,
+[data-track-product="dispocam"] .dtc-compare__card--new,
+[data-track-product="dispocam"] .dtc-compare-table__col,
+[data-track-product="dispocam"] .dtc-compare-table__col--muted,
+[data-track-product="dispocam"] .dtc-compare-table__col--highlight,
+[data-track-product="dispocam"] .dtc-faq__item,
+[data-track-product="dispocam"] .dtc-social-feed,
+[data-track-product="dispocam"] .dtc-guarantee,
+[data-track-product="dispocam"] .dtc-pay-section,
+[data-track-product="dispocam"] .dtc-pay-social,
+[data-track-product="dispocam"] .dtc-pay-review,
+[data-track-product="dispocam"] .dtc-pay-review--avatar {
+  background: var(--bg-section);
+  border: none;
+  box-shadow: none;
+}
+
+[data-track-product="dispocam"] .dtc-benefit-card,
+[data-track-product="dispocam"] .dtc-benefits-list,
+[data-track-product="dispocam"] .dtc-review-card,
+[data-track-product="dispocam"] .dtc-review-card--avatar,
+[data-track-product="dispocam"] .dtc-social-feed,
+[data-track-product="dispocam"] .dtc-guarantee {
+  padding: 20px;
+  border-radius: var(--dtc-radius);
+}
+
+[data-track-product="dispocam"] .dtc-benefits--list .dtc-section__title {
+  text-align: center;
+}
+
+[data-track-product="dispocam"] .dtc-benefits--list .dtc-benefits__grid {
+  align-items: center;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+[data-track-product="dispocam"] .dtc-benefits--list .dtc-social-feed {
+  width: 100%;
+  text-align: center;
+}
+
+[data-track-product="dispocam"] .dtc-benefits-list {
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+[data-track-product="dispocam"] .dtc-benefits-list__item,
+[data-track-product="dispocam"] .dtc-benefits-list__text {
+  color: var(--text-primary);
+  text-align: center;
+}
+
+[data-track-product="dispocam"] .dtc-benefits-list__icon {
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-compare__card {
+  padding: 18px;
+  border-radius: var(--dtc-radius);
+}
+
+[data-track-product="dispocam"] .dtc-compare-table__col {
+  padding: 20px;
+  border-radius: var(--dtc-radius);
+  border: none;
+  box-shadow: none;
+}
+
+[data-track-product="dispocam"] .dtc-compare-table__col--muted {
+  background: var(--bg-section);
+}
+
+[data-track-product="dispocam"] .dtc-compare-table__col--highlight {
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+}
+
+[data-track-product="dispocam"] .dtc-compare-table__col h3 {
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-compare-table__col--muted h3,
+[data-track-product="dispocam"] .dtc-compare-table__col--muted li {
+  color: var(--text-muted);
+}
+
+[data-track-product="dispocam"] .dtc-compare-table__col--highlight h3,
+[data-track-product="dispocam"] .dtc-compare-table__col--highlight li {
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-compare-table__icon--no {
+  color: var(--text-muted);
+}
+
+[data-track-product="dispocam"] .dtc-compare-table__icon--yes {
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-faq__item {
+  border-radius: var(--dtc-radius-sm);
+  margin-bottom: 8px;
+}
+
+[data-track-product="dispocam"] .dtc-scarcity {
+  background: var(--bg-section);
+  border: none;
+  border-left: 3px solid var(--border);
+  color: var(--text-muted);
+}
+
+[data-track-product="dispocam"] .dtc-scarcity strong {
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-delivery-banner {
+  background: var(--bg-section);
+  border: none;
+  color: var(--text-muted);
+}
+
+[data-track-product="dispocam"] .dtc-delivery-banner svg {
+  stroke: var(--text-primary);
+}
+
+/* ── Icons (monochrome line) ── */
+
+[data-track-product="dispocam"] .dtc-benefit-card__icon svg,
+[data-track-product="dispocam"] .dtc-trust-icons__icon svg,
+[data-track-product="dispocam"] .dtc-guarantee__badge svg,
+[data-track-product="dispocam"] .dtc-discount-box__icon svg {
+  stroke: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-trust-icons__item span {
+  color: var(--text-primary);
+}
+
+/* ── Compare & steps ── */
+
+[data-track-product="dispocam"] .dtc-compare__price--high,
+[data-track-product="dispocam"] .dtc-compare__strike,
+[data-track-product="dispocam"] .dtc-offer-card__now {
+  color: var(--text-muted);
+}
+
+[data-track-product="dispocam"] .dtc-step__num {
+  background: var(--accent);
+  color: #fff;
+}
+
+[data-track-product="dispocam"] .dtc-film-slider__dot {
+  background: var(--border);
+}
+
+[data-track-product="dispocam"] .dtc-film-slider__dot.is-active {
+  background: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-film-slider__caption {
+  color: var(--text-muted);
+}
+
+[data-track-product="dispocam"] .dtc-social-feed__title {
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-social-feed__body {
+  color: var(--text-muted);
+}
+
+[data-track-product="dispocam"] .dtc-social-feed__visual {
+  background: var(--bg-section);
+  border: none;
+}
+
+/* ── Guarantee ── */
+
+[data-track-product="dispocam"] .dtc-guarantee {
+  text-align: center;
+}
+
+[data-track-product="dispocam"] .dtc-pay-guarantee-seal {
+  background: var(--bg-section);
+  border: 2px solid var(--border);
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-pay-guarantee-seal strong {
+  color: var(--text-primary);
+}
+
+/* ── FAQ ── */
+
+[data-track-product="dispocam"] .dtc-faq__icon::before,
+[data-track-product="dispocam"] .dtc-faq__icon::after {
+  background: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-footer {
+  border-top-color: var(--border);
+}
+
+[data-track-product="dispocam"] .dtc-footer a {
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-footer__links a {
+  color: var(--text-muted);
+}
+
+[data-track-product="dispocam"] .dtc-footer__copy {
+  color: var(--text-muted);
+}
+
+/* ── Pay / checkout page ── */
+
+[data-track-product="dispocam"] .dtc-pay-header {
+  background: var(--bg-page);
+  border-bottom-color: var(--border);
+}
+
+[data-track-product="dispocam"] .dtc-pay-section__head {
+  background: var(--bg-dark);
+  color: #fff;
+}
+
+[data-track-product="dispocam"] .dtc-offer-card {
+  background: var(--bg-section);
+  border: 1px solid var(--border);
+}
+
+[data-track-product="dispocam"] .dtc-offer-card__badge {
+  background: var(--accent);
+  color: #fff;
+}
+
+[data-track-product="dispocam"] .dtc-stock-alert {
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+[data-track-product="dispocam"] .dtc-stock-alert__dot {
+  background: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-pay-trustbar {
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+[data-track-product="dispocam"] .dtc-pay-trustbar__dot {
+  background: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-pay-summary__row--total span:last-child {
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-pay-header__pm {
+  background: var(--bg-page);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-pay-social strong {
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-pay-review__text {
+  color: var(--text-muted);
+}
+
+[data-track-product="dispocam"] .dtc-checkout .form-group input,
+[data-track-product="dispocam"] .dtc-checkout .form-group select,
+[data-track-product="dispocam"] .dtc-pay .form-group input {
+  background: var(--bg-page);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-checkout .form-group input:focus,
+[data-track-product="dispocam"] .dtc-pay .form-group input:focus {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 3px rgba(28, 26, 23, 0.08);
+}
+
+[data-track-product="dispocam"] .dtc-checkout .form-group label,
+[data-track-product="dispocam"] .dtc-pay .form-group label {
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-checkout .payment-message,
+[data-track-product="dispocam"] .dtc-pay .payment-message {
+  background: var(--bg-section);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+[data-track-product="dispocam"] .legal-footer {
+  background: transparent;
+  border-top: 1px solid var(--border);
+}
+
+[data-track-product="dispocam"] .legal-footer__links a {
+  color: var(--text-muted);
+}
+
+[data-track-product="dispocam"] .legal-footer__links a:hover {
+  color: var(--text-primary);
+}
+
+[data-track-product="dispocam"] .dtc-order-bump {
+  background: var(--bg-section);
+  border-color: var(--border);
+}
+
+[data-track-product="dispocam"] .dtc-order-bump__badge {
+  background: var(--accent);
+}
+
+[data-track-product="dispocam"] .dtc-order-bump input {
+  accent-color: var(--accent);
+}
+
+[data-track-product="dispocam"] .dtc-offer-card input[type="radio"] {
+  accent-color: var(--accent);
+}
+
+[data-track-product="dispocam"] .pm-accordion-header {
+  border-color: var(--border);
+  background: var(--bg-page);
+}
+
+[data-track-product="dispocam"] .pm-option:hover {
+  background: var(--bg-section);
+}
+
+/* ── Hoe werkt het (visual) ── */
+
+.dtc-hiw__intro {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--dtc-muted);
+  margin-bottom: 20px;
+}
+
+.dtc-hiw__layout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dtc-hiw__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dtc-hiw-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--bg-section);
+  padding: 16px;
+  border-radius: var(--dtc-radius-sm);
+}
+
+[data-track-product="dispocam"] .dtc-hiw-step {
+  background: var(--bg-section);
+  border: none;
+}
+
+.dtc-hiw-step__num {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-track-product="dispocam"] .dtc-hiw-step__num {
+  background: var(--accent);
+}
+
+.dtc-hiw-step__body h3 {
+  font-size: 15px;
+  font-weight: 800;
+  margin-bottom: 4px;
+  color: var(--dtc-text);
+}
+
+.dtc-hiw-step__body p {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--dtc-muted);
+  margin: 0;
+}
+
+.dtc-hiw__visual {
+  margin: 0;
+  border-radius: var(--dtc-radius);
+  overflow: hidden;
+  background: var(--bg-section);
+}
+
+[data-track-product="dispocam"] .dtc-hiw__visual {
+  background: var(--bg-section);
+}
+
+.dtc-hiw__visual img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.dtc-hiw__tagline {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--dtc-text);
+  letter-spacing: -0.01em;
+}
+
+@media (min-width: 768px) {
+  .dtc-hiw__layout {
+    flex-direction: row;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .dtc-hiw__steps {
+    flex: 0 0 min(42%, 320px);
+  }
+
+  .dtc-hiw__visual {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* ── DispoCam vs concurrentie ── */
+
+.dtc-compare-visual__figure {
+  margin: 0 0 20px;
+  background: var(--bg-section);
+  border-radius: var(--dtc-radius);
+  overflow: hidden;
+  padding: 12px;
+}
+
+[data-track-product="dispocam"] .dtc-compare-visual__figure {
+  background: var(--bg-section);
+  border: none;
+}
+
+.dtc-compare-visual__figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: calc(var(--dtc-radius-sm) - 2px);
+}
+
+[data-track-product="dispocam"] .dtc-compare-visual .dtc-compare__highlight {
+  margin-top: 0;
 }

@@ -26,7 +26,7 @@ const BANCONTACT_ICON =
   '<svg viewBox="0 0 24 24" width="22" height="22"><rect width="24" height="24" rx="5" fill="#005498"/><path fill="#FFD800" d="M3 15.2c2.8-3.4 6.4-4.9 10.8-3.1 1.9.8 3.2 2.1 3.7 3.6H3z"/></svg>';
 
 function dispocamLogoHtml(className = 'dtc-brand-text') {
-  return `<a href="#" class="${className}" aria-label="DispoCam">DispoCam™</a>`;
+  return `<a href="#" class="${className}" aria-label="DispoCam">DispoCam</a>`;
 }
 
 function resolveVariant(v) {
@@ -108,9 +108,9 @@ const variants = [
     lander: 'checkout',
     country: 'nl',
     productSlug: 'dispocam',
-    productLabel: '1× DispoCam™',
-    titlePre: 'DispoCam™ | De wegwerpcamera van vroeger. Zonder het wachten.',
-    titlePay: 'Afrekenen | DispoCam™',
+    productLabel: '1× DispoCam',
+    titlePre: 'DispoCam | De wegwerpcamera van vroeger. Zonder het wachten.',
+    titlePay: 'Afrekenen | DispoCam',
     payHref: 'pay.html',
   },
 ];
@@ -247,8 +247,9 @@ function buildPre(v) {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="${v.brandCss}">
-  <link rel="stylesheet" href="${cssCheckout}">
+  ${v.productSlug === 'dispocam' ? `<link rel="stylesheet" href="${cssCheckout}">
+  <link rel="stylesheet" href="${v.brandCss}">` : `<link rel="stylesheet" href="${v.brandCss}">
+  <link rel="stylesheet" href="${cssCheckout}">`}
 </head>
 <body class="dtc-pre" data-track-page="lander" data-track-product="${v.productSlug}" data-track-country="${v.country}" data-track-lander="${v.lander}" data-pay-url="${pay}">
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1545607877104793&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
@@ -313,11 +314,15 @@ function buildPay(v) {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="${v.brandCss}">
-  <link rel="stylesheet" href="${scriptPrefix}checkout.css">
+  ${v.productSlug === 'dispocam' ? `<link rel="stylesheet" href="${scriptPrefix}checkout.css">
   <link rel="stylesheet" href="${cssCheckout}">
   <link rel="stylesheet" href="${cssPay}">
   <link rel="stylesheet" href="/legal/legal.css">
+  <link rel="stylesheet" href="${v.brandCss}">` : `<link rel="stylesheet" href="${v.brandCss}">
+  <link rel="stylesheet" href="${scriptPrefix}checkout.css">
+  <link rel="stylesheet" href="${cssCheckout}">
+  <link rel="stylesheet" href="${cssPay}">
+  <link rel="stylesheet" href="/legal/legal.css">`}
   <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body class="dtc-checkout dtc-pay" data-track-page="checkout" data-track-product="${v.productSlug}" data-track-country="${v.country}" data-track-lander="${v.lander}">

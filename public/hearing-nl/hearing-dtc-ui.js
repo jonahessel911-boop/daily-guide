@@ -41,9 +41,9 @@
 
     return `
       <section class="dtc-gallery" aria-label="Productafbeeldingen">
-        <div class="dtc-gallery__main">
+        <button type="button" class="dtc-gallery__main" id="dtc-gallery-main-btn" aria-label="Vergroot productafbeelding">
           <img id="dtc-gallery-main" src="${images[0].src}" alt="${images[0].alt}">
-        </div>
+        </button>
         <div class="dtc-gallery__thumbs">${thumbs}</div>
       </section>`;
   }
@@ -199,7 +199,25 @@
             </article>`;
   }
 
+  function renderBenefitsList() {
+    const list = cfg().benefitsList;
+    if (!list?.length) return '';
+
+    const rows = list
+      .map(
+        (item, i) =>
+          `<li class="dtc-benefits-list__item" style="--i:${i}"><span class="dtc-benefits-list__icon" aria-hidden="true">✓</span><span class="dtc-benefits-list__text">${item}</span></li>`
+      )
+      .join('');
+
+    return `
+      <div class="dtc-benefits-list" data-benefits-reveal>
+        <ul>${rows}</ul>
+      </div>`;
+  }
+
   function renderBenefits() {
+    const list = cfg().benefitsList;
     const visual = cfg().benefitsVisual;
     const items = cfg().benefits || [];
     const social = cfg().socialFeed;
@@ -207,7 +225,10 @@
     const splitIdx = splitTitle ? items.findIndex((b) => b.title === splitTitle) : -1;
 
     let contentHtml = '';
-    if (visual?.src) {
+    if (list?.length) {
+      contentHtml = renderBenefitsList();
+      if (social) contentHtml += renderSocialFeed();
+    } else if (visual?.src) {
       contentHtml = `
         <figure class="dtc-benefits__visual">
           <img src="${visual.src}" alt="${visual.alt || ''}" loading="lazy">
@@ -222,18 +243,76 @@
       contentHtml = items.map((b) => renderBenefitCard(b)).join('');
     }
 
-    if (!visual?.src && !items.length) return '';
+    if (!list?.length && !visual?.src && !items.length) return '';
 
     return `
-      <section class="dtc-section dtc-benefits">
+      <section class="dtc-section dtc-benefits${list?.length ? ' dtc-benefits--list' : ''}">
         <h2 class="dtc-section__title">${cfg().benefitsTitle || 'Waarom klanten hiervoor kiezen'}</h2>
-        <div class="dtc-benefits__grid${visual?.src ? ' dtc-benefits__grid--visual' : ''}">
+        <div class="dtc-benefits__grid${list?.length || visual?.src ? ' dtc-benefits__grid--visual' : ''}">
           ${contentHtml}
         </div>
       </section>`;
   }
 
+  function renderComparisonTable() {
+    const table = cfg().comparisonTable;
+    if (!table?.left?.items?.length || !table?.right?.items?.length) return '';
+
+    const payUrl = document.body.dataset.payUrl || 'pay.html';
+    const renderCol = (col, variant) => {
+      const icon = variant === 'highlight' ? '✓' : '✗';
+      const iconClass =
+        variant === 'highlight'
+          ? 'dtc-compare-table__icon dtc-compare-table__icon--yes'
+          : 'dtc-compare-table__icon dtc-compare-table__icon--no';
+      const rows = col.items
+        .map(
+          (item) =>
+            `<li><span class="${iconClass}" aria-hidden="true">${icon}</span><span>${item}</span></li>`
+        )
+        .join('');
+
+      return `
+        <div class="dtc-compare-table__col dtc-compare-table__col--${variant}">
+          <h3>${col.label}</h3>
+          <ul>${rows}</ul>
+        </div>`;
+    };
+
+    return `
+      <section class="dtc-section dtc-compare-table">
+        <h2 class="dtc-section__title">${table.title || 'Waarom deze prijs?'}</h2>
+        <div class="dtc-compare-table__grid">
+          ${renderCol(table.left, 'muted')}
+          ${renderCol(table.right, 'highlight')}
+        </div>
+        <a href="${payUrl}" class="dtc-compare__highlight dtc-cta-pulse">
+          <span>Bestel nu — Vandaag:</span>
+          <strong data-checkout-price>${fmt(cfg().product.price)}</strong>
+        </a>
+      </section>`;
+  }
+
   function renderPriceComparison() {
+    const tableHtml = renderComparisonTable();
+    if (tableHtml) return tableHtml;
+
+    const visual = cfg().comparisonVisual;
+    if (visual?.image) {
+      const payUrl = document.body.dataset.payUrl || 'pay.html';
+      return `
+      <section class="dtc-section dtc-compare-visual">
+        <h2 class="dtc-section__title">${visual.title || 'DispoCam vs. concurrentie'}</h2>
+        <figure class="dtc-compare-visual__figure">
+          <img src="${visual.image}" alt="${visual.imageAlt || visual.title || ''}" loading="lazy">
+        </figure>
+        <a href="${payUrl}" class="dtc-compare__highlight dtc-cta-pulse">
+          <span>Bestel nu — Vandaag:</span>
+          <strong data-checkout-price>${fmt(cfg().product.price)}</strong>
+        </a>
+      </section>`;
+    }
+
     const pc = cfg().priceComparison;
     if (!pc) return '';
     const payUrl = document.body.dataset.payUrl || 'pay.html';
@@ -284,7 +363,38 @@
   }
 
   function renderHowItWorks() {
+    const visual = cfg().howItWorksVisual;
+    if (visual?.image) {
+      const steps = (visual.steps || [])
+        .map(
+          (s) => `
+            <article class="dtc-hiw-step">
+              <span class="dtc-hiw-step__num">${s.step}</span>
+              <div class="dtc-hiw-step__body">
+                <h3>${s.title}</h3>
+                <p>${s.text}</p>
+              </div>
+            </article>`
+        )
+        .join('');
+
+      return `
+      <section class="dtc-section dtc-hiw">
+        <h2 class="dtc-section__title">${visual.title || 'Hoe werkt het'}</h2>
+        ${visual.intro ? `<p class="dtc-hiw__intro">${visual.intro}</p>` : ''}
+        <div class="dtc-hiw__layout">
+          <div class="dtc-hiw__steps">${steps}</div>
+          <figure class="dtc-hiw__visual">
+            <img src="${visual.image}" alt="${visual.imageAlt || visual.title || ''}" loading="lazy">
+          </figure>
+        </div>
+        ${visual.tagline ? `<p class="dtc-hiw__tagline">${visual.tagline}</p>` : ''}
+      </section>`;
+    }
+
     const steps = cfg().howItWorks || [];
+    if (!steps.length) return '';
+
     return `
       <section class="dtc-section dtc-steps">
         <h2 class="dtc-section__title">${cfg().howItWorksTitle || 'Van doos tot gebruik in minder dan 2 minuten'}</h2>
@@ -391,21 +501,179 @@
     }
   }
 
-  function initGallery() {
-    const main = document.getElementById('dtc-gallery-main');
+  function setGalleryImage(i) {
     const images = cfg().productImages || [];
-    if (!main) return;
+    const main = document.getElementById('dtc-gallery-main');
+    if (!main || !images[i]) return;
+
+    selectedImage = i;
+    main.src = images[i].src;
+    main.alt = images[i].alt;
+    document.querySelectorAll('.dtc-gallery__thumb').forEach((t) => {
+      t.classList.toggle('is-active', Number(t.dataset.index) === i);
+    });
+  }
+
+  function renderGalleryLightbox() {
+    if (document.getElementById('dtc-gallery-lightbox')) return;
+
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      `
+      <div class="dtc-gallery-lightbox" id="dtc-gallery-lightbox" hidden aria-hidden="true">
+        <div class="dtc-gallery-lightbox__backdrop" data-lightbox-close></div>
+        <button type="button" class="dtc-gallery-lightbox__close" data-lightbox-close aria-label="Sluiten">×</button>
+        <button type="button" class="dtc-gallery-lightbox__nav dtc-gallery-lightbox__nav--prev" aria-label="Vorige foto">‹</button>
+        <div class="dtc-gallery-lightbox__stage" id="dtc-gallery-lightbox-stage">
+          <img class="dtc-gallery-lightbox__img" id="dtc-gallery-lightbox-img" src="" alt="">
+        </div>
+        <button type="button" class="dtc-gallery-lightbox__nav dtc-gallery-lightbox__nav--next" aria-label="Volgende foto">›</button>
+        <p class="dtc-gallery-lightbox__counter" id="dtc-gallery-lightbox-counter" aria-live="polite"></p>
+      </div>`
+    );
+  }
+
+  function updateGalleryLightbox() {
+    const images = cfg().productImages || [];
+    const lightbox = document.getElementById('dtc-gallery-lightbox');
+    const img = document.getElementById('dtc-gallery-lightbox-img');
+    const counter = document.getElementById('dtc-gallery-lightbox-counter');
+    if (!lightbox || !img || !images.length) return;
+
+    const current = images[selectedImage];
+    img.src = current.src;
+    img.alt = current.alt;
+    if (counter) counter.textContent = `${selectedImage + 1} / ${images.length}`;
+  }
+
+  function openGalleryLightbox() {
+    const images = cfg().productImages || [];
+    const lightbox = document.getElementById('dtc-gallery-lightbox');
+    if (!lightbox || !images.length) return;
+
+    updateGalleryLightbox();
+    lightbox.hidden = false;
+    lightbox.classList.add('is-open');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('dtc-gallery-lightbox-open');
+    lightbox.querySelector('.dtc-gallery-lightbox__close')?.focus();
+  }
+
+  function closeGalleryLightbox() {
+    const lightbox = document.getElementById('dtc-gallery-lightbox');
+    if (!lightbox) return;
+
+    lightbox.classList.remove('is-open');
+    lightbox.hidden = true;
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('dtc-gallery-lightbox-open');
+    document.getElementById('dtc-gallery-main-btn')?.focus();
+  }
+
+  function stepGalleryLightbox(delta) {
+    const images = cfg().productImages || [];
+    if (!images.length) return;
+
+    const next = (selectedImage + delta + images.length) % images.length;
+    setGalleryImage(next);
+    updateGalleryLightbox();
+  }
+
+  function initGalleryLightboxSwipe() {
+    const stage = document.getElementById('dtc-gallery-lightbox-stage');
+    if (!stage || stage.dataset.swipeInit) return;
+    stage.dataset.swipeInit = '1';
+
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+
+    stage.addEventListener(
+      'touchstart',
+      (e) => {
+        if (!e.touches.length) return;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        tracking = true;
+      },
+      { passive: true }
+    );
+
+    stage.addEventListener(
+      'touchend',
+      (e) => {
+        if (!tracking || !e.changedTouches.length) return;
+        tracking = false;
+
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return;
+
+        stepGalleryLightbox(dx < 0 ? 1 : -1);
+      },
+      { passive: true }
+    );
+
+    stage.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'touch') return;
+      startX = e.clientX;
+      startY = e.clientY;
+      tracking = true;
+      stage.setPointerCapture(e.pointerId);
+    });
+
+    stage.addEventListener('pointerup', (e) => {
+      if (!tracking || e.pointerType === 'touch') return;
+      tracking = false;
+      if (stage.hasPointerCapture(e.pointerId)) {
+        stage.releasePointerCapture(e.pointerId);
+      }
+
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return;
+
+      stepGalleryLightbox(dx < 0 ? 1 : -1);
+    });
+
+    stage.addEventListener('pointercancel', () => {
+      tracking = false;
+    });
+  }
+
+  function initGallery() {
+    const images = cfg().productImages || [];
+    const mainBtn = document.getElementById('dtc-gallery-main-btn');
+    if (!mainBtn || !images.length) return;
+
+    renderGalleryLightbox();
+    initGalleryLightboxSwipe();
+
+    const lightbox = document.getElementById('dtc-gallery-lightbox');
+    lightbox?.querySelectorAll('[data-lightbox-close]').forEach((el) => {
+      el.addEventListener('click', closeGalleryLightbox);
+    });
+    lightbox?.querySelector('.dtc-gallery-lightbox__nav--prev')?.addEventListener('click', () => {
+      stepGalleryLightbox(-1);
+    });
+    lightbox?.querySelector('.dtc-gallery-lightbox__nav--next')?.addEventListener('click', () => {
+      stepGalleryLightbox(1);
+    });
+
+    mainBtn.addEventListener('click', openGalleryLightbox);
 
     document.querySelectorAll('.dtc-gallery__thumb').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const i = Number(btn.dataset.index);
-        selectedImage = i;
-        main.src = images[i].src;
-        main.alt = images[i].alt;
-        document.querySelectorAll('.dtc-gallery__thumb').forEach((t) => {
-          t.classList.toggle('is-active', Number(t.dataset.index) === i);
-        });
+        setGalleryImage(Number(btn.dataset.index));
+        if (lightbox?.classList.contains('is-open')) updateGalleryLightbox();
       });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox?.classList.contains('is-open')) return;
+      if (e.key === 'Escape') closeGalleryLightbox();
+      if (e.key === 'ArrowLeft') stepGalleryLightbox(-1);
+      if (e.key === 'ArrowRight') stepGalleryLightbox(1);
     });
   }
 
@@ -448,7 +716,32 @@
     renderFooterEl();
     initGallery();
     initFilmSlider();
+    initBenefitsListReveal();
     updateOrderSummary();
+  }
+
+  function initBenefitsListReveal() {
+    const lists = document.querySelectorAll('[data-benefits-reveal]');
+    if (!lists.length) return;
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) {
+      lists.forEach((list) => list.classList.add('is-revealed'));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-revealed');
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.2, rootMargin: '0px 0px -8% 0px' }
+    );
+
+    lists.forEach((list) => observer.observe(list));
   }
 
   function renderMainCta(payUrl) {
@@ -667,15 +960,30 @@
   function renderBelowCheckout() {
     const el = document.getElementById('dtc-col-below');
     if (!el) return;
-    el.innerHTML =
-      renderReviews() +
-      renderFilmLookSlider() +
-      renderBenefits() +
-      renderPriceComparison() +
-      renderResults() +
-      renderHowItWorks() +
-      renderGuarantee() +
-      renderFAQ();
+
+    const sections = {
+      reviews: renderReviews,
+      filmLook: renderFilmLookSlider,
+      benefits: renderBenefits,
+      priceComparison: renderPriceComparison,
+      results: renderResults,
+      howItWorks: renderHowItWorks,
+      guarantee: renderGuarantee,
+      faq: renderFAQ,
+    };
+
+    const order = cfg().sectionOrder || [
+      'reviews',
+      'filmLook',
+      'benefits',
+      'priceComparison',
+      'results',
+      'howItWorks',
+      'guarantee',
+      'faq',
+    ];
+
+    el.innerHTML = order.map((key) => sections[key]?.() || '').join('');
   }
 
   function renderFooterEl() {
@@ -705,6 +1013,7 @@
     renderFooterEl();
     initGallery();
     initOrderBump();
+    initBenefitsListReveal();
     updateOrderSummary();
   }
 

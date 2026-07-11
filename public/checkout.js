@@ -325,7 +325,7 @@ async function loadProductConfig() {
       window.HearingDTCConfig.product.originalPrice = productConfig.originalPrice || productConfig.price * 2;
       window.HearingDTCConfig.product.name = productConfig.name;
       if (productConfig.slug === 'dispocam') {
-        window.HearingDTCConfig.product.offerLabel = `1× ${window.HearingDTCConfig.brand?.name || 'DispoCam™'}`;
+        window.HearingDTCConfig.product.offerLabel = `1× ${window.HearingDTCConfig.brand?.name || 'DispoCam'}`;
       }
     }
     window.HearingDTC.updateOrderSummary();
@@ -779,22 +779,44 @@ async function mountWalletCheckout(method) {
   }
 }
 
+function isDispocamCheckout() {
+  return (
+    document.body.dataset.trackProduct === 'dispocam' ||
+    productConfig.slug === 'dispocam'
+  );
+}
+
+function dtcPrimaryColor() {
+  return isDispocamCheckout() ? '#2A2622' : '#172b4d';
+}
+
 function getStripeAppearance() {
+  const primary = isDtcCheckout() ? dtcPrimaryColor() : '#2563eb';
+  const focusRing = isDispocamCheckout()
+    ? '0 0 0 3px rgba(42,38,34,0.12)'
+    : isDtcCheckout()
+      ? '0 0 0 3px rgba(23,43,77,0.1)'
+      : '0 0 0 3px #dbeafe';
+
   return {
     theme: 'stripe',
     variables: {
-      colorPrimary: isDtcCheckout() ? '#172b4d' : '#2563eb',
-      colorBackground: '#ffffff',
-      colorText: '#0f172a',
+      colorPrimary: primary,
+      colorBackground: isDispocamCheckout() ? '#FAF7F2' : '#ffffff',
+      colorText: isDispocamCheckout() ? '#1C1A17' : '#0f172a',
       borderRadius: '10px',
       fontFamily: isDtcCheckout() ? 'Plus Jakarta Sans, Inter, sans-serif' : 'Inter, sans-serif',
       spacingUnit: '4px',
     },
     rules: {
-      '.Input': { border: '1px solid #e2e8f0', boxShadow: 'none' },
+      '.Input': {
+        border: `1px solid ${isDispocamCheckout() ? '#E3DCCE' : '#e2e8f0'}`,
+        boxShadow: 'none',
+        backgroundColor: isDispocamCheckout() ? '#FAF7F2' : undefined,
+      },
       '.Input:focus': {
-        border: `1px solid ${isDtcCheckout() ? '#172b4d' : '#2563eb'}`,
-        boxShadow: isDtcCheckout() ? '0 0 0 3px rgba(23,43,77,0.1)' : '0 0 0 3px #dbeafe',
+        border: `1px solid ${primary}`,
+        boxShadow: focusRing,
       },
       '.Label': { fontWeight: '600', fontSize: '13px' },
     },
