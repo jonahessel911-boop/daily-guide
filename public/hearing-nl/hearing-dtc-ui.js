@@ -3,6 +3,7 @@
  */
 (function () {
   const cfg = () => window.HearingDTCConfig || {};
+  const brandName = () => cfg().brand?.name || 'HearDirect™';
   const fmt = (n) =>
     new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
 
@@ -15,6 +16,11 @@
     easy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>',
     support: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
     shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>',
+    retro: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="6" width="16" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M8 6V4h8v2"/></svg>',
+    photos: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 16l-5-5L5 18"/></svg>',
+    battery: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2"/><path d="M6 11v2M10 11v2"/></svg>',
+    share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 3.9M15.4 6.6L8.6 10.5"/></svg>',
+    moment: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>',
   };
 
   let selectedImage = 0;
@@ -94,14 +100,29 @@
       </section>`;
   }
 
-  function renderReviews() {
-    const reviews = cfg().reviews || [];
-    const p = cfg().product;
-    const cards = reviews
-      .map(
-        (r) => `
+  function renderReviewCard(r) {
+    const avatar = r.avatar || r.image;
+    if (r.avatar) {
+      return `
+        <article class="dtc-review-card dtc-review-card--avatar">
+          <div class="dtc-review-card__head">
+            <img class="dtc-review-card__avatar" src="${avatar}" alt="" loading="lazy">
+            <div class="dtc-review-card__head-text">
+              <div class="dtc-review-card__meta">
+                <span class="dtc-review-card__name">${r.name}</span>
+                <span class="dtc-review-card__flag">🇳🇱</span>
+                <span class="dtc-review-card__verified" title="Geverifieerd">✓</span>
+              </div>
+              <div class="dtc-review-card__stars">★★★★★</div>
+            </div>
+          </div>
+          <p class="dtc-review-card__text">${r.text}</p>
+        </article>`;
+    }
+
+    return `
         <article class="dtc-review-card">
-          <img class="dtc-review-card__img" src="${r.image}" alt="" loading="lazy">
+          <img class="dtc-review-card__img" src="${avatar}" alt="" loading="lazy">
           <div class="dtc-review-card__body">
             <div class="dtc-review-card__meta">
               <span class="dtc-review-card__name">${r.name}</span>
@@ -111,9 +132,13 @@
             <div class="dtc-review-card__stars">★★★★★</div>
             <p class="dtc-review-card__text">${r.text}</p>
           </div>
-        </article>`
-      )
-      .join('');
+        </article>`;
+  }
+
+  function renderReviews() {
+    const reviews = cfg().reviews || [];
+    const p = cfg().product;
+    const cards = reviews.map((r) => renderReviewCard(r)).join('');
 
     return `
       <section class="dtc-section dtc-reviews">
@@ -124,22 +149,86 @@
       </section>`;
   }
 
-  function renderBenefits() {
-    const items = cfg().benefits || [];
+  function renderFilmLookSlider() {
+    const slider = cfg().filmLookSlider;
+    if (!slider?.slides?.length) return '';
+
+    const slides = slider.slides
+      .map(
+        (s, i) => `
+        <figure class="dtc-film-slider__slide" data-slide="${i}">
+          <img src="${s.src}" alt="${s.alt || ''}" loading="lazy" draggable="false">
+          <figcaption class="dtc-film-slider__caption">${s.caption || ''}</figcaption>
+        </figure>`
+      )
+      .join('');
+
     return `
-      <section class="dtc-section dtc-benefits">
-        <h2 class="dtc-section__title">Waarom klanten hiervoor kiezen</h2>
-        <div class="dtc-benefits__grid">
-          ${items
-            .map(
-              (b) => `
+      <section class="dtc-section dtc-film-slider" id="dtc-film-slider">
+        <h2 class="dtc-section__title">${slider.title}</h2>
+        <p class="dtc-film-slider__intro">${slider.intro}</p>
+        <div class="dtc-film-slider__track-wrap">
+          <div class="dtc-film-slider__track" id="dtc-film-slider-track">${slides}</div>
+        </div>
+        <div class="dtc-film-slider__dots" id="dtc-film-slider-dots" aria-hidden="true"></div>
+        ${slider.footer ? `<p class="dtc-film-slider__footer">${slider.footer}</p>` : ''}
+      </section>`;
+  }
+
+  function renderSocialFeed() {
+    const feed = cfg().socialFeed;
+    if (!feed?.image) return '';
+
+    return `
+      <div class="dtc-social-feed">
+        <h3 class="dtc-social-feed__title">${feed.title}</h3>
+        <p class="dtc-social-feed__body">${feed.body}</p>
+        <figure class="dtc-social-feed__visual">
+          <img src="${feed.image}" alt="${feed.imageAlt || feed.title}" loading="lazy">
+        </figure>
+        ${feed.cta ? `<p class="dtc-social-feed__cta">${feed.cta}</p>` : ''}
+      </div>`;
+  }
+
+  function renderBenefitCard(b) {
+    return `
             <article class="dtc-benefit-card">
               <div class="dtc-benefit-card__icon">${ICONS[b.icon] || ICONS.easy}</div>
               <h3>${b.title}</h3>
               <p>${b.text}</p>
-            </article>`
-            )
-            .join('')}
+            </article>`;
+  }
+
+  function renderBenefits() {
+    const visual = cfg().benefitsVisual;
+    const items = cfg().benefits || [];
+    const social = cfg().socialFeed;
+    const splitTitle = social?.insertAfterBenefit;
+    const splitIdx = splitTitle ? items.findIndex((b) => b.title === splitTitle) : -1;
+
+    let contentHtml = '';
+    if (visual?.src) {
+      contentHtml = `
+        <figure class="dtc-benefits__visual">
+          <img src="${visual.src}" alt="${visual.alt || ''}" loading="lazy">
+        </figure>`;
+      if (social) contentHtml += renderSocialFeed();
+    } else if (splitIdx >= 0) {
+      contentHtml =
+        items.slice(0, splitIdx + 1).map((b) => renderBenefitCard(b)).join('') +
+        renderSocialFeed() +
+        items.slice(splitIdx + 1).map((b) => renderBenefitCard(b)).join('');
+    } else {
+      contentHtml = items.map((b) => renderBenefitCard(b)).join('');
+    }
+
+    if (!visual?.src && !items.length) return '';
+
+    return `
+      <section class="dtc-section dtc-benefits">
+        <h2 class="dtc-section__title">${cfg().benefitsTitle || 'Waarom klanten hiervoor kiezen'}</h2>
+        <div class="dtc-benefits__grid${visual?.src ? ' dtc-benefits__grid--visual' : ''}">
+          ${contentHtml}
         </div>
       </section>`;
   }
@@ -174,6 +263,7 @@
 
   function renderResults() {
     const stats = cfg().resultStats || [];
+    if (!stats.length) return '';
     return `
       <section class="dtc-section dtc-results">
         <h2 class="dtc-section__title">Resultaten die voor zich spreken</h2>
@@ -197,7 +287,7 @@
     const steps = cfg().howItWorks || [];
     return `
       <section class="dtc-section dtc-steps">
-        <h2 class="dtc-section__title">Van doos tot gebruik in minder dan 2 minuten</h2>
+        <h2 class="dtc-section__title">${cfg().howItWorksTitle || 'Van doos tot gebruik in minder dan 2 minuten'}</h2>
         <div class="dtc-steps__list">
           ${steps
             .map(
@@ -220,7 +310,7 @@
       <section class="dtc-section dtc-guarantee">
         <div class="dtc-guarantee__badge">${ICONS.shield}</div>
         <h2 class="dtc-section__title">Een zorgeloze keuze met tevredenheidsgarantie</h2>
-        <p>Probeer HearDirect™ 90 dagen thuis uit. Niet tevreden? Dan stuur je het terug en krijg je je volledige aankoopbedrag terug — zonder gedoe.</p>
+        <p>Probeer ${brandName()} ${cfg().guaranteeDays || 90} dagen thuis uit. Niet tevreden? Dan stuur je het terug en krijg je je volledige aankoopbedrag terug — zonder gedoe.</p>
         <p>Daarnaast ontvang je 1 jaar garantie op fabricagefouten, zodat je met een gerust hart kunt bestellen.</p>
       </section>`;
   }
@@ -259,7 +349,7 @@
         <p><a href="mailto:${f.email}">${f.email}</a></p>
         <p>${f.location || 'Nederland'}</p>
         <nav class="dtc-footer__links">${links}</nav>
-        <p class="dtc-footer__copy">© ${new Date().getFullYear()} HearDirect™. Alle rechten voorbehouden.</p>
+        <p class="dtc-footer__copy">© ${new Date().getFullYear()} ${brandName()}. Alle rechten voorbehouden.</p>
       </footer>`;
   }
 
@@ -357,6 +447,7 @@
     renderBelowCheckout();
     renderFooterEl();
     initGallery();
+    initFilmSlider();
     updateOrderSummary();
   }
 
@@ -373,7 +464,7 @@
     return `
       <div class="dtc-delivery-banner">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
-        <span>Meer dan 100.000 producten geleverd. Tevreden klanten en betrouwbare klantenservice.</span>
+        <span>${cfg().deliveryBanner || 'Meer dan 100.000 producten geleverd. Tevreden klanten en betrouwbare klantenservice.'}</span>
       </div>`;
   }
 
@@ -381,9 +472,14 @@
     const reviews = cfg().reviews || [];
     const r = reviews[0];
     if (!r) return '';
+    const avatar = r.avatar || r.image;
+    const headImg = r.avatar
+      ? `<img class="dtc-pay-review__avatar" src="${avatar}" alt="">`
+      : `<img class="dtc-pay-review__img" src="${avatar}" alt="">`;
+
     return `
-      <div class="dtc-pay-review">
-        <img class="dtc-pay-review__img" src="${r.image}" alt="">
+      <div class="dtc-pay-review${r.avatar ? ' dtc-pay-review--avatar' : ''}">
+        ${headImg}
         <div class="dtc-pay-review__body">
           <div class="dtc-pay-review__name">${r.name}</div>
           <div class="dtc-pay-review__stars">★★★★★</div>
@@ -392,7 +488,7 @@
       </div>
       <div class="dtc-pay-guarantee-seal">
         NIET TEVREDEN?<br>
-        <strong>90 DAGEN</strong>
+        <strong>${cfg().guaranteeDays || 90} DAGEN</strong>
         GELD TERUG GARANTIE
       </div>`;
   }
@@ -423,6 +519,12 @@
       const el = document.getElementById(id);
       if (el) el.textContent = text;
     };
+    const offerLabel = p.offerLabel || `1× ${brandName()}`;
+    const offerNameEl = document.querySelector('.dtc-offer-card__name');
+    if (offerNameEl) offerNameEl.textContent = offerLabel;
+    const payProductEl = document.getElementById('dtc-pay-product-label');
+    if (payProductEl) payProductEl.textContent = offerLabel;
+
     set('dtc-offer-was', fmt(p.originalPrice));
     set('dtc-offer-now', fmt(p.price));
     set('dtc-offer-badge', `${fmt(p.price)} / stuk`);
@@ -437,7 +539,10 @@
     if (faces) {
       const imgs = (cfg().reviews || []).slice(0, 3);
       faces.innerHTML = imgs
-        .map((r) => `<img class="dtc-pay-social__face" src="${r.image}" alt="">`)
+        .map((r) => {
+          const src = r.avatar || r.image;
+          return `<img class="dtc-pay-social__face" src="${src}" alt="">`;
+        })
         .join('');
     }
 
@@ -458,11 +563,113 @@
     return renderProductGallery() + renderDeliveryBanner();
   }
 
+  function initFilmSlider() {
+    const track = document.getElementById('dtc-film-slider-track');
+    const dotsWrap = document.getElementById('dtc-film-slider-dots');
+    if (!track || !dotsWrap) return;
+
+    const slides = track.querySelectorAll('.dtc-film-slider__slide');
+    if (!slides.length) return;
+
+    dotsWrap.innerHTML = Array.from(slides)
+      .map((_, i) => `<button type="button" class="dtc-film-slider__dot${i === 0 ? ' is-active' : ''}" data-index="${i}" aria-label="Slide ${i + 1}"></button>`)
+      .join('');
+
+    const dots = dotsWrap.querySelectorAll('.dtc-film-slider__dot');
+    const setActive = (index) => {
+      dots.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
+    };
+
+    const snapToNearest = (smooth = true) => {
+      const center = track.scrollLeft + track.clientWidth / 2;
+      let closest = 0;
+      let minDist = Infinity;
+      slides.forEach((slide, i) => {
+        const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+        const dist = Math.abs(slideCenter - center);
+        if (dist < minDist) {
+          minDist = dist;
+          closest = i;
+        }
+      });
+      slides[closest].scrollIntoView({
+        behavior: smooth ? 'smooth' : 'auto',
+        inline: 'center',
+        block: 'nearest',
+      });
+      setActive(closest);
+    };
+
+    dots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        const slide = slides[Number(dot.dataset.index)];
+        if (slide) {
+          slide.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+          setActive(Number(dot.dataset.index));
+        }
+      });
+    });
+
+    let scrollEndTimer;
+    track.addEventListener(
+      'scroll',
+      () => {
+        if (track.classList.contains('is-dragging')) return;
+        const center = track.scrollLeft + track.clientWidth / 2;
+        let active = 0;
+        slides.forEach((slide, i) => {
+          const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+          if (Math.abs(slideCenter - center) < slide.offsetWidth / 2) active = i;
+        });
+        setActive(active);
+        clearTimeout(scrollEndTimer);
+        scrollEndTimer = setTimeout(() => snapToNearest(true), 120);
+      },
+      { passive: true }
+    );
+
+    let dragActive = false;
+    let dragStartX = 0;
+    let dragScrollStart = 0;
+    let dragMoved = false;
+
+    track.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      dragActive = true;
+      dragMoved = false;
+      dragStartX = e.clientX;
+      dragScrollStart = track.scrollLeft;
+      track.classList.add('is-dragging');
+      track.setPointerCapture(e.pointerId);
+    });
+
+    track.addEventListener('pointermove', (e) => {
+      if (!dragActive) return;
+      const delta = e.clientX - dragStartX;
+      if (Math.abs(delta) > 4) dragMoved = true;
+      track.scrollLeft = dragScrollStart - delta;
+    });
+
+    const endDrag = (e) => {
+      if (!dragActive) return;
+      dragActive = false;
+      track.classList.remove('is-dragging');
+      if (track.hasPointerCapture(e.pointerId)) {
+        track.releasePointerCapture(e.pointerId);
+      }
+      if (dragMoved) snapToNearest(true);
+    };
+
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+  }
+
   function renderBelowCheckout() {
     const el = document.getElementById('dtc-col-below');
     if (!el) return;
     el.innerHTML =
       renderReviews() +
+      renderFilmLookSlider() +
       renderBenefits() +
       renderPriceComparison() +
       renderResults() +

@@ -39,6 +39,14 @@ const PRODUCTS = {
     originalPrice: 300.0,
     orderPrefix: 'HEAR',
   },
+  dispocam: {
+    slug: 'dispocam',
+    name: 'DispoCam™ — Retro digitale camera',
+    description: 'DispoCam™ retro digitale camera — schiet als een wegwerpcamera, bekijk je foto\'s direct',
+    price: 69.0,
+    originalPrice: 139.0,
+    orderPrefix: 'DCAM',
+  },
 };
 
 function getProduct(slug) {

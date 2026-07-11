@@ -169,9 +169,10 @@ window.HearingDTCConfig = {
     email: 'support@heardirect.nl',
     location: 'België',
     links: [
-      { label: 'Privacybeleid', href: '#' },
-      { label: 'Retourbeleid', href: '#' },
-      { label: 'Algemene voorwaarden', href: '#' },
+      { label: 'Algemene voorwaarden', href: '/legal/algemene-voorwaarden.html' },
+      { label: 'Privacybeleid', href: '/legal/privacybeleid.html' },
+      { label: 'Verzending', href: '/legal/verzending.html' },
+      { label: 'Retourbeleid', href: '/legal/retourbeleid.html' },
     ],
   },
 };

@@ -322,8 +322,11 @@ async function loadProductConfig() {
   if (window.HearingDTC?.updateOrderSummary) {
     if (window.HearingDTCConfig?.product) {
       window.HearingDTCConfig.product.price = productConfig.price;
-      window.HearingDTCConfig.product.originalPrice = productConfig.originalPrice || 300;
+      window.HearingDTCConfig.product.originalPrice = productConfig.originalPrice || productConfig.price * 2;
       window.HearingDTCConfig.product.name = productConfig.name;
+      if (productConfig.slug === 'dispocam') {
+        window.HearingDTCConfig.product.offerLabel = `1× ${window.HearingDTCConfig.brand?.name || 'DispoCam™'}`;
+      }
     }
     window.HearingDTC.updateOrderSummary();
   }
@@ -930,7 +933,7 @@ function setPayLoading(loading) {
   spinner.hidden = !loading;
   buttonText.textContent = loading
     ? 'Bezig met verwerken...'
-    : isDtcPayPage() || (isDtcCheckout() && productConfig.slug === 'hearing')
+    : isDtcPayPage() || (isDtcCheckout() && ['hearing', 'dispocam'].includes(productConfig.slug))
       ? 'Bevestig uw bestelling!'
       : isDtcCheckout()
         ? 'Bestelling afronden'

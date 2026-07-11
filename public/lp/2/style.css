@@ -325,6 +325,23 @@ a { color: var(--blue); }
   border-top: 1px solid var(--border);
 }
 
+.footer-note__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 14px;
+  margin-bottom: 10px;
+}
+
+.footer-note__links a {
+  color: #999;
+  text-decoration: none;
+}
+
+.footer-note__links a:hover {
+  color: #666;
+}
+
 .trust-reviews--list {
   margin-top: 40px;
   padding-top: 0;

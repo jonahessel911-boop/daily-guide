@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="../../../checkout.css">
   <link rel="stylesheet" href="../../hearing-dtc-checkout.css">
   <link rel="stylesheet" href="../../hearing-dtc-pay.css">
+  <link rel="stylesheet" href="/legal/legal.css">
   <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body class="dtc-checkout dtc-pay" data-track-page="checkout" data-track-product="hearing" data-track-country="nl" data-track-lander="adv-1">
@@ -113,7 +114,7 @@
                   </div>
                 </div>
                 <div class="dtc-pay-summary">
-                  <div class="dtc-pay-summary__row"><span>Product</span><span>1× HearDirect™</span></div>
+                  <div class="dtc-pay-summary__row"><span>Product</span><span id="dtc-pay-product-label">1× HearDirect™</span></div>
                   <div class="dtc-pay-summary__row"><span>Prijs</span><span><s id="dtc-pay-was">€ 300,00</s> <strong id="dtc-pay-now" data-checkout-price>€ 149,00</strong></span></div>
                   <div class="dtc-pay-summary__row dtc-pay-summary__row--total"><span>Totaal</span><span id="dtc-sum-total" data-checkout-price>€ 149,00</span></div>
                 </div>
@@ -157,6 +158,15 @@
       <aside class="dtc-pay-sidebar" id="dtc-pay-sidebar"></aside>
     </div>
   </div>
+
+<footer class="legal-footer legal-footer--compact">
+  <nav class="legal-footer__links">
+    <a href="/legal/algemene-voorwaarden.html">Algemene voorwaarden</a>
+    <a href="/legal/privacybeleid.html">Privacybeleid</a>
+    <a href="/legal/verzending.html">Verzending</a>
+    <a href="/legal/retourbeleid.html">Retourbeleid</a>
+  </nav>
+</footer>
 
   <script src="../../../api.js"></script>
   <script src="../../../track.js"></script>

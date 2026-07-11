@@ -1,0 +1,24 @@
+/* DispoCam brand overrides */
+
+:root {
+  --dtc-navy: #1a1a2e;
+  --dtc-navy-dark: #0f0f1a;
+}
+
+.dtc-brand-text {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--dtc-navy);
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+
+.dtc-pay-header .dtc-brand-text {
+  font-size: 18px;
+}
+
+.dtc-pre-header__logo.dtc-brand-text,
+.dtc-pay-header__logo.dtc-brand-text {
+  display: inline-flex;
+  align-items: center;
+}

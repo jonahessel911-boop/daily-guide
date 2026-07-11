@@ -9,12 +9,52 @@ const path = require('path');
 const HEARING_LOGO_SRC = '/hearing/assets/heardirect-logo.png';
 const HEARING_BRAND_CSS = '/hearing/hearing-brand.css';
 
+const LEGAL_FOOTER = `<footer class="legal-footer legal-footer--compact">
+  <nav class="legal-footer__links">
+    <a href="/legal/algemene-voorwaarden.html">Algemene voorwaarden</a>
+    <a href="/legal/privacybeleid.html">Privacybeleid</a>
+    <a href="/legal/verzending.html">Verzending</a>
+    <a href="/legal/retourbeleid.html">Retourbeleid</a>
+  </nav>
+</footer>`;
+
 function hearingLogoHtml(className = 'hd-logo') {
   return `<a href="#" class="${className}" aria-label="HearDirect"><img src="${HEARING_LOGO_SRC}" alt="HearDirect" width="120" height="40" decoding="async"></a>`;
 }
 
 const BANCONTACT_ICON =
   '<svg viewBox="0 0 24 24" width="22" height="22"><rect width="24" height="24" rx="5" fill="#005498"/><path fill="#FFD800" d="M3 15.2c2.8-3.4 6.4-4.9 10.8-3.1 1.9.8 3.2 2.1 3.7 3.6H3z"/></svg>';
+
+function dispocamLogoHtml(className = 'dtc-brand-text') {
+  return `<a href="#" class="${className}" aria-label="DispoCam">DispoCam™</a>`;
+}
+
+function resolveVariant(v) {
+  const isDispocam = v.productSlug === 'dispocam';
+  return {
+    productSlug: 'hearing',
+    productLabel: '1× HearDirect™',
+    titlePre: 'HearDirect™ | Comfortabele hoortoestellen',
+    titlePay: 'Afrekenen | HearDirect™',
+    configFile: 'hearing-dtc-config.js',
+    brandCss: HEARING_BRAND_CSS,
+    preLogoHtml: hearingLogoHtml('dtc-pre-header__logo hd-logo'),
+    payLogoHtml: hearingLogoHtml('dtc-pay-header__logo hd-logo'),
+    ...v,
+    ...(isDispocam
+      ? {
+          cssCheckout: '../hearing-nl/hearing-dtc-checkout.css',
+          cssPay: '../hearing-nl/hearing-dtc-pay.css',
+          configPath: './dispocam-dtc-config.js',
+          uiPath: '../hearing-nl/hearing-dtc-ui.js',
+          brandCss: './dispocam-brand.css',
+          scriptPrefix: '../',
+          preLogoHtml: dispocamLogoHtml('dtc-pre-header__logo dtc-brand-text'),
+          payLogoHtml: dispocamLogoHtml('dtc-pay-header__logo dtc-brand-text'),
+        }
+      : {}),
+  };
+}
 
 const variants = [
   {
@@ -62,6 +102,17 @@ const variants = [
     scriptPrefix: '../../../',
     payHref: 'pay.html',
   },
+  {
+    preOut: 'public/dispocam/checkout.html',
+    payOut: 'public/dispocam/pay.html',
+    lander: 'checkout',
+    country: 'nl',
+    productSlug: 'dispocam',
+    productLabel: '1× DispoCam™',
+    titlePre: 'DispoCam™ | De wegwerpcamera van vroeger. Zonder het wachten.',
+    titlePay: 'Afrekenen | DispoCam™',
+    payHref: 'pay.html',
+  },
 ];
 
 function buildNlPaymentOptions() {
@@ -82,7 +133,9 @@ function buildBePaymentOptions() {
                     <label class="pm-option"><input type="radio" name="payment-method" value="google_pay"><span class="pm-option-icon"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/></svg></span><span class="pm-option-label">Google Pay</span></label>`;
 }
 
-function buildFormBlock(country) {
+function buildFormBlock(v) {
+  const country = v.country;
+  const productLabel = v.productLabel || '1× HearDirect™';
   const isBe = country === 'be';
   const emailPlaceholder = isBe ? 'naam@voorbeeld.be' : 'naam@voorbeeld.nl';
   const postcodePlaceholder = isBe ? '1000' : '1234AB';
@@ -145,7 +198,7 @@ function buildFormBlock(country) {
                   </div>
                 </div>
                 <div class="dtc-pay-summary">
-                  <div class="dtc-pay-summary__row"><span>Product</span><span>1× HearDirect™</span></div>
+                  <div class="dtc-pay-summary__row"><span>Product</span><span id="dtc-pay-product-label">${productLabel}</span></div>
                   <div class="dtc-pay-summary__row"><span>Prijs</span><span><s id="dtc-pay-was">€ 300,00</s> <strong id="dtc-pay-now" data-checkout-price>€ 149,00</strong></span></div>
                   <div class="dtc-pay-summary__row dtc-pay-summary__row--total"><span>Totaal</span><span id="dtc-sum-total" data-checkout-price>€ 149,00</span></div>
                 </div>
@@ -179,23 +232,25 @@ function buildFormBlock(country) {
 }
 
 function buildPre(v) {
-  const a = v.assetPrefix;
-  const s = v.scriptPrefix;
   const pay = v.payHref;
+  const cssCheckout = v.cssCheckout || `${v.assetPrefix}hearing-dtc-checkout.css`;
+  const configPath = v.configPath || `${v.assetPrefix}${v.configFile || 'hearing-dtc-config.js'}`;
+  const uiPath = v.uiPath || `${v.assetPrefix}hearing-dtc-ui.js`;
+  const scriptPrefix = v.scriptPrefix || '../../';
   return `<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="/meta-pixel.js"></script>
-  <title>HearDirect™ | Comfortabele hoortoestellen</title>
+  <title>${v.titlePre}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="${HEARING_BRAND_CSS}">
-  <link rel="stylesheet" href="${a}hearing-dtc-checkout.css">
+  <link rel="stylesheet" href="${v.brandCss}">
+  <link rel="stylesheet" href="${cssCheckout}">
 </head>
-<body class="dtc-pre" data-track-page="lander" data-track-product="hearing" data-track-country="${v.country}" data-track-lander="${v.lander}" data-pay-url="${pay}">
+<body class="dtc-pre" data-track-page="lander" data-track-product="${v.productSlug}" data-track-country="${v.country}" data-track-lander="${v.lander}" data-pay-url="${pay}">
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1545607877104793&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
 
   <header class="dtc-discount-bar">
@@ -206,7 +261,7 @@ function buildPre(v) {
   </header>
 
   <div class="dtc-pre-header">
-    ${hearingLogoHtml('dtc-pre-header__logo hd-logo')}
+    ${v.preLogoHtml}
     <a href="${pay}" class="dtc-pre-header__cta">Bestel nu</a>
   </div>
 
@@ -223,16 +278,20 @@ function buildPre(v) {
     <a href="${pay}" class="dtc-cta-pulse">Vandaag 50% korting — Bestel nu</a>
   </div>
 
-  <script src="${s}track.js"></script>
-  <script src="${a}hearing-dtc-config.js"></script>
-  <script src="${a}hearing-dtc-ui.js"></script>
+  <script src="${scriptPrefix}track.js"></script>
+  <script src="${configPath}"></script>
+  <script src="${uiPath}"></script>
 </body>
 </html>`;
 }
 
 function buildPay(v) {
-  const a = v.assetPrefix;
-  const s = v.scriptPrefix;
+  const cssCheckout = v.cssCheckout || `${v.assetPrefix}hearing-dtc-checkout.css`;
+  const cssPay = v.cssPay || `${v.assetPrefix}hearing-dtc-pay.css`;
+  const configPath = v.configPath || `${v.assetPrefix}${v.configFile || 'hearing-dtc-config.js'}`;
+  const uiPath = v.uiPath || `${v.assetPrefix}hearing-dtc-ui.js`;
+  const scriptPrefix = v.scriptPrefix || '../../';
+  const productLabel = v.productLabel || '1× HearDirect™';
   const isBe = v.country === 'be';
   const headerPayments = isBe
     ? `<span class="dtc-pay-header__pm">Bancontact</span>
@@ -250,21 +309,22 @@ function buildPay(v) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="/meta-pixel.js"></script>
-  <title>Afrekenen | HearDirect™</title>
+  <title>${v.titlePay}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="${HEARING_BRAND_CSS}">
-  <link rel="stylesheet" href="${s}checkout.css">
-  <link rel="stylesheet" href="${a}hearing-dtc-checkout.css">
-  <link rel="stylesheet" href="${a}hearing-dtc-pay.css">
+  <link rel="stylesheet" href="${v.brandCss}">
+  <link rel="stylesheet" href="${scriptPrefix}checkout.css">
+  <link rel="stylesheet" href="${cssCheckout}">
+  <link rel="stylesheet" href="${cssPay}">
+  <link rel="stylesheet" href="/legal/legal.css">
   <script src="https://js.stripe.com/v3/"></script>
 </head>
-<body class="dtc-checkout dtc-pay" data-track-page="checkout" data-track-product="hearing" data-track-country="${v.country}" data-track-lander="${v.lander}">
+<body class="dtc-checkout dtc-pay" data-track-page="checkout" data-track-product="${v.productSlug}" data-track-country="${v.country}" data-track-lander="${v.lander}">
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1545607877104793&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
 
   <header class="dtc-pay-header">
-    ${hearingLogoHtml('dtc-pay-header__logo hd-logo')}
+    ${v.payLogoHtml}
     <div class="dtc-pay-header__trust">
       <div class="dtc-pay-header__payments">
         ${headerPayments}
@@ -283,7 +343,7 @@ function buildPay(v) {
               <input type="radio" name="offer" checked disabled>
               <img class="dtc-offer-card__img" id="dtc-offer-img" src="" alt="">
               <div class="dtc-offer-card__info">
-                <div class="dtc-offer-card__name">1× HearDirect™</div>
+                <div class="dtc-offer-card__name">${productLabel}</div>
               </div>
               <div class="dtc-offer-card__prices">
                 <span class="dtc-offer-card__was" id="dtc-offer-was">€ 300,00</span>
@@ -301,7 +361,7 @@ function buildPay(v) {
         <div class="dtc-pay-section">
           <div class="dtc-pay-section__head">🪪 Afleveradres</div>
           <div class="dtc-pay-section__body">
-${buildFormBlock(v.country)}
+${buildFormBlock(v)}
           </div>
         </div>
 
@@ -316,17 +376,20 @@ ${buildFormBlock(v.country)}
     </div>
   </div>
 
-  <script src="${s}api.js"></script>
-  <script src="${s}track.js"></script>
-  <script src="${a}hearing-dtc-config.js"></script>
-  <script src="${a}hearing-dtc-ui.js"></script>
-  <script src="${s}checkout.js"></script>
+${LEGAL_FOOTER}
+
+  <script src="${scriptPrefix}api.js"></script>
+  <script src="${scriptPrefix}track.js"></script>
+  <script src="${configPath}"></script>
+  <script src="${uiPath}"></script>
+  <script src="${scriptPrefix}checkout.js"></script>
 </body>
 </html>`;
 }
 
 const root = path.join(__dirname, '..');
-variants.forEach((v) => {
+variants.forEach((raw) => {
+  const v = resolveVariant(raw);
   fs.mkdirSync(path.dirname(path.join(root, v.preOut)), { recursive: true });
   fs.writeFileSync(path.join(root, v.preOut), buildPre(v));
   fs.writeFileSync(path.join(root, v.payOut), buildPay(v));
