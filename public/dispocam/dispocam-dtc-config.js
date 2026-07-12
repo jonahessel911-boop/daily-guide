@@ -1,5 +1,5 @@
 /**
- * DispoCam DTC checkout — content config
+ * Dispocam DTC checkout — content config
  */
 const DISPOCAM_IMG = '/dispocam/assets/product';
 const DISPOCAM_GALLERY = '/dispocam/assets/gallery';
@@ -8,9 +8,9 @@ const DISPOCAM_REVIEWS = '/dispocam/assets/reviews';
 
 window.HearingDTCConfig = {
   brand: {
-    name: 'DispoCam',
+    name: 'Dispocam',
     logo: null,
-    logoAlt: 'DispoCam',
+    logoAlt: 'Dispocam',
   },
 
   brandPage: {
@@ -22,55 +22,74 @@ window.HearingDTCConfig = {
     tagline: 'Eén camera, tien jaar herinneringen.',
     manifest:
       'De mooiste foto\'s zijn niet perfect. Ze zijn korrelig, geflitst, half scheef, en precies zoals die avond voelde. Daarom bestaat Dispocam: de camera die schiet zoals vroeger, maar denkt zoals nu. Geen scherm dat je avond steelt. Geen rolletje wegbrengen. Geen camera die je na 27 foto\'s weggooit. Klik, leef verder. Je foto\'s staan er al.',
-    founderNote: {
-      text:
-        'Dispocam begon met een simpele irritatie: €40 kwijt aan een wegwerpcamera, drie weken wachten op je foto\'s, en daarna gooi je het ding weg. Dat moest anders kunnen: dezelfde vibe, zonder het gedoe.',
-      author: 'Jona, oprichter',
+    founderStory: {
+      title: 'Hoe Dispocam ontstond',
+      paragraphs: [
+        'Het begon op een verjaardag, ergens vorig jaar. De vriendin van mijn broer liet foto\'s zien van een weekendje weg, en tussendoor zei ze iets dat ik pas veel later echt hoorde: "Nee, de foto\'s van de wegwerpcamera zien we pas over een paar dagen. En het kost ook nog eens geld om ze te laten ontwikkelen."',
+        'Het vloog voorbij, zoals dat gaat. Iedereen knikte, iemand pakte de taart, klaar.',
+        'Maar het bleef ergens hangen. Weken later begon ik er over mijn eigen vriendin over. Ik vroeg haar of ze die camera\'s kende, en natuurlijk kende ze die. Zij en haar vriendinnen namen er eentje mee naar elk festival. En haar verhaal was letterlijk hetzelfde: veertig euro kwijt, weken wachten, de helft van de foto\'s mislukt, en daarna gooi je het ding weg. "Maar die foto\'s zijn wel de leukste die we hebben," zei ze erbij.',
+        'Dat is toch gek? Het beste fotoproduct dat ik kende was ook meteen het onhandigste.',
+        'Wat ze niet wist: ik had stiekem al een site gebouwd. Ik speelde de nieuwsgierige vriend, stelde nog wat vragen, en liet haar vijf minuten later mijn scherm zien. Ik wilde haar echte mening, niet de lieve versie. Ze keek er even naar, scrolde, en zei: "Oké. Dit zou ik kopen."',
+        'Toen wist ik het.',
+        'Nu moet ik iets bekennen: ik ben een man van 21 die een product lanceert dat vooral vrouwen gaan gebruiken. Dus heb ik het enige verstandige gedaan: heel veel vragen stellen en vooral heel goed luisteren. Naar mijn vriendin, haar vriendinnen, de vriendin van mijn broer. Elke keuze in dit product is langs hen gegaan voordat \'ie langs mij mocht.',
+        'Daarna zijn we gaan bouwen. Prototypes getest, software ontwikkeld, net zo lang tot het klopte: een camera met de vibe van 1980 en de technologie van vandaag. Geen scherm, geen filters, gewoon richten en klikken zoals vroeger. Maar je foto\'s staan direct op je telefoon, ontwikkelen kost niks meer, en je gooit \'m nooit meer weg.',
+        'Zo is de Dispocam ontstaan. Een oud product in een nieuw jasje, gemaakt door iemand die er vol voor gaat en geen plan B heeft.',
+      ],
+      author: 'Jona, oprichter van Dispocam',
+      promises: [
+        'Gaat \'ie kapot binnen 1 jaar? Je krijgt een nieuwe.',
+        'Vind je \'m niks? Binnen 60 dagen je geld terug.',
+        'Heb je een idee? Mail me: jona@dispocam.nl',
+      ],
+      expandAfter: 3,
     },
     visionTeaser: {
       title: 'Dit is pas het begin.',
       body:
         'We bouwen aan een plek waar alleen échte foto\'s bestaan. Geen filters, geen AI, alleen momenten geschoten met een Dispocam. Koop je nu een camera, dan ben je er straks als eerste bij.',
+      note: 'De eerste 500 camera\'s zijn genummerd. Nº 001 is vergeven.',
+      cta: 'Bestel je Dispocam',
     },
     mainCta: {
       title: 'Bestel je Dispocam',
-      sub: 'Gratis verzending · 30 dagen thuis proberen',
+      sub: 'Gratis verzending · 60 dagen thuis proberen',
     },
     shippingPromise: 'Gratis verzending in NL & BE',
   },
 
-  guaranteeDays: 30,
+  guaranteeDays: 60,
+  embedSocialInBenefits: false,
 
   deliveryBanner:
     'Alles wat je mist van vroeger, zonder alles wat je haatte.',
 
-  benefitsTitle: 'De DispoCam',
+  benefitsTitle: 'De Dispocam',
   howItWorksTitle: 'Van doos tot gebruik',
 
   sectionOrder: [
     'filmLook',
     'benefits',
     'manifest',
-    'reviews',
-    'priceComparison',
     'howItWorks',
+    'socialFeed',
+    'priceComparison',
+    'founderStory',
     'guarantee',
-    'founderNote',
+    'reviews',
     'faq',
     'visionTeaser',
-    'brandTagline',
   ],
 
   product: {
-    name: 'DispoCam | De wegwerpcamera van vroeger. Zonder het wachten.',
-    offerLabel: '1× DispoCam',
+    eyebrow: 'DISPOCAM',
+    headline: 'De wegwerpcamera van vroeger. Zonder het wachten.',
+    name: 'Dispocam — De wegwerpcamera van vroeger. Zonder het wachten.',
+    offerLabel: '1× Dispocam',
     shortDescription:
-      'Schiet zoals in de jaren \'90 — geen scherm, pure nostalgie. Maar je foto\'s staan er direct op je Dispocam. Geen filmrolletje, geen ontwikkelkosten, geen weken wachten.',
+      'Schiet zoals in de jaren \'90 — geen scherm, pure nostalgie. Maar je foto\'s staan er direct op je telefoon. Geen filmrolletje, geen ontwikkelkosten, geen weken wachten.',
     price: 69,
     originalPrice: 139,
     discountPercent: 50,
-    rating: 4.7,
-    reviewCount: 2180,
     shippingLabel: 'Gratis',
   },
 
@@ -85,34 +104,37 @@ window.HearingDTCConfig = {
   productImages: [
     {
       src: `${DISPOCAM_IMG}/dispocam-front.png`,
-      alt: 'DispoCam — retro digitale camera, vooraanzicht',
+      alt: 'Dispocam — retro digitale camera, vooraanzicht',
     },
     {
       src: `${DISPOCAM_IMG}/dispocam-contents.png`,
-      alt: 'DispoCam complete set — camera, doos, USB-kabel, polsband en QR-kaart',
+      alt: 'Dispocam complete set — camera, doos, USB-kabel, polsband en QR-kaart',
     },
     {
       src: `${DISPOCAM_IMG}/dispocam-benefits.png`,
-      alt: 'DispoCam — camera met voordelen: direct op je telefoon, 1.000 foto\'s, film-look en 60 dagen garantie',
+      alt: 'Dispocam — camera met voordelen: direct op je telefoon, 1.000 foto\'s, film-look en 60 dagen garantie',
     },
     {
       src: `${DISPOCAM_IMG}/dispocam-setup.png`,
-      alt: 'DispoCam koppelen in 1 minuut — QR scannen en direct gekoppeld op je telefoon',
+      alt: 'Dispocam koppelen in 1 minuut — QR scannen en direct gekoppeld op je telefoon',
     },
   ],
 
   trustIcons: [
-    { icon: 'trial', label: '30 dagen thuis proberen' },
+    { icon: 'trial', label: '60 dagen thuis proberen' },
     { icon: 'warranty', label: '1 jaar garantie' },
     { icon: 'setup', label: 'Opgeladen geleverd — klaar om te klikken' },
   ],
 
   reviewBanner: null,
 
+  // Loaded from dispocam-reviews.js — Real customer reviews only.
+  reviews: typeof window !== 'undefined' && window.DispoCamReviews ? window.DispoCamReviews : [],
+
   filmLookSlider: {
     title: 'De look die je krijgt',
     intro:
-      'Geen filter, geen bewerking, geen nabewerken op je telefoon. Elke foto komt uit de DispoCam met die echte jaren-90 film-look — korrel, warme kleuren en datumstempel incluis.',
+      'Geen filter, geen bewerking, geen nabewerken op je telefoon. Elke foto komt uit de Dispocam met die echte jaren-90 film-look — korrel, warme kleuren en datumstempel incluis.',
     footer:
       'Vroeger wachtte je twee weken op deze foto\'s. Nu kijk je ze direct terug.',
     slides: [
@@ -150,31 +172,8 @@ window.HearingDTCConfig = {
       'De mooiste foto\'s zijn de foto\'s die je deelt. Zet je foto\'s in een paar tikken door naar je telefoon en stuur ze naar wie erbij was — of post ze door. Die film-look doet de rest: dit zijn geen perfecte kiekjes, dit zijn échte momenten. En dat ziet iedereen.',
     cta: 'Eén Dispocam op tafel bij een avond met vrienden = de hele avond vastgelegd.',
     image: `${DISPOCAM_SOCIAL}/feed.png`,
-    imageAlt: 'DispoCam social feed — retro foto\'s gedeeld met vrienden',
+    imageAlt: 'Dispocam social feed — retro foto\'s gedeeld met vrienden',
   },
-
-  reviews: [
-    {
-      name: 'Emma R.',
-      avatar: `${DISPOCAM_REVIEWS}/emma-avatar.png`,
-      text: 'Precies die old-school vibe, maar mijn foto\'s staan er meteen. Geen rolletje meer naar de winkel.',
-    },
-    {
-      name: 'Tom K.',
-      avatar: `${DISPOCAM_REVIEWS}/tomo-avatar.png`,
-      text: 'Geen scherm = iedereen is eindelijk weer in het moment. En die film-look is echt leuk.',
-    },
-    {
-      name: 'Lisa M.',
-      avatar: `${DISPOCAM_REVIEWS}/lisa-avatar.png`,
-      text: 'Op een feestje meegenomen en binnen een uur stonden de foto\'s al op mijn telefoon. Perfect.',
-    },
-    {
-      name: 'Daan V.',
-      avatar: `${DISPOCAM_REVIEWS}/daan-avatar.png`,
-      text: 'Licht, simpel, één knop. Voelt als een wegwerpcamera — alleen dan eentje die je jaren kunt gebruiken.',
-    },
-  ],
 
   benefitsList: [
     'Foto gemaakt? Real-time beschikbaar op je telefoon, zonder kabel of gedoe',
@@ -190,7 +189,7 @@ window.HearingDTCConfig = {
   benefits: [],
 
   comparisonTable: {
-    title: 'Waarom de DispoCam?',
+    title: 'Waarom de Dispocam?',
     left: {
       label: 'Normale disposable camera',
       items: [
@@ -203,7 +202,7 @@ window.HearingDTCConfig = {
       ],
     },
     right: {
-      label: 'DispoCam',
+      label: 'Dispocam',
       items: [
         'Direct op je telefoon',
         '1.000 foto\'s per lading',
@@ -226,13 +225,13 @@ window.HearingDTCConfig = {
     intro:
       'Geen handleiding van 40 pagina\'s. Drie stappen en je bent klaar om te schieten — net als vroeger, alleen dan digitaal.',
     image: '/dispocam/assets/how-it-works.png',
-    imageAlt: 'DispoCam setup in drie stappen — uitpakken, scannen, klaar',
+    imageAlt: 'Dispocam setup in drie stappen — uitpakken, scannen, klaar',
     tagline: 'Stel in 1 minuut in, gebruik 10 jaar',
     steps: [
       {
         step: 1,
         title: 'Uitpakken',
-        text: 'Je DispoCam, kabel en QR-kaart — alles zit in de doos. Opgeladen en klaar om te gebruiken.',
+        text: 'Je Dispocam, kabel en QR-kaart — alles zit in de doos. Opgeladen en klaar om te gebruiken.',
       },
       {
         step: 2,
@@ -270,7 +269,7 @@ window.HearingDTCConfig = {
     },
     {
       q: 'Kan ik het retourneren?',
-      a: 'Ja. Je hebt 30 dagen om je Dispocam thuis uit te proberen. Niet tevreden? Dan krijg je je geld terug.',
+      a: 'Ja. Je hebt 60 dagen om je Dispocam thuis uit te proberen. Niet tevreden? Dan krijg je je geld terug.',
     },
     {
       q: 'Is er garantie?',
@@ -278,7 +277,7 @@ window.HearingDTCConfig = {
     },
     {
       q: 'Wat zit er in de doos?',
-      a: 'Je DispoCam, USB-C kabel, polsband, QR-kaart voor overzetten naar je telefoon en een korte handleiding.',
+      a: 'Je Dispocam, USB-C kabel, polsband, QR-kaart voor overzetten naar je telefoon en een korte handleiding.',
     },
   ],
 
@@ -286,20 +285,21 @@ window.HearingDTCConfig = {
     announcement: 'Gratis verzending in NL & BE · Eerste batch nu leverbaar',
     nav: {
       shop: 'Shop',
-      mission: { label: 'Onze missie', href: '/dispocam/missie.html' },
-      faq: { label: 'FAQ', href: '/dispocam/checkout.html#faq' },
-      feed: { label: 'Feed', href: '/dispocam/feed.html' },
+      mission: { label: 'Onze missie', href: '/dispocam/missie' },
+      faq: { label: 'FAQ', href: '/dispocam/checkout#faq' },
+      feed: { label: 'Feed', href: '/dispocam/feed' },
       support: { label: 'Support', href: 'mailto:hallo@dispocam.nl' },
     },
     megaMenu: {
       product: {
+        badge: 'NU beschikbaar',
         title: 'Dispocam 1.0',
         image: `${DISPOCAM_IMG}/dispocam-front.png`,
-        href: '/dispocam/checkout.html',
+        href: '/dispocam/checkout',
       },
     },
     mission: {
-      hint: 'Swipe naar rechts voor de volgende pagina',
+      hint: 'Veeg het papier om — volgende pagina',
       slides: [
         {
           type: 'cover',
@@ -354,19 +354,18 @@ window.HearingDTCConfig = {
       subtitle: 'Zonder het wachten.',
       body: 'Schiet zoals in de jaren \'90 — geen scherm, pure nostalgie. Je foto\'s staan er direct.',
       cta: 'Shop Dispocam',
-      ctaHref: '/dispocam/checkout.html',
-      rating: '4,7/5 · 2.180+ beoordelingen',
+      ctaHref: '/dispocam/checkout',
     },
     products: {
       title: 'Bestsellers',
-      shopAllHref: '/dispocam/checkout.html',
+      shopAllHref: '/dispocam/checkout',
       items: [
         {
           name: 'Dispocam',
           variant: 'Classic Black',
           price: 69,
           image: `${DISPOCAM_IMG}/dispocam-front.png`,
-          href: '/dispocam/checkout.html',
+          href: '/dispocam/checkout',
           badge: 'Bestseller',
         },
       ],
@@ -374,9 +373,9 @@ window.HearingDTCConfig = {
     moments: {
       title: 'Meer Dispocam-momenten',
       items: [
-        { image: `${DISPOCAM_GALLERY}/festival.png`, title: 'Festival', href: '/dispocam/checkout.html#film-look' },
-        { image: `${DISPOCAM_GALLERY}/roadtrip.png`, title: 'Roadtrip', href: '/dispocam/checkout.html#film-look' },
-        { image: `${DISPOCAM_GALLERY}/terras.png`, title: 'Terras', href: '/dispocam/checkout.html#film-look' },
+        { image: `${DISPOCAM_GALLERY}/festival.png`, title: 'Festival', href: '/dispocam/checkout#film-look' },
+        { image: `${DISPOCAM_GALLERY}/roadtrip.png`, title: 'Roadtrip', href: '/dispocam/checkout#film-look' },
+        { image: `${DISPOCAM_GALLERY}/terras.png`, title: 'Terras', href: '/dispocam/checkout#film-look' },
       ],
     },
     feed: {

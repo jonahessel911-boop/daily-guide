@@ -37,6 +37,7 @@
       <div class="dc-mega" id="dc-mega-menu">
         <div class="dc-mega__inner dc-mega__inner--single">
           <a href="${product.href}" class="dc-mega__product">
+            ${product.badge ? `<p class="dc-mega__product-badge">${product.badge}</p>` : ''}
             <img src="${product.image}" alt="" loading="lazy">
             <p class="dc-mega__product-title">${product.title}</p>
           </a>
@@ -84,6 +85,7 @@
     const shopBlock = product
       ? `
           <a href="${product.href}" class="dc-mobile-nav__product">
+            ${product.badge ? `<span class="dc-mobile-nav__product-badge">${product.badge}</span>` : ''}
             <img src="${product.image}" alt="" loading="lazy">
             <span class="dc-mobile-nav__product-title">${product.title}</span>
           </a>`
@@ -140,7 +142,7 @@
           <h1 class="dc-hero__title">${hero.title}</h1>
           ${hero.subtitle ? `<p class="dc-hero__subtitle">${hero.subtitle}</p>` : ''}
           ${hero.body ? `<p class="dc-hero__body">${hero.body}</p>` : ''}
-          <a href="${hero.ctaHref || '/dispocam/checkout.html'}" class="dc-hero__cta">${hero.cta || 'Shop Dispocam'}</a>
+          <a href="${hero.ctaHref || '/dispocam/checkout'}" class="dc-hero__cta">${hero.cta || 'Shop Dispocam'}</a>
           ${hero.rating ? `<p class="dc-hero__rating">★★★★★ ${hero.rating}</p>` : ''}
         </div>
       </section>`;
@@ -169,7 +171,7 @@
       <section class="dc-section">
         <div class="dc-section__head">
           <h2 class="dc-section__title">${block.title || 'Shop'}</h2>
-          <a href="${block.shopAllHref || '/dispocam/checkout.html'}" class="dc-section__link">Alles bekijken →</a>
+          <a href="${block.shopAllHref || '/dispocam/checkout'}" class="dc-section__link">Alles bekijken →</a>
         </div>
         <div class="dc-product-grid">${cards}</div>
       </section>`;
@@ -444,11 +446,13 @@
   }
 
   function renderMissionSlide(slide, index) {
+    const activeClass = index === 0 ? ' is-active' : '';
+
     if (slide.type === 'cover') {
       const meta = slide.meta || {};
       return `
-        <section class="dc-mission__slide" data-mission-index="${index}" aria-label="Pagina ${index + 1}">
-          <div class="dc-mission__slide-inner dc-mission__slide-inner--cover">
+        <article class="dc-mission__page${activeClass}" data-mission-page="${index}" aria-label="Pagina ${index + 1}" aria-hidden="${index === 0 ? 'false' : 'true'}">
+          <div class="dc-mission__paper dc-mission__paper--cover">
             <p class="dc-mission__label">${slide.label || ''}</p>
             <h1 class="dc-mission__title">${slide.title || ''}</h1>
             <p class="dc-mission__meta">
@@ -459,16 +463,16 @@
               <span>${meta.author || ''}</span>
             </p>
           </div>
-        </section>`;
+        </article>`;
     }
 
     if (slide.type === 'byline') {
       return `
-        <section class="dc-mission__slide" data-mission-index="${index}" aria-label="Pagina ${index + 1}">
-          <div class="dc-mission__slide-inner dc-mission__slide-inner--byline">
+        <article class="dc-mission__page${activeClass}" data-mission-page="${index}" aria-label="Pagina ${index + 1}" aria-hidden="${index === 0 ? 'false' : 'true'}">
+          <div class="dc-mission__paper dc-mission__paper--byline">
             <p class="dc-mission__byline">${slide.text || ''}</p>
           </div>
-        </section>`;
+        </article>`;
     }
 
     const paragraphs = (slide.paragraphs || [])
@@ -479,11 +483,212 @@
       : '';
 
     return `
-      <section class="dc-mission__slide" data-mission-index="${index}" aria-label="Pagina ${index + 1}">
-        <div class="dc-mission__slide-inner">
+      <article class="dc-mission__page${activeClass}" data-mission-page="${index}" aria-label="Pagina ${index + 1}" aria-hidden="${index === 0 ? 'false' : 'true'}">
+        <div class="dc-mission__paper">
           <div class="dc-mission__content">${paragraphs}${highlight}</div>
         </div>
-      </section>`;
+      </article>`;
+  }
+
+  function createMissionPageSound() {
+    let audioCtx = null;
+
+    const ensure = () => {
+      if (!audioCtx) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return null;
+        audioCtx = new Ctx();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    };
+
+    return (direction = 'forward') => {
+      const ctx = ensure();
+      if (!ctx) return;
+
+      const t = ctx.currentTime;
+      const duration = 0.32;
+      const length = Math.floor(ctx.sampleRate * duration);
+      const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      for (let i = 0; i < length; i++) {
+        const envelope = Math.pow(1 - i / length, 1.75);
+        data[i] = (Math.random() * 2 - 1) * envelope;
+      }
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = direction === 'forward' ? 940 : 720;
+      filter.Q.value = 0.6;
+
+      const rustleGain = ctx.createGain();
+      rustleGain.gain.setValueAtTime(0.0001, t);
+      rustleGain.gain.exponentialRampToValueAtTime(0.1, t + 0.018);
+      rustleGain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+
+      noise.connect(filter);
+      filter.connect(rustleGain);
+      rustleGain.connect(ctx.destination);
+      noise.start(t);
+      noise.stop(t + duration + 0.02);
+
+      const thump = ctx.createOscillator();
+      thump.type = 'triangle';
+      thump.frequency.setValueAtTime(direction === 'forward' ? 190 : 150, t);
+      thump.frequency.exponentialRampToValueAtTime(85, t + 0.1);
+
+      const thumpGain = ctx.createGain();
+      thumpGain.gain.setValueAtTime(0.0001, t);
+      thumpGain.gain.exponentialRampToValueAtTime(0.05, t + 0.01);
+      thumpGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
+
+      thump.connect(thumpGain);
+      thumpGain.connect(ctx.destination);
+      thump.start(t);
+      thump.stop(t + 0.16);
+    };
+  }
+
+  function initMissionPageTurn(book, pages, dots, playSound, reducedMotion) {
+    let currentIndex = 0;
+    let animating = false;
+    const total = pages.length;
+
+    const updateUi = () => {
+      dots.forEach((dot, i) => dot.classList.toggle('is-active', i === currentIndex));
+      book.querySelector('.dc-mission__nav--prev')?.toggleAttribute('disabled', currentIndex === 0);
+      book.querySelector('.dc-mission__nav--next')?.toggleAttribute('disabled', currentIndex >= total - 1);
+      pages.forEach((page, i) => {
+        page.setAttribute('aria-hidden', i === currentIndex ? 'false' : 'true');
+      });
+    };
+
+    const resetPage = (page) => {
+      page.classList.remove('is-flip-out', 'is-flip-in', 'is-under');
+      page.style.visibility = '';
+      page.style.transform = '';
+    };
+
+    const showPage = (index) => {
+      pages.forEach((page, i) => {
+        resetPage(page);
+        page.classList.toggle('is-active', i === index);
+        if (i !== index) page.style.visibility = 'hidden';
+      });
+      currentIndex = index;
+      updateUi();
+    };
+
+    const goTo = (index, direction) => {
+      if (animating || index < 0 || index >= total || index === currentIndex) return;
+
+      if (reducedMotion) {
+        showPage(index);
+        return;
+      }
+
+      animating = true;
+      playSound(direction);
+
+      const current = pages[currentIndex];
+      const target = pages[index];
+
+      if (direction === 'forward') {
+        resetPage(target);
+        target.style.visibility = 'visible';
+        target.classList.add('is-under');
+        current.classList.remove('is-active');
+        current.classList.add('is-flip-out');
+
+        current.addEventListener(
+          'animationend',
+          () => {
+            current.style.visibility = 'hidden';
+            resetPage(current);
+            resetPage(target);
+            target.classList.add('is-active');
+            currentIndex = index;
+            animating = false;
+            updateUi();
+          },
+          { once: true }
+        );
+        return;
+      }
+
+      resetPage(target);
+      target.style.visibility = 'visible';
+      target.classList.add('is-flip-in');
+      current.classList.remove('is-active');
+      current.classList.add('is-under');
+
+      target.addEventListener(
+        'animationend',
+        () => {
+          current.style.visibility = 'hidden';
+          resetPage(current);
+          resetPage(target);
+          target.classList.add('is-active');
+          currentIndex = index;
+          animating = false;
+          updateUi();
+        },
+        { once: true }
+      );
+    };
+
+    book.querySelector('.dc-mission__nav--prev')?.addEventListener('click', () => {
+      goTo(currentIndex - 1, 'backward');
+    });
+
+    book.querySelector('.dc-mission__nav--next')?.addEventListener('click', () => {
+      goTo(currentIndex + 1, 'forward');
+    });
+
+    dots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        const index = Number(dot.dataset.missionDot);
+        if (Number.isNaN(index)) return;
+        goTo(index, index > currentIndex ? 'forward' : 'backward');
+      });
+    });
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    book.addEventListener(
+      'touchstart',
+      (e) => {
+        touchStartX = e.changedTouches[0].clientX;
+        touchStartY = e.changedTouches[0].clientY;
+      },
+      { passive: true }
+    );
+
+    book.addEventListener(
+      'touchend',
+      (e) => {
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return;
+        if (dx < 0) goTo(currentIndex + 1, 'forward');
+        else goTo(currentIndex - 1, 'backward');
+      },
+      { passive: true }
+    );
+
+    document.addEventListener('keydown', (e) => {
+      if (!book.isConnected) return;
+      if (e.key === 'ArrowRight') goTo(currentIndex + 1, 'forward');
+      if (e.key === 'ArrowLeft') goTo(currentIndex - 1, 'backward');
+    });
+
+    updateUi();
   }
 
   function renderMissionPage() {
@@ -492,7 +697,10 @@
 
     const slides = mission.slides.map(renderMissionSlide).join('');
     const dots = mission.slides
-      .map((_, i) => `<span class="dc-mission__dot${i === 0 ? ' is-active' : ''}" data-mission-dot="${i}"></span>`)
+      .map(
+        (_, i) =>
+          `<button type="button" class="dc-mission__dot${i === 0 ? ' is-active' : ''}" data-mission-dot="${i}" aria-label="Pagina ${i + 1}"></button>`
+      )
       .join('');
 
     return `
@@ -501,7 +709,11 @@
           <span class="dc-mission__hint-arrow" aria-hidden="true">→</span>
           <span class="dc-mission__hint-text">${mission.hint || 'Swipe naar rechts voor de volgende pagina'}</span>
         </div>
-        <div class="dc-mission__track" id="dc-mission-track">${slides}</div>
+        <div class="dc-mission__book" id="dc-mission-book">
+          <button type="button" class="dc-mission__nav dc-mission__nav--prev" aria-label="Vorige pagina" disabled>‹</button>
+          <div class="dc-mission__pages" id="dc-mission-pages">${slides}</div>
+          <button type="button" class="dc-mission__nav dc-mission__nav--next" aria-label="Volgende pagina">›</button>
+        </div>
         <div class="dc-mission__progress" aria-hidden="true">${dots}</div>
       </div>`;
   }
@@ -512,23 +724,20 @@
 
     main.innerHTML = renderMissionPage();
 
-    const track = document.getElementById('dc-mission-track');
+    const book = document.getElementById('dc-mission-book');
     const hint = document.getElementById('dc-mission-hint');
+    const pages = book ? Array.from(book.querySelectorAll('.dc-mission__page')) : [];
     const dots = document.querySelectorAll('.dc-mission__dot');
+    const playSound = createMissionPageSound();
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (hint) {
       window.setTimeout(() => hint.classList.add('is-hidden'), 2800);
     }
 
-    const updateProgress = () => {
-      if (!track || !track.offsetWidth) return;
-      const index = Math.round(track.scrollLeft / track.offsetWidth);
-      dots.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
-    };
-
-    track?.addEventListener('scroll', updateProgress, { passive: true });
-    window.addEventListener('resize', updateProgress);
-    updateProgress();
+    if (book && pages.length) {
+      initMissionPageTurn(book, pages, dots, playSound, reducedMotion);
+    }
   }
 
   function initCheckoutIntegration() {

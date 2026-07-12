@@ -63,13 +63,26 @@
           <span class="dtc-summary__badge">Bespaar ${p.discountPercent}%</span>
         </div>`;
 
-    return `
-      <section class="dtc-summary">
-        <h1 class="dtc-summary__title" id="checkout-product-name">${p.name}</h1>
-        <div class="dtc-summary__rating">
+    const titleHtml =
+      bp && p.eyebrow
+        ? `<h1 class="dtc-summary__title dtc-summary__title--brand" id="checkout-product-name">
+            <span class="dtc-summary__eyebrow">${p.eyebrow}</span>
+            <span class="dtc-summary__headline">${p.headline || p.name}</span>
+          </h1>`
+        : `<h1 class="dtc-summary__title" id="checkout-product-name">${p.name}</h1>`;
+
+    const ratingHtml =
+      bp || !p.rating
+        ? ''
+        : `<div class="dtc-summary__rating">
           <span class="dtc-stars" aria-hidden="true">★★★★★</span>
           <span>${p.rating.toFixed(1).replace('.', ',')} (${p.reviewCount.toLocaleString('nl-NL')} beoordelingen)</span>
-        </div>
+        </div>`;
+
+    return `
+      <section class="dtc-summary">
+        ${titleHtml}
+        ${ratingHtml}
         ${priceRow}
         <p class="dtc-summary__desc">${p.shortDescription}</p>
       </section>`;
@@ -146,7 +159,12 @@
   }
 
   function renderReviews() {
+    // Real customer reviews only.
     const reviews = cfg().reviews || [];
+    if (!reviews.length) {
+      return `<section class="dtc-section dtc-reviews dtc-reviews--empty" hidden aria-hidden="true"><!-- Real customer reviews only. --></section>`;
+    }
+
     const p = cfg().product;
     const cards = reviews.map((r) => renderReviewCard(r)).join('');
 
@@ -155,7 +173,7 @@
         ${cfg().reviewBanner ? `<figure class="dtc-reviews__banner"><img src="${cfg().reviewBanner}" alt="HearDirect™ hoortoestel — discreet en compact op uw vinger" width="720" height="720" loading="lazy"></figure>` : ''}
         <h2 class="dtc-section__title">Wat onze klanten zeggen</h2>
         <div class="dtc-reviews__grid">${cards}</div>
-        <p class="dtc-reviews__score">Trustscore <strong>${p.rating.toFixed(1).replace('.', ',')}</strong> · <strong>${p.reviewCount.toLocaleString('nl-NL')}</strong> beoordelingen</p>
+        ${p.rating ? `<p class="dtc-reviews__score">Trustscore <strong>${p.rating.toFixed(1).replace('.', ',')}</strong> · <strong>${p.reviewCount.toLocaleString('nl-NL')}</strong> beoordelingen</p>` : ''}
       </section>`;
   }
 
@@ -200,6 +218,16 @@
       </div>`;
   }
 
+  function renderSocialFeedSection() {
+    const feed = cfg().socialFeed;
+    if (!feed?.image) return '';
+
+    return `
+      <section class="dtc-section dtc-social-section" id="social-feed">
+        ${renderSocialFeed()}
+      </section>`;
+  }
+
   function renderBenefitCard(b) {
     return `
             <article class="dtc-benefit-card">
@@ -237,7 +265,7 @@
     let contentHtml = '';
     if (list?.length) {
       contentHtml = renderBenefitsList();
-      if (social) contentHtml += renderSocialFeed();
+      if (social && cfg().embedSocialInBenefits !== false) contentHtml += renderSocialFeed();
     } else if (visual?.src) {
       contentHtml = `
         <figure class="dtc-benefits__visual">
@@ -322,6 +350,42 @@
       </section>`;
   }
 
+  function renderFounderStory() {
+    const story = brandPage()?.founderStory;
+    if (!story?.paragraphs?.length) return '';
+
+    const expandAfter = story.expandAfter || 3;
+    const paragraphs = story.paragraphs
+      .map(
+        (text, i) =>
+          `<p class="dtc-founder-story__p${i >= expandAfter ? ' dtc-founder-story__p--more' : ''}">${text}</p>`
+      )
+      .join('');
+
+    const promises = (story.promises || [])
+      .map(
+        (line) =>
+          `<li><span class="dtc-founder-story__check" aria-hidden="true">✓</span><span>${line}</span></li>`
+      )
+      .join('');
+
+    return `
+      <section class="dtc-section dtc-founder-story" id="founder-story">
+        <h2 class="dtc-section__title">${story.title || 'Hoe Dispocam ontstond'}</h2>
+        <div class="dtc-founder-story__inner">
+          <div class="dtc-founder-story__photo" aria-hidden="true"></div>
+          <div class="dtc-founder-story__content" id="dtc-founder-story-content">
+            ${paragraphs}
+          </div>
+          <div class="dtc-founder-story__expand-wrap" id="dtc-founder-expand-wrap">
+            <button type="button" class="dtc-founder-story__expand" id="dtc-founder-expand">Lees verder</button>
+          </div>
+          ${story.author ? `<p class="dtc-founder-story__author">${story.author}</p>` : ''}
+          ${promises ? `<ul class="dtc-founder-story__promises">${promises}</ul>` : ''}
+        </div>
+      </section>`;
+  }
+
   function renderFounderNote() {
     const note = brandPage()?.founderNote;
     if (!note?.text) return '';
@@ -342,11 +406,19 @@
     const teaser = brandPage()?.visionTeaser;
     if (!teaser?.title) return '';
 
+    const payUrl = document.body.dataset.payUrl || 'pay.html';
+    const note = teaser.note ? `<p class="dtc-vision__note">${teaser.note}</p>` : '';
+    const cta = teaser.cta
+      ? `<a href="${payUrl}" class="dtc-vision__cta">${teaser.cta} — <strong data-checkout-price>${fmt(cfg().product.price)}</strong></a>`
+      : '';
+
     return `
       <section class="dtc-section dtc-vision" aria-label="Visie">
         <div class="dtc-vision__card">
           <h2 class="dtc-vision__title">${teaser.title}</h2>
           ${teaser.body ? `<p class="dtc-vision__body">${teaser.body}</p>` : ''}
+          ${note}
+          ${cta}
         </div>
       </section>`;
   }
@@ -512,6 +584,18 @@
       .map((l) => `<a href="${l.href}">${l.label}</a>`)
       .join(' · ');
     const bb = f.brandBlock;
+
+    if (isBrandPage() && bb) {
+      return `
+      <footer class="dtc-footer dtc-footer--brand">
+        <div class="dtc-footer__brand">
+          <p class="dtc-footer__brand-copy">${bb.copyright || ''}</p>
+          ${bb.kvk ? `<p class="dtc-footer__brand-meta">${bb.kvk}</p>` : ''}
+          ${bb.email ? `<p class="dtc-footer__brand-meta"><a href="mailto:${bb.email}">${bb.email}</a></p>` : ''}
+        </div>
+        <nav class="dtc-footer__links">${links}</nav>
+      </footer>`;
+    }
 
     const brandBlock = bb
       ? `<div class="dtc-footer__brand">
@@ -790,6 +874,7 @@
     initGallery();
     initFilmSlider();
     initBenefitsListReveal();
+    initFounderStoryExpand();
     initBrandChrome();
     updateOrderSummary();
   }
@@ -816,6 +901,24 @@
     );
 
     lists.forEach((list) => observer.observe(list));
+  }
+
+  function initFounderStoryExpand() {
+    const wrap = document.getElementById('dtc-founder-expand-wrap');
+    const btn = document.getElementById('dtc-founder-expand');
+    const content = document.getElementById('dtc-founder-story-content');
+    if (!wrap || !btn || !content) return;
+
+    const more = content.querySelectorAll('.dtc-founder-story__p--more');
+    if (!more.length) {
+      wrap.remove();
+      return;
+    }
+
+    btn.addEventListener('click', () => {
+      content.classList.add('is-expanded');
+      wrap.remove();
+    });
   }
 
   function renderMainCta(payUrl) {
@@ -1070,11 +1173,13 @@
       filmLook: renderFilmLookSlider,
       benefits: renderBenefits,
       manifest: renderManifest,
+      socialFeed: renderSocialFeedSection,
       priceComparison: renderPriceComparison,
       results: renderResults,
       howItWorks: renderHowItWorks,
       guarantee: renderGuarantee,
       founderNote: renderFounderNote,
+      founderStory: renderFounderStory,
       faq: renderFAQ,
       visionTeaser: renderVisionTeaser,
       brandTagline: renderBrandTagline,

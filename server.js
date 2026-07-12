@@ -2,6 +2,7 @@ const portOverride = process.env.PORT;
 require('dotenv').config({ override: true });
 if (portOverride) process.env.PORT = portOverride;
 const crypto = require('crypto');
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -623,6 +624,29 @@ app.get('/api/payment-status', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+const DISPOCAM_PAGES = new Set(['checkout', 'pay', 'missie', 'feed', 'about']);
+
+app.get('/dispocam/:page.html', (req, res) => {
+  const qs = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : '';
+  res.redirect(301, `/dispocam/${req.params.page}${qs}`);
+});
+
+app.get('/dispocam', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public/dispocam/index.html'));
+});
+
+app.get('/dispocam/', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public/dispocam/index.html'));
+});
+
+app.get('/dispocam/:page', (req, res, next) => {
+  const { page } = req.params;
+  if (!DISPOCAM_PAGES.has(page)) return next();
+  const filePath = path.join(__dirname, 'public/dispocam', `${page}.html`);
+  if (!fs.existsSync(filePath)) return next();
+  res.sendFile(filePath);
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
