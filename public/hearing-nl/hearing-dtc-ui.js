@@ -3,6 +3,8 @@
  */
 (function () {
   const cfg = () => window.HearingDTCConfig || {};
+  const brandPage = () => cfg().brandPage || null;
+  const isBrandPage = () => Boolean(brandPage());
   const brandName = () => cfg().brand?.name || 'HearDirect™';
   const fmt = (n) =>
     new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
@@ -50,6 +52,17 @@
 
   function renderProductSummary() {
     const p = cfg().product;
+    const bp = brandPage();
+    const priceRow = bp
+      ? `<div class="dtc-summary__price-row dtc-summary__price-row--brand">
+          <span class="dtc-summary__price" data-checkout-price>${fmt(p.price)}</span>
+        </div>`
+      : `<div class="dtc-summary__price-row">
+          <span class="dtc-summary__price" data-checkout-price>${fmt(p.price)}</span>
+          <span class="dtc-summary__was">${fmt(p.originalPrice)}</span>
+          <span class="dtc-summary__badge">Bespaar ${p.discountPercent}%</span>
+        </div>`;
+
     return `
       <section class="dtc-summary">
         <h1 class="dtc-summary__title" id="checkout-product-name">${p.name}</h1>
@@ -57,11 +70,7 @@
           <span class="dtc-stars" aria-hidden="true">★★★★★</span>
           <span>${p.rating.toFixed(1).replace('.', ',')} (${p.reviewCount.toLocaleString('nl-NL')} beoordelingen)</span>
         </div>
-        <div class="dtc-summary__price-row">
-          <span class="dtc-summary__price" data-checkout-price>${fmt(p.price)}</span>
-          <span class="dtc-summary__was">${fmt(p.originalPrice)}</span>
-          <span class="dtc-summary__badge">Bespaar ${p.discountPercent}%</span>
-        </div>
+        ${priceRow}
         <p class="dtc-summary__desc">${p.shortDescription}</p>
       </section>`;
   }
@@ -94,6 +103,7 @@
   }
 
   function renderScarcityBox() {
+    if (isBrandPage()) return '';
     return `
       <section class="dtc-scarcity">
         <strong>LET OP:</strong> Door de tijdelijke korting is de vraag momenteel hoog. Kun je het product nog aan je winkelwagen toevoegen? Dan is er nog voorraad beschikbaar met korting.
@@ -164,7 +174,7 @@
       .join('');
 
     return `
-      <section class="dtc-section dtc-film-slider" id="dtc-film-slider">
+      <section class="dtc-section dtc-film-slider" id="film-look">
         <h2 class="dtc-section__title">${slider.title}</h2>
         <p class="dtc-film-slider__intro">${slider.intro}</p>
         <div class="dtc-film-slider__track-wrap">
@@ -246,12 +256,22 @@
     if (!list?.length && !visual?.src && !items.length) return '';
 
     return `
-      <section class="dtc-section dtc-benefits${list?.length ? ' dtc-benefits--list' : ''}">
+      <section class="dtc-section dtc-benefits${list?.length ? ' dtc-benefits--list' : ''}" id="waarom">
         <h2 class="dtc-section__title">${cfg().benefitsTitle || 'Waarom klanten hiervoor kiezen'}</h2>
         <div class="dtc-benefits__grid${list?.length || visual?.src ? ' dtc-benefits__grid--visual' : ''}">
           ${contentHtml}
         </div>
       </section>`;
+  }
+
+  function renderCompareCta(payUrl) {
+    const pulse = isBrandPage() ? '' : ' dtc-cta-pulse';
+    const label = isBrandPage() ? 'Bestel nu' : 'Bestel nu — Vandaag:';
+    return `
+        <a href="${payUrl}" class="dtc-compare__highlight${pulse}">
+          <span>${label}</span>
+          <strong data-checkout-price>${fmt(cfg().product.price)}</strong>
+        </a>`;
   }
 
   function renderComparisonTable() {
@@ -286,11 +306,55 @@
           ${renderCol(table.left, 'muted')}
           ${renderCol(table.right, 'highlight')}
         </div>
-        <a href="${payUrl}" class="dtc-compare__highlight dtc-cta-pulse">
-          <span>Bestel nu — Vandaag:</span>
-          <strong data-checkout-price>${fmt(cfg().product.price)}</strong>
-        </a>
+        ${renderCompareCta(payUrl)}
       </section>`;
+  }
+
+  function renderManifest() {
+    const text = brandPage()?.manifest;
+    if (!text) return '';
+
+    const tagline = brandPage()?.tagline;
+    return `
+      <section class="dtc-section dtc-manifest" aria-label="Het manifest">
+        <blockquote class="dtc-manifest__quote"><p>${text}</p></blockquote>
+        ${tagline ? `<p class="dtc-brand-tagline dtc-brand-tagline--manifest">${tagline}</p>` : ''}
+      </section>`;
+  }
+
+  function renderFounderNote() {
+    const note = brandPage()?.founderNote;
+    if (!note?.text) return '';
+
+    return `
+      <section class="dtc-section dtc-founder" aria-label="Founder note">
+        <div class="dtc-founder__inner">
+          <div class="dtc-founder__avatar" aria-hidden="true"></div>
+          <div class="dtc-founder__body">
+            <p>${note.text}</p>
+            ${note.author ? `<p class="dtc-founder__author">${note.author}</p>` : ''}
+          </div>
+        </div>
+      </section>`;
+  }
+
+  function renderVisionTeaser() {
+    const teaser = brandPage()?.visionTeaser;
+    if (!teaser?.title) return '';
+
+    return `
+      <section class="dtc-section dtc-vision" aria-label="Visie">
+        <div class="dtc-vision__card">
+          <h2 class="dtc-vision__title">${teaser.title}</h2>
+          ${teaser.body ? `<p class="dtc-vision__body">${teaser.body}</p>` : ''}
+        </div>
+      </section>`;
+  }
+
+  function renderBrandTagline() {
+    const tagline = brandPage()?.tagline;
+    if (!tagline) return '';
+    return `<p class="dtc-brand-tagline dtc-brand-tagline--footer">${tagline}</p>`;
   }
 
   function renderPriceComparison() {
@@ -306,10 +370,7 @@
         <figure class="dtc-compare-visual__figure">
           <img src="${visual.image}" alt="${visual.imageAlt || visual.title || ''}" loading="lazy">
         </figure>
-        <a href="${payUrl}" class="dtc-compare__highlight dtc-cta-pulse">
-          <span>Bestel nu — Vandaag:</span>
-          <strong data-checkout-price>${fmt(cfg().product.price)}</strong>
-        </a>
+        ${renderCompareCta(payUrl)}
       </section>`;
     }
 
@@ -333,10 +394,7 @@
           <h3>${pc.ours.label}</h3>
           <ul>${highlights}</ul>
         </div>
-        <a href="${payUrl}" class="dtc-compare__highlight dtc-cta-pulse">
-          <span>Bestel nu — Vandaag:</span>
-          <strong data-checkout-price>${fmt(cfg().product.price)}</strong>
-        </a>
+        ${renderCompareCta(payUrl)}
       </section>`;
   }
 
@@ -379,7 +437,7 @@
         .join('');
 
       return `
-      <section class="dtc-section dtc-hiw">
+      <section class="dtc-section dtc-hiw" id="hoe-werkt-het">
         <h2 class="dtc-section__title">${visual.title || 'Hoe werkt het'}</h2>
         ${visual.intro ? `<p class="dtc-hiw__intro">${visual.intro}</p>` : ''}
         <div class="dtc-hiw__layout">
@@ -416,11 +474,12 @@
   }
 
   function renderGuarantee() {
+    const productLabel = isBrandPage() ? 'je Dispocam' : brandName();
     return `
       <section class="dtc-section dtc-guarantee">
         <div class="dtc-guarantee__badge">${ICONS.shield}</div>
         <h2 class="dtc-section__title">Een zorgeloze keuze met tevredenheidsgarantie</h2>
-        <p>Probeer ${brandName()} ${cfg().guaranteeDays || 90} dagen thuis uit. Niet tevreden? Dan stuur je het terug en krijg je je volledige aankoopbedrag terug — zonder gedoe.</p>
+        <p>Probeer ${productLabel} ${cfg().guaranteeDays || 90} dagen thuis uit. Niet tevreden? Dan stuur je het terug en krijg je je volledige aankoopbedrag terug — zonder gedoe.</p>
         <p>Daarnaast ontvang je 1 jaar garantie op fabricagefouten, zodat je met een gerust hart kunt bestellen.</p>
       </section>`;
   }
@@ -428,7 +487,7 @@
   function renderFAQ() {
     const items = cfg().faqItems || [];
     return `
-      <section class="dtc-section dtc-faq">
+      <section class="dtc-section dtc-faq" id="faq">
         <h2 class="dtc-section__title">Veelgestelde vragen</h2>
         <div class="dtc-faq__list">
           ${items
@@ -452,9 +511,19 @@
     const links = (f.links || [])
       .map((l) => `<a href="${l.href}">${l.label}</a>`)
       .join(' · ');
+    const bb = f.brandBlock;
+
+    const brandBlock = bb
+      ? `<div class="dtc-footer__brand">
+          <p class="dtc-footer__brand-copy">${bb.copyright || ''}</p>
+          ${bb.kvk ? `<p class="dtc-footer__brand-meta">${bb.kvk}</p>` : ''}
+          ${bb.email ? `<p class="dtc-footer__brand-meta"><a href="mailto:${bb.email}">${bb.email}</a></p>` : ''}
+        </div>`
+      : '';
 
     return `
       <footer class="dtc-footer">
+        ${brandBlock}
         <h3>${f.supportTitle || 'Klantenservice'}</h3>
         <p><a href="mailto:${f.email}">${f.email}</a></p>
         <p>${f.location || 'Nederland'}</p>
@@ -721,6 +790,7 @@
     initGallery();
     initFilmSlider();
     initBenefitsListReveal();
+    initBrandChrome();
     updateOrderSummary();
   }
 
@@ -749,12 +819,42 @@
   }
 
   function renderMainCta(payUrl) {
+    const bp = brandPage();
+    const title = bp?.mainCta?.title || 'Beperkte tijd: 50% KORTING';
+    const sub = bp?.mainCta?.sub || `${ICONS.shield.replace('stroke="currentColor"', 'stroke="#fff" width="16" height="16"')} 100% tevreden of uw geld terug!`;
+    const subHtml = bp
+      ? `<span class="dtc-main-cta__sub">${sub}</span>`
+      : `<span class="dtc-main-cta__sub">${sub}</span>`;
+    const pulse = bp ? '' : ' dtc-cta-pulse';
+
     return `
-      <a href="${payUrl}" class="dtc-main-cta dtc-cta-pulse">
-        <span class="dtc-main-cta__title">Beperkte tijd: 50% KORTING</span>
-        <span class="dtc-main-cta__sub">${ICONS.shield.replace('stroke="currentColor"', 'stroke="#fff" width="16" height="16"')} 100% tevreden of uw geld terug!</span>
+      <a href="${payUrl}" class="dtc-main-cta${pulse}">
+        <span class="dtc-main-cta__title">${title}</span>
+        ${subHtml}
       </a>
-      <p class="dtc-shipping-promise">Bestel voor 23:59, morgen verzonden</p>`;
+      <p class="dtc-shipping-promise">${bp?.shippingPromise || 'Bestel voor 23:59, morgen verzonden'}</p>`;
+  }
+
+  function initBrandChrome() {
+    const bp = brandPage();
+    if (!bp) return;
+
+    const payUrl = document.body.dataset.payUrl || 'pay.html';
+    const topBar = document.querySelector('.dtc-discount-bar__left');
+    if (topBar && bp.topBar) {
+      topBar.innerHTML = `<span class="dtc-top-bar__text">${bp.topBar}</span>`;
+      topBar.closest('.dtc-discount-bar')?.classList.add('dtc-top-bar--brand');
+    }
+
+    const mobileCta = document.getElementById('dtc-mobile-cta');
+    if (mobileCta && bp.mobileCta) {
+      mobileCta.classList.add('dtc-mobile-cta--brand');
+      mobileCta.innerHTML = `
+        <span class="dtc-mobile-cta__label">${bp.mobileCta.label} — <strong data-checkout-price>${fmt(cfg().product.price)}</strong></span>
+        <a href="${payUrl}" class="dtc-mobile-cta__btn">${bp.mobileCta.button || 'Bestel nu'}</a>`;
+    }
+
+    document.body.classList.add('dtc-page--brand');
   }
 
   function renderDeliveryBanner() {
@@ -969,11 +1069,15 @@
       reviews: renderReviews,
       filmLook: renderFilmLookSlider,
       benefits: renderBenefits,
+      manifest: renderManifest,
       priceComparison: renderPriceComparison,
       results: renderResults,
       howItWorks: renderHowItWorks,
       guarantee: renderGuarantee,
+      founderNote: renderFounderNote,
       faq: renderFAQ,
+      visionTeaser: renderVisionTeaser,
+      brandTagline: renderBrandTagline,
     };
 
     const order = cfg().sectionOrder || [

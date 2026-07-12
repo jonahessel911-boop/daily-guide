@@ -237,6 +237,51 @@ function buildPre(v) {
   const configPath = v.configPath || `${v.assetPrefix}${v.configFile || 'hearing-dtc-config.js'}`;
   const uiPath = v.uiPath || `${v.assetPrefix}hearing-dtc-ui.js`;
   const scriptPrefix = v.scriptPrefix || '../../';
+
+  if (v.productSlug === 'dispocam') {
+    return `<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/meta-pixel.js"></script>
+  <title>${v.titlePre}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./dispocam-site.css">
+  <link rel="stylesheet" href="${cssCheckout}">
+  <link rel="stylesheet" href="${v.brandCss}">
+</head>
+<body class="dc-site dtc-pre dc-site--checkout" data-track-page="lander" data-track-product="dispocam" data-track-country="${v.country}" data-track-lander="${v.lander}" data-pay-url="${pay}">
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1545607877104793&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
+
+  <div id="dc-site-header"></div>
+
+  <div class="dtc-page">
+    <div class="dtc-layout">
+      <div class="dtc-col-left" id="dtc-col-left"></div>
+      <div class="dtc-col-right" id="dtc-col-right"></div>
+    </div>
+    <div class="dtc-col-below" id="dtc-col-below"></div>
+    <div id="dtc-footer"></div>
+  </div>
+
+  <div id="dc-site-footer"></div>
+
+  <div class="dtc-mobile-cta dtc-mobile-cta--brand" id="dtc-mobile-cta">
+    <span class="dtc-mobile-cta__label">Dispocam — <strong data-checkout-price>€ 69,00</strong></span>
+    <a href="${pay}" class="dtc-mobile-cta__btn">Bestel nu</a>
+  </div>
+
+  <script src="${scriptPrefix}track.js"></script>
+  <script src="${configPath}"></script>
+  <script src="./dispocam-site.js"></script>
+  <script src="${uiPath}"></script>
+</body>
+</html>`;
+  }
+
   return `<!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -246,7 +291,7 @@ function buildPre(v) {
   <title>${v.titlePre}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800${v.productSlug === 'dispocam' ? '&family=Lora:ital@0;1' : ''}&display=swap" rel="stylesheet">
   ${v.productSlug === 'dispocam' ? `<link rel="stylesheet" href="${cssCheckout}">
   <link rel="stylesheet" href="${v.brandCss}">` : `<link rel="stylesheet" href="${v.brandCss}">
   <link rel="stylesheet" href="${cssCheckout}">`}
@@ -254,10 +299,12 @@ function buildPre(v) {
 <body class="dtc-pre" data-track-page="lander" data-track-product="${v.productSlug}" data-track-country="${v.country}" data-track-lander="${v.lander}" data-pay-url="${pay}">
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1545607877104793&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
 
-  <header class="dtc-discount-bar">
+  <header class="dtc-discount-bar${v.productSlug === 'dispocam' ? ' dtc-top-bar--brand' : ''}">
     <div class="dtc-discount-bar__left">
-      <strong>⚡ Exclusieve korting</strong>
-      <span>Alleen beschikbaar op deze pagina</span>
+      ${v.productSlug === 'dispocam'
+    ? '<span class="dtc-top-bar__text">Gratis verzending in NL & BE · Eerste batch nu leverbaar</span>'
+    : `<strong>⚡ Exclusieve korting</strong>
+      <span>Alleen beschikbaar op deze pagina</span>`}
     </div>
   </header>
 
@@ -275,8 +322,11 @@ function buildPre(v) {
     <div id="dtc-footer"></div>
   </div>
 
-  <div class="dtc-mobile-cta" id="dtc-mobile-cta">
-    <a href="${pay}" class="dtc-cta-pulse">Vandaag 50% korting — Bestel nu</a>
+  <div class="dtc-mobile-cta${v.productSlug === 'dispocam' ? ' dtc-mobile-cta--brand' : ''}" id="dtc-mobile-cta">
+    ${v.productSlug === 'dispocam'
+    ? `<span class="dtc-mobile-cta__label">Dispocam — <strong data-checkout-price>€ 69,00</strong></span>
+    <a href="${pay}" class="dtc-mobile-cta__btn">Bestel nu</a>`
+    : `<a href="${pay}" class="dtc-cta-pulse">Vandaag 50% korting — Bestel nu</a>`}
   </div>
 
   <script src="${scriptPrefix}track.js"></script>
