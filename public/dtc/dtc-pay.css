@@ -60,6 +60,20 @@
 
 .dtc-pay-main { min-width: 0; }
 
+.dtc-pay-free-shipping {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #166534;
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--dtc-radius, 12px);
+}
+
 .dtc-pay-section {
   background: #fff;
   border: 1px solid var(--dtc-border);

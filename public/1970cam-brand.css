@@ -459,6 +459,12 @@
   background: var(--text-primary);
 }
 
+[data-track-product="1970cam"] .dtc-pay-free-shipping {
+  color: var(--text-primary);
+  background: var(--bg-page);
+  border-color: var(--border);
+}
+
 [data-track-product="1970cam"] .dtc-pay-trustbar {
   background: var(--bg-page);
   border: 1px solid var(--border);
