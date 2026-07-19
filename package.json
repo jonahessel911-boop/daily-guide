@@ -1,7 +1,7 @@
 {
-  "name": "slaap-beter-slapen",
+  "name": "1970cam",
   "version": "1.0.0",
-  "description": "Digitale slaapgids — sales funnel met Stripe checkout",
+  "description": "1970cam — retro digitale camera webshop",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

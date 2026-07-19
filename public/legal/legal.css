@@ -31,6 +31,14 @@ body {
   width: auto;
 }
 
+.legal-brand-text {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a1a2e;
+  letter-spacing: -0.02em;
+}
+
 .legal-page {
   max-width: 720px;
   margin: 0 auto;

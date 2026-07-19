@@ -4,15 +4,20 @@
     { "src": "server.js", "use": "@vercel/node" }
   ],
   "routes": [
+    { "src": "/dispocam/?", "dest": "/", "status": 308 },
     {
-      "src": "/dispocam/(checkout|pay|missie|feed|about)\\.html",
-      "dest": "/dispocam/$1",
+      "src": "/dispocam/(checkout|pay|missie|feed|about)(\\.html)?/?",
+      "dest": "/$1",
       "status": 308
     },
-    { "src": "/dispocam/?", "dest": "/dispocam/index.html" },
     {
-      "src": "/dispocam/(checkout|pay|missie|feed|about)/?",
-      "dest": "/dispocam/$1.html"
+      "src": "/(checkout|pay|missie|feed|about)\\.html",
+      "dest": "/$1",
+      "status": 308
+    },
+    {
+      "src": "/(checkout|pay|missie|feed|about)/?",
+      "dest": "/$1.html"
     },
     { "handle": "filesystem" },
     { "src": "/api/(.*)", "dest": "server.js" },

@@ -3,24 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Meta Pixel -->
   <script src="/meta-pixel.js"></script>
   <script src="/meta-track.js"></script>
-  <title>Bedankt! | Slaap Beter Slapen</title>
+  <title>Bedankt! | 1970cam</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="checkout.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/checkout.css">
   <link rel="stylesheet" href="/legal/legal.css">
+  <link rel="stylesheet" href="/1970cam-brand.css">
 </head>
-<body class="checkout-page success-page">
+<body class="checkout-page success-page" data-track-product="1970cam">
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1545607877104793&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
   <div class="success-card">
     <div class="success-icon">✓</div>
-    <h1>Bedankt voor je aankoop!</h1>
-    <p id="success-message">Je e-books en e-cursus worden binnen enkele minuten naar je e-mailadres gestuurd. Controleer ook je spammap.</p>
-    <a href="index.html" class="btn-primary" style="max-width:100%">Terug naar home</a>
+    <h1>Bedankt voor je bestelling!</h1>
+    <p id="success-message">Je betaling is gelukt. Je ontvangt een bevestiging per e-mail en we gaan je 1970cam zo snel mogelijk verzenden.</p>
+    <a href="/" class="btn-primary" style="max-width:100%">Terug naar home</a>
   </div>
 
   <footer class="legal-footer legal-footer--compact">
@@ -32,7 +31,7 @@
     </nav>
   </footer>
 
-  <script src="api.js"></script>
+  <script src="/api.js"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
     const paymentIntent = params.get('payment_intent');
@@ -50,11 +49,8 @@
       if (data.status !== 'succeeded' && data.status !== 'paid') return;
       const amount = `€${data.amount.toFixed(2).replace('.', ',')}`;
       const email = data.email || 'je e-mailadres';
-      const isHearing = data.productSlug === 'hearing';
-      document.getElementById('success-message').textContent = isHearing
-        ? `Je betaling van ${amount} is gelukt! Je HearDirect™ bestelling wordt naar ${email} bevestigd en zo snel mogelijk verzonden.`
-        : `Je betaling van ${amount} is gelukt! Je e-books worden naar ${email} gestuurd.`;
-      document.title = isHearing ? 'Bedankt! | HearDirect™' : 'Bedankt! | Slaap Beter Slapen';
+      document.getElementById('success-message').textContent =
+        `Je betaling van ${amount} is gelukt! Bevestiging gaat naar ${email}. Je 1970cam wordt zo snel mogelijk verzonden.`;
       trackMetaPurchase(sessionId || paymentIntent, data.amount);
     }
 

@@ -23,35 +23,19 @@ const STRIPE_PUBLISHABLE_KEY =
   'pk_live_51TQqFYLGVqAZBTckWzCiVrZsmrJX5rkUxuYVjFkIMZVMVE6990yANMCjbn17Osp3ZVmgHrticwv7tHzoB0KTTWRO00dWpf0uMj';
 
 const PRODUCTS = {
-  sleep: {
-    slug: 'sleep',
-    name: 'Slaap Beter Slapen — Compleet Pakket (e-books + e-cursus)',
+  '1970cam': {
+    slug: '1970cam',
+    name: '1970cam — Retro digitale camera',
     description:
-      '3 e-books + e-cursus Dr. Joachiem van Blievaden: Slaap Beter Slapen, De 7 Gouden Slaapregels & Snel Inslaap Methode',
-    price: 17.0,
-    originalPrice: 30.0,
-    orderPrefix: 'SLAAP',
-  },
-  hearing: {
-    slug: 'hearing',
-    name: 'HearDirect™ — Comfortabele hoortoestellen',
-    description: 'HearDirect™ digitale hoortoestellen met oplaadcase',
-    price: 149.0,
-    originalPrice: 300.0,
-    orderPrefix: 'HEAR',
-  },
-  dispocam: {
-    slug: 'dispocam',
-    name: 'DispoCam — Retro digitale camera',
-    description: 'DispoCam retro digitale camera — schiet als een wegwerpcamera, bekijk je foto\'s direct',
-    price: 69.0,
-    originalPrice: 139.0,
-    orderPrefix: 'DCAM',
+      "1970cam — schiet als een wegwerpcamera, bekijk je foto's direct op je telefoon",
+    price: 69.99,
+    originalPrice: 99.99,
+    orderPrefix: 'CAM70',
   },
 };
 
 function getProduct(slug) {
-  return PRODUCTS[slug] || PRODUCTS.sleep;
+  return PRODUCTS[slug] || PRODUCTS['1970cam'];
 }
 
 function buildOrderMetadata({
@@ -214,7 +198,7 @@ app.use(cors({ origin: true }));
 app.use(express.json());
 
 app.get('/api/config', (req, res) => {
-  const slug = req.query.p || req.query.product || 'sleep';
+  const slug = req.query.p || req.query.product || '1970cam';
   const product = getProduct(slug);
   res.json({ publishableKey: STRIPE_PUBLISHABLE_KEY, product });
 });
@@ -307,7 +291,7 @@ app.post('/api/track', async (req, res) => {
 
   const result = await insertEvent({
     eventType,
-    productSlug: productSlug || 'sleep',
+    productSlug: productSlug || '1970cam',
     country: country || 'NL',
     landerSlug: landerSlug || null,
     sessionId,
@@ -417,7 +401,7 @@ app.post('/api/create-payment', async (req, res) => {
       return res.status(400).json({ error: 'E-mailadres is verplicht' });
     }
 
-    const productSlug = analytics.productSlug || req.body.productSlug || 'sleep';
+    const productSlug = analytics.productSlug || req.body.productSlug || '1970cam';
     const product = getProduct(productSlug);
     const orderBump = Boolean(req.body.orderBump);
     const bumpCents = orderBump && productSlug === 'hearing' ? 995 : 0;
@@ -486,7 +470,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
       return res.status(400).json({ error: 'cancelUrl en successUrl zijn verplicht' });
     }
 
-    const productSlug = analytics.productSlug || req.body.productSlug || 'sleep';
+    const productSlug = analytics.productSlug || req.body.productSlug || '1970cam';
     const product = getProduct(productSlug);
     const orderBump = Boolean(req.body.orderBump);
     const bumpCents = orderBump && productSlug === 'hearing' ? 995 : 0;
@@ -626,25 +610,32 @@ app.get('/api/payment-status', async (req, res) => {
   }
 });
 
-const DISPOCAM_PAGES = new Set(['checkout', 'pay', 'missie', 'feed', 'about']);
+const BRAND_PAGES = new Set(['checkout', 'pay', 'missie', 'feed', 'about']);
 
+// Legacy /dispocam/* → root brand pages
+app.get('/dispocam', (_req, res) => res.redirect(301, '/'));
+app.get('/dispocam/', (_req, res) => res.redirect(301, '/'));
 app.get('/dispocam/:page.html', (req, res) => {
   const qs = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : '';
-  res.redirect(301, `/dispocam/${req.params.page}${qs}`);
+  res.redirect(301, `/${req.params.page}${qs}`);
+});
+app.get('/dispocam/:page', (req, res) => {
+  const qs = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : '';
+  res.redirect(301, `/${req.params.page}${qs}`);
 });
 
-app.get('/dispocam', (_req, res) => {
-  res.sendFile(path.join(__dirname, 'public/dispocam/index.html'));
-});
-
-app.get('/dispocam/', (_req, res) => {
-  res.sendFile(path.join(__dirname, 'public/dispocam/index.html'));
-});
-
-app.get('/dispocam/:page', (req, res, next) => {
+// Clean URLs without .html
+app.get('/:page.html', (req, res, next) => {
   const { page } = req.params;
-  if (!DISPOCAM_PAGES.has(page)) return next();
-  const filePath = path.join(__dirname, 'public/dispocam', `${page}.html`);
+  if (!BRAND_PAGES.has(page)) return next();
+  const qs = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : '';
+  res.redirect(301, `/${page}${qs}`);
+});
+
+app.get('/:page', (req, res, next) => {
+  const { page } = req.params;
+  if (!BRAND_PAGES.has(page)) return next();
+  const filePath = path.join(__dirname, 'public', `${page}.html`);
   if (!fs.existsSync(filePath)) return next();
   res.sendFile(filePath);
 });
@@ -667,7 +658,7 @@ if (stripe) {
 
 if (require.main === module) {
   const server = app.listen(PORT, () => {
-    console.log(`🌙 Slaap Beter Slapen: http://localhost:${PORT}`);
+    console.log(`1970cam: http://localhost:${PORT}`);
     ensurePaymentMethodDomains().catch(() => {});
   });
   server.on('error', (err) => {

@@ -74,7 +74,7 @@ function getProductSlug() {
   const domSlug = document.body.dataset.trackProduct;
   const urlSlug = new URLSearchParams(window.location.search).get('p');
   const attr = window.FunnelTrack?.getAttribution?.() || {};
-  return domSlug || urlSlug || attr.product || 'sleep';
+  return domSlug || urlSlug || attr.product || '1970cam';
 }
 
 function hasShippingForm() {
@@ -288,11 +288,11 @@ function initPostcodeLookup() {
 }
 
 let productConfig = {
-  slug: 'sleep',
-  name: 'Slaap Beter Slapen',
-  price: 17,
-  originalPrice: 30,
-  amountCents: 1700,
+  slug: '1970cam',
+  name: '1970cam',
+  price: 69.99,
+  originalPrice: 99.99,
+  amountCents: 6999,
 };
 
 function formatEuroPrice(amount) {
@@ -324,8 +324,8 @@ async function loadProductConfig() {
       window.HearingDTCConfig.product.price = productConfig.price;
       window.HearingDTCConfig.product.originalPrice = productConfig.originalPrice || productConfig.price * 2;
       window.HearingDTCConfig.product.name = productConfig.name;
-      if (productConfig.slug === 'dispocam') {
-        window.HearingDTCConfig.product.offerLabel = `1× ${window.HearingDTCConfig.brand?.name || 'DispoCam'}`;
+      if (productConfig.slug === '1970cam') {
+        window.HearingDTCConfig.product.offerLabel = `1× ${window.HearingDTCConfig.brand?.name || '1970cam'}`;
       }
     }
     window.HearingDTC.updateOrderSummary();
@@ -334,8 +334,8 @@ async function loadProductConfig() {
   const nameEl = document.getElementById('checkout-product-name');
   if (nameEl && productConfig.name) nameEl.textContent = productConfig.name;
 
-  if (productConfig.slug === 'hearing') {
-    document.title = 'Afrekenen | HearDirect™';
+  if (productConfig.slug === '1970cam') {
+    document.title = 'Afrekenen | 1970cam';
   }
 }
 
@@ -628,7 +628,7 @@ async function tryMountPaymentRequestButton(method, amount) {
   paymentRequest = stripe.paymentRequest({
     country: stripeCountryCode(),
     currency: 'eur',
-    total: { label: productConfig.name || 'HearDirect™', amount },
+    total: { label: productConfig.name || '1970cam', amount },
     requestPayerEmail: true,
     requestPayerName: true,
   });
@@ -705,7 +705,7 @@ async function mountWalletCheckout(method) {
   walletUnavailable.hidden = true;
 
   const amount = getCheckoutAmountCents();
-  const productLabel = productConfig.name || 'HearDirect™';
+  const productLabel = productConfig.name || '1970cam';
 
   const prMounted = await tryMountPaymentRequestButton(method, amount);
   if (prMounted) return;
@@ -779,20 +779,20 @@ async function mountWalletCheckout(method) {
   }
 }
 
-function isDispocamCheckout() {
+function is1970camCheckout() {
   return (
-    document.body.dataset.trackProduct === 'dispocam' ||
-    productConfig.slug === 'dispocam'
+    document.body.dataset.trackProduct === '1970cam' ||
+    productConfig.slug === '1970cam'
   );
 }
 
 function dtcPrimaryColor() {
-  return isDispocamCheckout() ? '#2A2622' : '#172b4d';
+  return is1970camCheckout() ? '#2A2622' : '#172b4d';
 }
 
 function getStripeAppearance() {
   const primary = isDtcCheckout() ? dtcPrimaryColor() : '#2563eb';
-  const focusRing = isDispocamCheckout()
+  const focusRing = is1970camCheckout()
     ? '0 0 0 3px rgba(42,38,34,0.12)'
     : isDtcCheckout()
       ? '0 0 0 3px rgba(23,43,77,0.1)'
@@ -802,17 +802,17 @@ function getStripeAppearance() {
     theme: 'stripe',
     variables: {
       colorPrimary: primary,
-      colorBackground: isDispocamCheckout() ? '#FAF7F2' : '#ffffff',
-      colorText: isDispocamCheckout() ? '#1C1A17' : '#0f172a',
+      colorBackground: is1970camCheckout() ? '#FAF7F2' : '#ffffff',
+      colorText: is1970camCheckout() ? '#1C1A17' : '#0f172a',
       borderRadius: '10px',
       fontFamily: isDtcCheckout() ? 'Plus Jakarta Sans, Inter, sans-serif' : 'Inter, sans-serif',
       spacingUnit: '4px',
     },
     rules: {
       '.Input': {
-        border: `1px solid ${isDispocamCheckout() ? '#E3DCCE' : '#e2e8f0'}`,
+        border: `1px solid ${is1970camCheckout() ? '#E3DCCE' : '#e2e8f0'}`,
         boxShadow: 'none',
-        backgroundColor: isDispocamCheckout() ? '#FAF7F2' : undefined,
+        backgroundColor: is1970camCheckout() ? '#FAF7F2' : undefined,
       },
       '.Input:focus': {
         border: `1px solid ${primary}`,
@@ -955,7 +955,7 @@ function setPayLoading(loading) {
   spinner.hidden = !loading;
   buttonText.textContent = loading
     ? 'Bezig met verwerken...'
-    : isDtcPayPage() || (isDtcCheckout() && ['hearing', 'dispocam'].includes(productConfig.slug))
+    : isDtcPayPage() || (isDtcCheckout() && ['hearing', '1970cam'].includes(productConfig.slug))
       ? 'Bevestig uw bestelling!'
       : isDtcCheckout()
         ? 'Bestelling afronden'
