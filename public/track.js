@@ -1,11 +1,16 @@
 /**
- * Funnel attribution & analytics tracking.
- * URL params: ?p=sleep&c=nl&l=lp-2
+ * Funnel attribution & analytics tracking for 1970cam.
+ * URL params: ?p=1970cam&c=nl&l=checkout
  * Or body data attributes: data-track-product, data-track-country, data-track-lander
+ *
+ * Pages:
+ * - /checkout (ads lander) → lander_view
+ * - /pay → checkout_view (pay page views)
  */
 (function () {
   const STORAGE_KEY = 'funnel_attribution';
   const SESSION_KEY = 'funnel_session_id';
+  const DEFAULT_PRODUCT = '1970cam';
 
   function getSessionId() {
     let id = localStorage.getItem(SESSION_KEY);
@@ -19,7 +24,7 @@
   function readFromDom() {
     const el = document.body;
     return {
-      product: el.dataset.trackProduct || 'sleep',
+      product: el.dataset.trackProduct || DEFAULT_PRODUCT,
       country: (el.dataset.trackCountry || 'nl').toLowerCase(),
       lander: el.dataset.trackLander || null,
     };
@@ -40,7 +45,7 @@
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
 
     const merged = {
-      product: url.product || stored.product || dom.product || 'sleep',
+      product: url.product || stored.product || dom.product || DEFAULT_PRODUCT,
       country: (url.country || stored.country || dom.country || 'nl').toLowerCase(),
       lander: url.lander || stored.lander || dom.lander || null,
     };
@@ -59,7 +64,7 @@
   }
 
   function patchCheckoutLinks() {
-    document.querySelectorAll('a[href*="checkout.html"]').forEach((link) => {
+    document.querySelectorAll('a[href*="checkout.html"], a[href*="/checkout"], a[href*="/pay"]').forEach((link) => {
       const href = link.getAttribute('href');
       if (!href || href.startsWith('http')) return;
       try {
@@ -79,7 +84,7 @@
     const attr = getAttribution();
     const payload = {
       eventType,
-      productSlug: attr.product,
+      productSlug: attr.product || DEFAULT_PRODUCT,
       country: attr.country.toUpperCase(),
       landerSlug: attr.lander,
       sessionId: getSessionId(),
@@ -102,9 +107,11 @@
     const page = document.body.dataset.trackPage;
     patchCheckoutLinks();
 
-    if (page === 'lander') {
+    // Ads lander = /checkout
+    if (page === 'lander' || page === 'checkout-lander') {
       track('lander_view');
-    } else if (page === 'checkout') {
+    // Pay page = /pay
+    } else if (page === 'checkout' || page === 'pay') {
       track('checkout_view');
     }
   }

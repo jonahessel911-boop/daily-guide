@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard — Funnel analytics</title>
+  <title>Dashboard — 1970cam</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,8 +17,8 @@
   <div class="dashboard">
     <header class="dash-header">
       <div>
-        <h1>Funnel analytics</h1>
-        <p class="muted">Per product · lander · land</p>
+        <h1>1970cam analytics</h1>
+        <p class="muted">Checkout (ads) → Pay → Sales</p>
       </div>
       <div class="dash-actions">
         <select id="filter-range">
@@ -32,125 +32,17 @@
       </div>
     </header>
 
-    <section class="panel panel-split">
-      <div class="split-header">
-        <div>
-          <h2>Sleep traffic split</h2>
-          <p class="hint" style="margin:0;">Gebruik deze URL in je sleep ads — verdeelt traffic automatisch.</p>
-        </div>
-        <button type="button" id="btn-copy-checker" class="btn-copy">Kopieer URL</button>
-      </div>
-      <div class="checker-url-box">
-        <code id="checker-url">https://www.the-daily-guide.com/checker</code>
-      </div>
-      <p class="split-total">Totaal: <strong id="split-total">—</strong>% <span id="split-total-warn" class="split-warn" hidden> (moet 100% zijn)</span></p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Lander</th>
-              <th>Pagina</th>
-              <th>Traffic %</th>
-              <th>Views</th>
-              <th>Sales</th>
-              <th>CR</th>
-              <th>Omzet</th>
-            </tr>
-          </thead>
-          <tbody id="split-body">
-            <tr><td colspan="7" class="empty">Laden…</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="split-actions">
-        <button type="button" id="btn-save-splits" class="btn-save">Splits opslaan</button>
-        <span id="split-save-msg" class="split-save-msg" hidden></span>
-      </div>
-    </section>
-
-    <section class="panel panel-hearing">
-      <div class="split-header">
-        <div>
-          <h2>Hearing traffic split (NL)</h2>
-          <p class="hint" style="margin:0;">URL voor hearing ads in Nederland — verdeelt tussen adv/1 en adv/2.</p>
-        </div>
-        <button type="button" id="btn-copy-hearing-checker" class="btn-copy">Kopieer URL</button>
-      </div>
-      <div class="checker-url-box">
-        <code id="hearing-checker-url">https://www.the-daily-guide.com/hearing-checker</code>
-      </div>
-      <p class="split-total">Totaal: <strong id="hearing-split-total">—</strong>% <span id="hearing-split-total-warn" class="split-warn" hidden> (moet 100% zijn)</span></p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Lander</th>
-              <th>Pagina</th>
-              <th>Traffic %</th>
-              <th>Views</th>
-              <th>Sales</th>
-              <th>CR</th>
-              <th>Omzet</th>
-            </tr>
-          </thead>
-          <tbody id="hearing-split-body">
-            <tr><td colspan="7" class="empty">Laden…</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="split-actions">
-        <button type="button" id="btn-save-hearing-splits" class="btn-save">Splits opslaan</button>
-        <span id="hearing-split-save-msg" class="split-save-msg" hidden></span>
-      </div>
-    </section>
-
-    <section class="panel panel-hearing-be">
-      <div class="split-header">
-        <div>
-          <h2>Hearing traffic split (BE)</h2>
-          <p class="hint" style="margin:0;">URL voor hearing ads in België — verdeelt tussen adv/1 en adv/2.</p>
-        </div>
-        <button type="button" id="btn-copy-hearing-be-checker" class="btn-copy">Kopieer URL</button>
-      </div>
-      <div class="checker-url-box">
-        <code id="hearing-be-checker-url">https://www.the-daily-guide.com/hearing-checker-be</code>
-      </div>
-      <p class="split-total">Totaal: <strong id="hearing-be-split-total">—</strong>% <span id="hearing-be-split-total-warn" class="split-warn" hidden> (moet 100% zijn)</span></p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Lander</th>
-              <th>Pagina</th>
-              <th>Traffic %</th>
-              <th>Views</th>
-              <th>Sales</th>
-              <th>CR</th>
-              <th>Omzet</th>
-            </tr>
-          </thead>
-          <tbody id="hearing-be-split-body">
-            <tr><td colspan="7" class="empty">Laden…</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="split-actions">
-        <button type="button" id="btn-save-hearing-be-splits" class="btn-save">Splits opslaan</button>
-        <span id="hearing-be-split-save-msg" class="split-save-msg" hidden></span>
-      </div>
-    </section>
-
     <section class="kpi-grid" id="kpi-grid">
       <div class="kpi-card">
-        <span class="kpi-label">Lander views</span>
+        <span class="kpi-label">Checkout views</span>
         <span class="kpi-value" id="kpi-views">—</span>
       </div>
       <div class="kpi-card">
-        <span class="kpi-label">Checkout views</span>
+        <span class="kpi-label">Pay views</span>
         <span class="kpi-value" id="kpi-checkout">—</span>
       </div>
       <div class="kpi-card">
-        <span class="kpi-label">CTR → checkout</span>
+        <span class="kpi-label">CTR → pay</span>
         <span class="kpi-value" id="kpi-ctr">—</span>
       </div>
       <div class="kpi-card">
@@ -162,34 +54,34 @@
         <span class="kpi-value" id="kpi-revenue">—</span>
       </div>
       <div class="kpi-card">
-        <span class="kpi-label">CR (lander → sale)</span>
+        <span class="kpi-label">CR (checkout → sale)</span>
         <span class="kpi-value" id="kpi-cr">—</span>
       </div>
     </section>
 
     <section class="panel">
-      <h2>Per lander &amp; product</h2>
+      <h2>Per pagina</h2>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Product</th>
+              <th>Pagina</th>
               <th>Land</th>
-              <th>Lander</th>
-              <th>Views</th>
               <th>Checkout</th>
+              <th>Pay</th>
               <th>CTR</th>
               <th>Sales</th>
               <th>Omzet</th>
               <th>CR</th>
-              <th>Checkout CR</th>
+              <th>Pay CR</th>
             </tr>
           </thead>
           <tbody id="stats-body">
-            <tr><td colspan="10" class="empty">Laden…</td></tr>
+            <tr><td colspan="9" class="empty">Laden…</td></tr>
           </tbody>
         </table>
       </div>
+      <p class="hint">Checkout = lander vanuit ads (<code>/checkout</code>). Pay = betaalpagina (<code>/pay</code>).</p>
     </section>
 
     <section class="panel">
@@ -199,24 +91,6 @@
       <input type="text" id="meta-test-code" class="meta-test-input" placeholder="bijv. TEST37197" autocomplete="off">
       <button type="button" id="btn-test-purchase" class="btn-test">Send test purchase</button>
       <p id="meta-test-result" class="meta-test-result" hidden></p>
-    </section>
-
-    <section class="panel">
-      <h2>Geregistreerde landers</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Slug</th>
-              <th>Naam</th>
-              <th>Product</th>
-              <th>Pad</th>
-            </tr>
-          </thead>
-          <tbody id="landers-body"></tbody>
-        </table>
-      </div>
-      <p class="hint">Nieuwe lander? Voeg rij toe in Supabase <code>landers</code> + <code>data-track-lander</code> op de pagina.</p>
     </section>
   </div>
 
