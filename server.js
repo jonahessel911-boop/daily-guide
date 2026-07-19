@@ -97,6 +97,7 @@ const CHECKOUT_METHOD_TYPES = {
   bancontact: ['bancontact'],
   card: ['card'],
   klarna: ['klarna'],
+  all: ['ideal', 'bancontact', 'card', 'klarna'],
 };
 
 let stripe = null;
@@ -488,13 +489,10 @@ app.post('/api/create-checkout-session', async (req, res) => {
   }
 
   try {
-    const { email, paymentMethod = 'ideal', analytics = {}, meta = {}, shipping = {}, cancelUrl, successUrl } =
+    const { email, paymentMethod = 'all', analytics = {}, meta = {}, shipping = {}, cancelUrl, successUrl } =
       req.body;
     if (!email) {
       return res.status(400).json({ error: 'E-mailadres is verplicht' });
-    }
-    if (paymentMethod === 'apple_pay' || paymentMethod === 'google_pay') {
-      return res.status(400).json({ error: 'Apple Pay en Google Pay worden op de pagina afgehandeld.' });
     }
     if (!cancelUrl || !successUrl) {
       return res.status(400).json({ error: 'cancelUrl en successUrl zijn verplicht' });
@@ -505,7 +503,8 @@ app.post('/api/create-checkout-session', async (req, res) => {
     const orderBump = Boolean(req.body.orderBump);
     const bumpCents = orderBump && productSlug === 'hearing' ? 995 : 0;
     const amountCents = Math.round(product.price * 100) + bumpCents;
-    const paymentTypes = CHECKOUT_METHOD_TYPES[paymentMethod] || ['ideal'];
+    const paymentTypes =
+      CHECKOUT_METHOD_TYPES[paymentMethod] || CHECKOUT_METHOD_TYPES.all;
     const orderId = `${product.orderPrefix}-${Date.now()}`;
     const metadata = buildOrderMetadata({
       product,

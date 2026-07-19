@@ -385,16 +385,16 @@ function getMetaCookies() {
   return { fbc: read('_fbc'), fbp: read('_fbp') };
 }
 
-async function createCheckoutSession(email, method) {
+async function createCheckoutSession(email, method = 'all') {
   const continueText = document.getElementById('continue-text');
-  if (continueText) continueText.textContent = redirectPaymentLabel(method);
+  if (continueText) continueText.textContent = 'Doorverwijzen naar veilige betaling...';
 
   const { res, data } = await Api.apiFetch('/api/create-checkout-session', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       email,
-      paymentMethod: method,
+      paymentMethod: method || 'all',
       cancelUrl: window.location.href,
       successUrl: `${window.location.origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
       analytics: getCheckoutAnalytics(),
@@ -419,55 +419,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const selectForm = document.getElementById('select-form');
   const emailInput = document.getElementById('email');
-  const accordionToggle = document.getElementById('pm-accordion-toggle');
-  const accordionBody = document.getElementById('pm-accordion-body');
-  const btnBack = document.getElementById('btn-back');
-  const btnSubmit = document.getElementById('submit-payment');
 
   if (!selectForm) return;
 
   const savedEmail = sessionStorage.getItem('checkout_email');
   if (savedEmail && emailInput) emailInput.value = savedEmail;
 
-  const availableMethods = [...document.querySelectorAll('input[name="payment-method"]')].map(
-    (radio) => radio.value
-  );
-  const savedMethod = sessionStorage.getItem('checkout_method');
-  if (savedMethod && availableMethods.includes(savedMethod)) {
-    selectMethod(savedMethod);
-  } else {
-    selectMethod(defaultPaymentMethod());
+  const continueText = document.getElementById('continue-text');
+  if (continueText && (isDtcCheckout() || isDtcPayPage())) {
+    continueText.textContent = dtcConfirmLabel();
   }
-
-  accordionToggle?.addEventListener('click', () => {
-    const open = accordionBody.hidden;
-    accordionBody.hidden = !open;
-    accordionToggle.setAttribute('aria-expanded', String(open));
-    accordionToggle.classList.toggle('open', open);
-  });
-
-  document.querySelectorAll('input[name="payment-method"]').forEach((radio) => {
-    radio.addEventListener('change', () => {
-      if (radio.checked) {
-        selectMethod(radio.value);
-        accordionBody.hidden = true;
-        accordionToggle?.setAttribute('aria-expanded', 'false');
-        accordionToggle?.classList.remove('open');
-      }
-    });
-  });
-
-  btnBack?.addEventListener('click', () => {
-    destroyStripeElements();
-    pendingAutoConfirm = false;
-    const stepPay = document.getElementById('step-pay');
-    stepPay.hidden = true;
-    stepPay.classList.remove('wallet-step');
-    document.getElementById('step-select').hidden = false;
-    setContinueLoading(false);
-  });
-
-  btnSubmit?.addEventListener('click', () => handlePayment());
 
   selectForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -494,35 +455,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     customerName = shipping?.name || '';
     shippingInfo = shipping;
     sessionStorage.setItem('checkout_email', email);
-    sessionStorage.setItem('checkout_method', selectedMethod);
     if (shipping) sessionStorage.setItem('checkout_shipping', JSON.stringify(shipping));
 
     setContinueLoading(true);
     showMessage('select-message', null);
 
     try {
-      if (usesCheckoutSession(selectedMethod)) {
-        await createCheckoutSession(email, selectedMethod);
-        return;
-      }
-
-      if (isWalletPaymentMethod(selectedMethod)) {
-        if (!stripe) stripe = Stripe(STRIPE_PK);
-        clientSecret = null;
-        document.getElementById('step-select').hidden = true;
-        const stepPay = document.getElementById('step-pay');
-        stepPay.hidden = false;
-        stepPay.classList.add('wallet-step');
-        updatePayHeader(selectedMethod);
-        stepPay.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-        await mountWalletCheckout(selectedMethod);
-        return;
-      }
-
-      throw new Error('Onbekende betaalmethode. Kies een andere optie.');
+      await createCheckoutSession(email, 'all');
     } catch (err) {
       showMessage('select-message', err.message);
+      const label = document.getElementById('continue-text');
+      if (label && (isDtcCheckout() || isDtcPayPage())) {
+        label.textContent = dtcConfirmLabel();
+      }
     } finally {
       setContinueLoading(false);
     }
