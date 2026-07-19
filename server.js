@@ -574,7 +574,6 @@ app.post('/api/create-checkout-session', async (req, res) => {
       payment_intent_data: {
         metadata,
         description: `${product.name} (${orderId})`,
-        ...(stripeShipping ? { shipping: stripeShipping } : {}),
       },
       locale: 'nl',
     });
