@@ -355,6 +355,14 @@
 
 .dtc-pay-sidebar { min-width: 0; }
 
+/* On mobile the full review list is already under the form — hide sidebar copy. */
+@media (max-width: 899px) {
+  .dtc-pay-sidebar .dtc-pay-trust-head,
+  .dtc-pay-sidebar .dtc-pay-sidebar__reviews {
+    display: none;
+  }
+}
+
 @media (min-width: 900px) {
   .dtc-pay-sidebar {
     position: sticky;
