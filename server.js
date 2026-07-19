@@ -489,8 +489,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
   }
 
   try {
-    const { email, paymentMethod = 'all', analytics = {}, meta = {}, shipping = {}, cancelUrl, successUrl } =
-      req.body;
+    const { email, analytics = {}, meta = {}, shipping = {}, cancelUrl, successUrl } = req.body;
     if (!email) {
       return res.status(400).json({ error: 'E-mailadres is verplicht' });
     }
@@ -502,27 +501,43 @@ app.post('/api/create-checkout-session', async (req, res) => {
     const product = getProduct(productSlug);
     const orderBump = Boolean(req.body.orderBump);
     const bumpCents = orderBump && productSlug === 'hearing' ? 995 : 0;
-    const amountCents = Math.round(product.price * 100) + bumpCents;
-    const paymentTypes =
-      CHECKOUT_METHOD_TYPES[paymentMethod] || CHECKOUT_METHOD_TYPES.all;
+    const amountCents = Math.round(Number(product.price) * 100) + bumpCents;
     const orderId = `${product.orderPrefix}-${Date.now()}`;
     const metadata = buildOrderMetadata({
       product,
       productSlug,
       email,
       shipping,
-      paymentMethod,
+      paymentMethod: 'stripe_checkout',
       analytics,
       meta,
       orderBump,
       orderId,
     });
-    const stripeShippingSession = buildStripeShipping(shipping);
+    const stripeShipping = buildStripeShipping(shipping);
+
+    // Prefill name + address on Stripe Checkout (still editable there)
+    const customer = await stripe.customers.create({
+      email,
+      name: shipping.name || undefined,
+      shipping: stripeShipping,
+      address: stripeShipping?.address,
+      metadata: {
+        order_id: orderId,
+        product_slug: productSlug,
+      },
+    });
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      customer_email: email,
-      payment_method_types: paymentTypes,
+      customer: customer.id,
+      customer_update: {
+        name: 'auto',
+        address: 'auto',
+        shipping: 'auto',
+      },
+      // Omit payment_method_types → Stripe shows every method enabled in the Dashboard
+      // (iDEAL, Bancontact, card/Apple Pay/Google Pay, Klarna, etc.)
       line_items: [
         {
           quantity: 1,
@@ -536,14 +551,30 @@ app.post('/api/create-checkout-session', async (req, res) => {
           },
         },
       ],
+      billing_address_collection: 'required',
+      shipping_address_collection: {
+        allowed_countries: ['NL', 'BE'],
+      },
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            fixed_amount: { amount: 0, currency: 'eur' },
+            display_name: 'Gratis verzending',
+            delivery_estimate: {
+              minimum: { unit: 'business_day', value: 2 },
+              maximum: { unit: 'business_day', value: 5 },
+            },
+          },
+        },
+      ],
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata,
       payment_intent_data: {
         metadata,
-        receipt_email: email,
         description: `${product.name} (${orderId})`,
-        ...(stripeShippingSession ? { shipping: stripeShippingSession } : {}),
+        ...(stripeShipping ? { shipping: stripeShipping } : {}),
       },
       locale: 'nl',
     });
