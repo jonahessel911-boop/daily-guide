@@ -72,12 +72,11 @@
           </h1>`
         : `<h1 class="dtc-summary__title" id="checkout-product-name">${p.name}</h1>`;
 
-    const ratingHtml =
-      bp || !p.rating
-        ? ''
-        : `<div class="dtc-summary__rating">
+    const ratingHtml = !p.rating
+      ? ''
+      : `<div class="dtc-summary__rating${bp ? ' dtc-summary__rating--brand' : ''}">
           <span class="dtc-stars" aria-hidden="true">★★★★★</span>
-          <span>${p.rating.toFixed(1).replace('.', ',')} (${p.reviewCount.toLocaleString('nl-NL')} beoordelingen)</span>
+          <span><strong>${p.rating.toFixed(1).replace('.', ',')}</strong> · ${p.reviewCount.toLocaleString('nl-NL')} reviews</span>
         </div>`;
 
     return `
@@ -160,21 +159,22 @@
   }
 
   function renderReviews() {
-    // Real customer reviews only.
     const reviews = cfg().reviews || [];
     if (!reviews.length) {
-      return `<section class="dtc-section dtc-reviews dtc-reviews--empty" hidden aria-hidden="true"><!-- Real customer reviews only. --></section>`;
+      return `<section class="dtc-section dtc-reviews dtc-reviews--empty" hidden aria-hidden="true"></section>`;
     }
 
     const p = cfg().product;
+    const count = p.reviewCount || reviews.length;
+    const brand = brandName();
     const cards = reviews.map((r) => renderReviewCard(r)).join('');
 
     return `
-      <section class="dtc-section dtc-reviews">
-        ${cfg().reviewBanner ? `<figure class="dtc-reviews__banner"><img src="${cfg().reviewBanner}" alt="HearDirect™ hoortoestel — discreet en compact op uw vinger" width="720" height="720" loading="lazy"></figure>` : ''}
-        <h2 class="dtc-section__title">Wat onze klanten zeggen</h2>
+      <section class="dtc-section dtc-reviews" id="reviews">
+        ${cfg().reviewBanner ? `<figure class="dtc-reviews__banner"><img src="${cfg().reviewBanner}" alt="" width="720" height="720" loading="lazy"></figure>` : ''}
+        <h2 class="dtc-section__title">Vertrouwd door ${count.toLocaleString('nl-NL')} ${brand} gebruikers</h2>
+        ${p.rating ? `<p class="dtc-reviews__lead"><span class="dtc-stars" aria-hidden="true">★★★★★</span> <strong>${p.rating.toFixed(1).replace('.', ',')}</strong> · ${count.toLocaleString('nl-NL')} reviews</p>` : ''}
         <div class="dtc-reviews__grid">${cards}</div>
-        ${p.rating ? `<p class="dtc-reviews__score">Trustscore <strong>${p.rating.toFixed(1).replace('.', ',')}</strong> · <strong>${p.reviewCount.toLocaleString('nl-NL')}</strong> beoordelingen</p>` : ''}
       </section>`;
   }
 
@@ -976,27 +976,56 @@
 
   function renderPaySidebar() {
     const reviews = cfg().reviews || [];
-    const r = reviews[0];
-    if (!r) return '';
-    const avatar = r.avatar || r.image;
-    const headImg = r.avatar
-      ? `<img class="dtc-pay-review__avatar" src="${avatar}" alt="">`
-      : `<img class="dtc-pay-review__img" src="${avatar}" alt="">`;
+    if (!reviews.length) return '';
+    const p = cfg().product;
+    const count = p.reviewCount || reviews.length;
+    const brand = brandName();
+    const cards = reviews
+      .slice(0, 3)
+      .map((r) => {
+        const avatar = r.avatar || r.image;
+        return `
+          <div class="dtc-pay-review dtc-pay-review--avatar">
+            <img class="dtc-pay-review__avatar" src="${avatar}" alt="">
+            <div class="dtc-pay-review__body">
+              <div class="dtc-pay-review__name">${r.name}</div>
+              <div class="dtc-pay-review__stars">★★★★★</div>
+              <p class="dtc-pay-review__text">${r.text}</p>
+            </div>
+          </div>`;
+      })
+      .join('');
 
     return `
-      <div class="dtc-pay-review${r.avatar ? ' dtc-pay-review--avatar' : ''}">
-        ${headImg}
-        <div class="dtc-pay-review__body">
-          <div class="dtc-pay-review__name">${r.name}</div>
-          <div class="dtc-pay-review__stars">★★★★★</div>
-          <p class="dtc-pay-review__text">${r.text}</p>
-        </div>
+      <div class="dtc-pay-trust-head">
+        <p class="dtc-pay-trust-head__title">Vertrouwd door ${count.toLocaleString('nl-NL')} ${brand} gebruikers</p>
+        ${p.rating ? `<p class="dtc-pay-trust-head__score"><span class="dtc-stars" aria-hidden="true">★★★★★</span> ${p.rating.toFixed(1).replace('.', ',')} · ${count.toLocaleString('nl-NL')} reviews</p>` : ''}
       </div>
+      <div class="dtc-pay-sidebar__reviews">${cards}</div>
       <div class="dtc-pay-guarantee-seal">
         NIET TEVREDEN?<br>
-        <strong>${cfg().guaranteeDays || 90} DAGEN</strong>
+        <strong>${cfg().guaranteeDays || 60} DAGEN</strong>
         GELD TERUG GARANTIE
       </div>`;
+  }
+
+  function renderPayReviewsBelow() {
+    const reviews = cfg().reviews || [];
+    if (!reviews.length) return '';
+    const p = cfg().product;
+    const count = p.reviewCount || reviews.length;
+    const brand = brandName();
+    const cards = reviews
+      .slice(0, 6)
+      .map((r) => renderReviewCard(r))
+      .join('');
+
+    return `
+      <section class="dtc-pay-reviews" id="pay-reviews">
+        <h2 class="dtc-pay-reviews__title">Vertrouwd door ${count.toLocaleString('nl-NL')} ${brand} gebruikers</h2>
+        ${p.rating ? `<p class="dtc-pay-reviews__score"><span class="dtc-stars" aria-hidden="true">★★★★★</span> <strong>${p.rating.toFixed(1).replace('.', ',')}</strong> · ${count.toLocaleString('nl-NL')} reviews</p>` : ''}
+        <div class="dtc-pay-reviews__grid">${cards}</div>
+      </section>`;
   }
 
   function initStockCount() {
@@ -1041,15 +1070,28 @@
     const sidebar = document.getElementById('dtc-pay-sidebar');
     if (sidebar) sidebar.innerHTML = renderPaySidebar();
 
+    const payReviews = document.getElementById('dtc-pay-reviews');
+    if (payReviews) payReviews.innerHTML = renderPayReviewsBelow();
+
     const faces = document.getElementById('dtc-pay-faces');
     if (faces) {
-      const imgs = (cfg().reviews || []).slice(0, 3);
+      const imgs = (cfg().reviews || []).slice(0, 4);
       faces.innerHTML = imgs
         .map((r) => {
           const src = r.avatar || r.image;
           return `<img class="dtc-pay-social__face" src="${src}" alt="">`;
         })
         .join('');
+    }
+
+    const socialStrong = document.querySelector('.dtc-pay-social strong');
+    const socialSpan = document.querySelector('.dtc-pay-social span');
+    const count = p.reviewCount || 683;
+    if (socialStrong) {
+      socialStrong.textContent = `Vertrouwd door ${count.toLocaleString('nl-NL')} ${brandName()} gebruikers`;
+    }
+    if (socialSpan && p.rating) {
+      socialSpan.textContent = `${p.rating.toFixed(1).replace('.', ',')} · ${count.toLocaleString('nl-NL')} reviews`;
     }
 
     initStockCount();

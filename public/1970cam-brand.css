@@ -45,6 +45,17 @@
 
 [data-track-product="1970cam"] .dtc-summary__desc,
 [data-track-product="1970cam"] .dtc-film-slider__intro,
+[data-track-product="1970cam"] .dtc-summary__rating--brand {
+  margin-bottom: 10px;
+  color: var(--text-secondary, #6b6560);
+}
+
+[data-track-product="1970cam"] .dtc-reviews__lead,
+[data-track-product="1970cam"] .dtc-pay-reviews__score,
+[data-track-product="1970cam"] .dtc-pay-trust-head__score {
+  color: var(--text-secondary, #6b6560);
+}
+
 [data-track-product="1970cam"] .dtc-reviews__score {
   color: var(--text-muted);
 }

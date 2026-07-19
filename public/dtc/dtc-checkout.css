@@ -331,6 +331,18 @@
 .dtc-review-card__verified { color: var(--dtc-green); font-weight: 800; font-size: 12px; }
 .dtc-review-card__stars { color: var(--dtc-green); font-size: 13px; margin-bottom: 6px; }
 .dtc-review-card__text { font-size: 14px; line-height: 1.5; color: #334155; }
+.dtc-reviews__lead {
+  text-align: center;
+  font-size: 14px;
+  color: var(--dtc-muted);
+  margin: -8px 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .dtc-reviews__score { text-align: center; font-size: 13px; color: var(--dtc-muted); margin-top: 16px; }
 
 .dtc-review-card--avatar { padding: 14px; }

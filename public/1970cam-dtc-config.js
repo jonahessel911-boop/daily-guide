@@ -69,13 +69,13 @@ window.HearingDTCConfig = {
   sectionOrder: [
     'filmLook',
     'benefits',
+    'reviews',
     'manifest',
     'howItWorks',
     'socialFeed',
     'priceComparison',
     'founderStory',
     'guarantee',
-    'reviews',
     'faq',
     'visionTeaser',
   ],
@@ -90,6 +90,8 @@ window.HearingDTCConfig = {
     price: 69.99,
     originalPrice: 99.99,
     discountPercent: 30,
+    rating: 4.7,
+    reviewCount: 683,
     shippingLabel: 'Gratis',
   },
 
@@ -363,6 +365,7 @@ window.HearingDTCConfig = {
       body: 'Direct op je telefoon. Nooit meer opnieuw kopen. Deel overal — of kijk samen terug in de app.',
       cta: 'Shop 1970cam',
       ctaHref: '/checkout',
+      rating: '4,7 · 683 reviews',
     },
     products: {
       title: 'Bestsellers',

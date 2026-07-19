@@ -262,6 +262,71 @@
 
 .dtc-pay-social span { font-size: 13px; color: var(--dtc-muted); }
 
+.dtc-pay-trust-head {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.dtc-pay-trust-head__title {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.35;
+  margin: 0 0 6px;
+  color: var(--dtc-navy);
+}
+
+.dtc-pay-trust-head__score {
+  font-size: 13px;
+  color: var(--dtc-muted);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.dtc-pay-sidebar__reviews {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dtc-pay-sidebar__reviews .dtc-pay-review {
+  margin: 0;
+}
+
+.dtc-pay-reviews {
+  margin-top: 28px;
+  padding-top: 8px;
+}
+
+.dtc-pay-reviews__title {
+  font-size: 20px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.3;
+  margin: 0 0 8px;
+  color: var(--dtc-navy);
+}
+
+.dtc-pay-reviews__score {
+  text-align: center;
+  font-size: 14px;
+  color: var(--dtc-muted);
+  margin: 0 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dtc-pay-reviews__grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .dtc-pay-sidebar { min-width: 0; }
 
 @media (min-width: 900px) {
