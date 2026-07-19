@@ -176,7 +176,7 @@ window.HearingDTCConfig = {
       'Koppel ’m één keer aan je telefoon. Daarna mag je telefoon thuisblijven: neem alleen de 1970cam mee naar de party, schiet de avond, en zie de foto\'s direct in de app. Jouw vrienden kunnen meekijken — of jij deelt ze overal: WhatsApp, Instagram, Stories.',
     cta: 'Eén 1970cam op tafel = de hele avond vastgelegd. Voor iedereen.',
     image: `${CAM_SOCIAL}/feed.png`,
-    imageAlt: '1970cam app — retro foto\'s die jij en je vrienden direct terugkijken',
+    imageAlt: '1970cam community feed — echte film-look foto\'s van over de hele wereld',
   },
 
   benefitsList: [
