@@ -213,6 +213,18 @@
   flex-wrap: wrap;
 }
 
+.dtc-pay-methods {
+  display: block;
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  margin: 14px auto 0;
+}
+
+.dtc-pay-methods--step {
+  margin-top: 16px;
+}
+
 .dtc-pay-trustbar__item {
   display: flex;
   align-items: center;

@@ -72,6 +72,26 @@ function buildOrderMetadata({
   };
 }
 
+function buildStripeShipping(shipping = {}) {
+  if (!shipping.name && !shipping.street) return undefined;
+  const house = [shipping.houseNumber, shipping.houseAddition].filter(Boolean).join(' ');
+  const line1 = [shipping.street, house].filter(Boolean).join(' ').trim();
+  const country =
+    shipping.country === 'België' || String(shipping.country || '').toUpperCase() === 'BE'
+      ? 'BE'
+      : 'NL';
+
+  return {
+    name: shipping.name || 'Klant',
+    address: {
+      line1: line1 || 'Onbekend',
+      city: shipping.city || '',
+      postal_code: shipping.postalCode || '',
+      country,
+    },
+  };
+}
+
 const CHECKOUT_METHOD_TYPES = {
   ideal: ['ideal'],
   bancontact: ['bancontact'],
@@ -88,7 +108,12 @@ if (process.env.STRIPE_SECRET_KEY) {
 
 async function ensurePaymentMethodDomains() {
   if (!stripe) return;
-  const domains = ['www.the-daily-guide.com', 'the-daily-guide.com'];
+  const domains = [
+    'www.the-daily-guide.com',
+    'the-daily-guide.com',
+    '1970cam.com',
+    'www.1970cam.com',
+  ];
   for (const domain of domains) {
     try {
       const list = await stripe.paymentMethodDomains.list({ domain_name: domain, limit: 1 });
@@ -430,6 +455,11 @@ app.post('/api/create-payment', async (req, res) => {
       metadata,
     };
 
+    const stripeShipping = buildStripeShipping(shipping);
+    if (stripeShipping) {
+      intentParams.shipping = stripeShipping;
+    }
+
     if (paymentMethod === 'apple_pay' || paymentMethod === 'google_pay') {
       intentParams.payment_method_types = ['card'];
     } else if (methodTypes[paymentMethod]) {
@@ -488,6 +518,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
       orderBump,
       orderId,
     });
+    const stripeShippingSession = buildStripeShipping(shipping);
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -513,6 +544,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
         metadata,
         receipt_email: email,
         description: `${product.name} (${orderId})`,
+        ...(stripeShippingSession ? { shipping: stripeShippingSession } : {}),
       },
       locale: 'nl',
     });

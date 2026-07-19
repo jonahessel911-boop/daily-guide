@@ -537,17 +537,55 @@ function selectMethod(method) {
     r.closest('.pm-option')?.classList.toggle('selected', r.checked);
   });
 
-  document.getElementById('pm-selected-label').textContent = METHOD_LABELS[method];
-  document.getElementById('pm-selected-icon').innerHTML = METHOD_ICONS[method];
+  const labelEl = document.getElementById('pm-selected-label');
+  const iconEl = document.getElementById('pm-selected-icon');
+  if (labelEl) labelEl.textContent = METHOD_LABELS[method];
+  if (iconEl) iconEl.innerHTML = METHOD_ICONS[method];
 
   const continueText = document.getElementById('continue-text');
-  if (!continueText) return;
-  if (method === 'apple_pay') continueText.textContent = 'Doorgaan met Apple Pay';
-  else if (method === 'google_pay') continueText.textContent = 'Doorgaan met Google Pay';
-  else if (method === 'card') continueText.textContent = 'Doorgaan met creditcard';
-  else if (method === 'klarna') continueText.textContent = 'Doorgaan met Klarna';
-  else if (isDtcCheckout()) continueText.textContent = dtcConfirmLabel();
-  else continueText.textContent = 'Doorgaan naar betalen';
+  if (continueText) {
+    continueText.textContent = isDtcCheckout() || isDtcPayPage() ? dtcConfirmLabel() : 'Doorgaan naar betalen';
+  }
+}
+
+function buildStripeBillingDetails() {
+  const shipping = shippingInfo || {};
+  const house = [shipping.houseNumber, shipping.houseAddition].filter(Boolean).join(' ');
+  const line1 = [shipping.street, house].filter(Boolean).join(' ').trim();
+  const country =
+    shipping.country === 'België' || isBelgiumCheckout() ? 'BE' : 'NL';
+
+  return {
+    email: customerEmail || shipping.email || undefined,
+    name: customerName || shipping.name || undefined,
+    address: line1
+      ? {
+          line1,
+          city: shipping.city || undefined,
+          postal_code: shipping.postalCode || undefined,
+          country,
+        }
+      : undefined,
+  };
+}
+
+function buildStripeShippingDetails() {
+  const shipping = shippingInfo || {};
+  if (!shipping.name && !shipping.street) return undefined;
+  const house = [shipping.houseNumber, shipping.houseAddition].filter(Boolean).join(' ');
+  const line1 = [shipping.street, house].filter(Boolean).join(' ').trim();
+  const country =
+    shipping.country === 'België' || isBelgiumCheckout() ? 'BE' : 'NL';
+
+  return {
+    name: shipping.name || customerName || 'Klant',
+    address: {
+      line1: line1 || 'Onbekend',
+      city: shipping.city || '',
+      postal_code: shipping.postalCode || '',
+      country,
+    },
+  };
 }
 
 function updatePayHeader(method) {
@@ -606,11 +644,9 @@ async function handleWalletConfirm(method) {
     confirmParams: {
       return_url: `${window.location.origin}/success.html`,
       receipt_email: customerEmail,
+      shipping: buildStripeShippingDetails(),
       payment_method_data: {
-        billing_details: {
-          email: customerEmail,
-          name: customerName || undefined,
-        },
+        billing_details: buildStripeBillingDetails(),
       },
     },
   });
@@ -660,7 +696,10 @@ async function tryMountPaymentRequestButton(method, amount) {
 
       const { error, paymentIntent } = await stripe.confirmCardPayment(
         clientSecret,
-        { payment_method: ev.paymentMethod.id },
+        {
+          payment_method: ev.paymentMethod.id,
+          shipping: buildStripeShippingDetails(),
+        },
         { handleActions: true }
       );
 
@@ -849,7 +888,17 @@ async function mountPaymentUI(method) {
 
     paymentElement = elements.create('payment', {
       paymentMethodOrder: [method === 'card' ? 'card' : method],
-      fields: { billingDetails: { name: 'auto', email: 'never' } },
+      fields: {
+        billingDetails: {
+          name: 'never',
+          email: 'never',
+          phone: 'never',
+          address: 'never',
+        },
+      },
+      defaultValues: {
+        billingDetails: buildStripeBillingDetails(),
+      },
       wallets: { applePay: 'never', googlePay: 'never', link: 'never' },
     });
 
@@ -877,16 +926,14 @@ async function handlePayment() {
   const { error } = await stripe.confirmPayment({
     elements,
     clientSecret,
-      confirmParams: {
-        return_url: `${window.location.origin}/success.html`,
-        receipt_email: customerEmail,
-        payment_method_data: {
-          billing_details: {
-            email: customerEmail,
-            name: customerName || undefined,
-          },
-        },
+    confirmParams: {
+      return_url: `${window.location.origin}/success.html`,
+      receipt_email: customerEmail,
+      shipping: buildStripeShippingDetails(),
+      payment_method_data: {
+        billing_details: buildStripeBillingDetails(),
       },
+    },
   });
 
   if (error) {
