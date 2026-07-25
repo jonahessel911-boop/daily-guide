@@ -442,6 +442,15 @@
       document.getElementById('shop-mobile-nav')?.classList.remove('is-open');
     });
 
+    // Accordion: only one open at a time (Hears-style)
+    document.getElementById('shop-acc')?.addEventListener('toggle', (e) => {
+      const item = e.target;
+      if (!(item instanceof HTMLDetailsElement) || !item.open) return;
+      document.querySelectorAll('#shop-acc .shop-acc__item').forEach((el) => {
+        if (el !== item) el.open = false;
+      });
+    }, true);
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeDrawer();
     });
