@@ -8,6 +8,7 @@
     duo: { qty: 2, price: 119.99, was: 139.98, label: '2× 1970cam' },
   };
 
+  /* Product gallery: square 1:1 assets only (Hears-style PDP) */
   const IMAGES = [
     { src: '/assets/product/1970cam-front.png', alt: '1970cam vooraanzicht' },
     { src: '/assets/product/1970cam-contents.png', alt: '1970cam complete set' },
@@ -16,12 +17,6 @@
     { src: '/assets/product/1970cam-phone-gallery.png', alt: '1970cam in de app' },
     { src: '/assets/product/1970cam-vs-concurrentie.png', alt: '1970cam vs concurrentie' },
     { src: '/assets/product/1970cam-lifestyle.png', alt: '1970cam lifestyle' },
-    { src: '/assets/product/1970cam-how-it-works.png', alt: 'Hoe 1970cam werkt' },
-    { src: '/assets/gallery/huisfeest.png', alt: 'Huisfeest foto' },
-    { src: '/assets/gallery/festival.png', alt: 'Festival foto' },
-    { src: '/assets/gallery/terras.png', alt: 'Terras foto' },
-    { src: '/assets/gallery/zomer.png', alt: 'Zomer foto' },
-    { src: '/assets/gallery/roadtrip.png', alt: 'Roadtrip foto' },
   ];
 
   const LOVED = [
