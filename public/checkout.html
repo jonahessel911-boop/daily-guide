@@ -4,39 +4,287 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="/meta-pixel.js"></script>
-  <title>1970cam — De vibe van een wegwerpcamera. Zonder wegwerpen.</title>
+  <title>1970cam — Shop</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./1970cam-site.css">
-  <link rel="stylesheet" href="/dtc/dtc-checkout.css">
-  <link rel="stylesheet" href="./1970cam-brand.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shop.css">
+  <link rel="stylesheet" href="/legal/legal.css">
 </head>
-<body class="dc-site dtc-pre dc-site--checkout" data-track-page="lander" data-track-product="1970cam" data-track-country="nl" data-track-lander="checkout" data-pay-url="/pay">
+<body
+  class="shop-page"
+  data-track-page="lander"
+  data-track-product="1970cam"
+  data-track-country="nl"
+  data-track-lander="checkout"
+>
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1545607877104793&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
 
-  <div id="dc-site-header"></div>
+  <div class="shop-promo">Beperkte aanbieding · Gratis verzending in NL &amp; BE</div>
 
-  <div class="dtc-page">
-    <div class="dtc-layout">
-      <div class="dtc-col-left" id="dtc-col-left"></div>
-      <div class="dtc-col-right" id="dtc-col-right"></div>
+  <header class="shop-header">
+    <div class="shop-header__inner">
+      <div class="shop-header__left">
+        <button type="button" class="shop-icon-btn shop-burger" id="shop-burger" aria-label="Menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <nav class="shop-nav-desktop" aria-label="Hoofdmenu">
+          <a href="/checkout">Shop</a>
+          <a href="/missie">Missie</a>
+          <a href="/feed">Feed</a>
+          <a href="/about">Over</a>
+        </nav>
+      </div>
+      <a href="/" class="shop-logo">1970cam</a>
+      <div class="shop-header__right">
+        <button type="button" class="shop-icon-btn" id="shop-cart-open" aria-label="Winkelwagen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6l-1-3H2"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>
+          <span class="shop-cart-badge" id="shop-cart-badge" hidden></span>
+        </button>
+      </div>
     </div>
-    <div class="dtc-col-below" id="dtc-col-below"></div>
-    <div id="dtc-footer"></div>
+  </header>
+
+  <div class="shop-mobile-nav" id="shop-mobile-nav" aria-hidden="true">
+    <button type="button" class="shop-icon-btn" id="shop-mobile-nav-close" aria-label="Sluiten">×</button>
+    <a href="/checkout">Shop</a>
+    <a href="/missie">Missie</a>
+    <a href="/feed">Feed</a>
+    <a href="/about">Over</a>
+    <a href="/legal/verzending.html">Verzending</a>
   </div>
 
-  <div id="dc-site-footer"></div>
+  <main class="shop-main">
+    <div class="shop-pdp">
+      <section class="shop-gallery" aria-label="Productfoto's">
+        <div class="shop-gallery__stage">
+          <div class="shop-gallery__badges">
+            <span class="shop-pill shop-pill--dark">60 dagen thuis proberen</span>
+            <span class="shop-pill shop-pill--accent">Bestseller</span>
+          </div>
+          <img id="shop-main-image" src="/assets/product/1970cam-front.png" alt="1970cam">
+          <button type="button" class="shop-gallery__nav" id="shop-gallery-prev" aria-label="Vorige">‹</button>
+          <button type="button" class="shop-gallery__nav shop-gallery__nav--next" id="shop-gallery-next" aria-label="Volgende">›</button>
+        </div>
+        <div class="shop-thumbs" id="shop-thumbs"></div>
+      </section>
 
-  <div class="dtc-mobile-cta dtc-mobile-cta--brand" id="dtc-mobile-cta">
-    <span class="dtc-mobile-cta__label">1970cam — <strong data-checkout-price>€ 69,99</strong></span>
-    <a href="/pay" class="dtc-mobile-cta__btn">Bestel nu</a>
-  </div>
+      <section class="shop-buybox">
+        <p class="shop-buybox__eyebrow">Retro digitale camera</p>
+        <h1 class="shop-buybox__title">1970cam</h1>
+        <div class="shop-rating">
+          <span class="shop-stars" aria-hidden="true">★★★★★</span>
+          <span>4,7 · 683 reviews</span>
+        </div>
+
+        <ul class="shop-usps">
+          <li>Foto's staan direct op je telefoon — geen kabel, geen ontwikkelen.</li>
+          <li>De vibe van een wegwerpcamera, zonder weggooien.</li>
+          <li>Telefoon mag thuis. Schiet. Deel overal.</li>
+        </ul>
+
+        <p class="shop-label">Kies je set</p>
+        <div class="shop-offer-grid">
+          <button type="button" class="shop-offer is-selected" data-offer="single">
+            <div>
+              <div class="shop-offer__title">1 camera</div>
+            </div>
+            <div class="shop-offer__price">
+              <span class="shop-offer__now">€ 69,99</span>
+              <span class="shop-offer__was">€ 99,99</span>
+              <span class="shop-offer__per">Per stuk</span>
+            </div>
+          </button>
+          <button type="button" class="shop-offer" data-offer="duo">
+            <span class="shop-offer__badge">Meest populair</span>
+            <div>
+              <div class="shop-offer__title">Koop 2, deel er één</div>
+              <div class="shop-offer__meta">
+                <span class="shop-tag">Je bespaart 14%</span>
+                <span class="shop-tag">Gratis verzending</span>
+              </div>
+            </div>
+            <div class="shop-offer__price">
+              <span class="shop-offer__was">€ 139,98</span>
+              <span class="shop-offer__now">€ 119,99</span>
+              <span class="shop-offer__per">€ 60,00 / stuk</span>
+            </div>
+          </button>
+        </div>
+
+        <p class="shop-ship">🚚 Bestel vandaag, binnen 2–5 werkdagen in huis</p>
+        <p class="shop-stock">Op voorraad — klaar om te verzenden</p>
+
+        <button type="button" class="shop-atc" id="shop-atc">Voeg toe aan winkelwagen</button>
+        <p class="shop-guarantee">🛡 60 dagen niet goed, geld terug</p>
+
+        <div class="shop-copy">
+          <h2>De vibe van een wegwerpcamera. Zonder wegwerpen.</h2>
+          <p>
+            Geen scherm, geen filters, gewoon richten en klikken — precies zoals vroeger.
+            Alleen staan je foto's nu direct op je telefoon. Nooit meer een rolletje,
+            nooit meer ontwikkelen, nooit meer weggooien. Over 683 tevreden gebruikers.
+          </p>
+        </div>
+
+        <div class="shop-acc">
+          <details>
+            <summary>Details &amp; inhoud</summary>
+            <p>1970cam camera · USB-kabel · polsband · QR-kaart voor app-koppeling · opgeladen geleverd. 1 jaar garantie.</p>
+          </details>
+          <details>
+            <summary>Verzending &amp; retour</summary>
+            <p>Gratis verzending in NL &amp; BE. Levering in 2–5 werkdagen. 60 dagen thuis proberen — niet tevreden? Geld terug.</p>
+          </details>
+          <details>
+            <summary>Betaalmethodes</summary>
+            <p>iDEAL, Bancontact, Visa, Mastercard, Apple Pay, Google Pay, Klarna en meer via Stripe.</p>
+          </details>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <section class="shop-section">
+    <h2>Vertrouwd door 683 1970cam gebruikers</h2>
+    <p class="shop-section__lead">Echte reviews over wat telt: direct op je telefoon, die film-look, en avondjes zonder scherm.</p>
+    <div class="shop-reviews" id="shop-reviews"></div>
+  </section>
+
+  <section class="shop-section">
+    <h2>Eén camera. Oneindig veel momenten.</h2>
+    <p class="shop-section__lead">Van huisfeest tot festival — altijd die echte 1970-vibe.</p>
+    <div class="shop-usecases">
+      <article class="shop-usecase">
+        <img src="/assets/gallery/huisfeest.png" alt="Huisfeest" loading="lazy">
+        <div class="shop-usecase__body">
+          <h3>Huisfeesten</h3>
+          <div class="shop-usecase__stat">
+            <strong>94%</strong>
+            <span>zegt dat de foto's écht voelen zoals die avond was — korrelig, warm, ongefilterd.</span>
+          </div>
+        </div>
+      </article>
+      <article class="shop-usecase">
+        <img src="/assets/gallery/festival.png" alt="Festival" loading="lazy">
+        <div class="shop-usecase__body">
+          <h3>Festivals</h3>
+          <div class="shop-usecase__stat">
+            <strong>91%</strong>
+            <span>neemt de telefoon minder vaak tevoorschijn — en mist niks in de app.</span>
+          </div>
+        </div>
+      </article>
+      <article class="shop-usecase">
+        <img src="/assets/gallery/terras.png" alt="Terras" loading="lazy">
+        <div class="shop-usecase__body">
+          <h3>Avondjes weg</h3>
+          <div class="shop-usecase__stat">
+            <strong>89%</strong>
+            <span>deelt foto's liever vanuit de 1970cam-app dan vanaf de telefooncamera.</span>
+          </div>
+        </div>
+      </article>
+      <article class="shop-usecase">
+        <img src="/assets/gallery/zomer.png" alt="Zomer" loading="lazy">
+        <div class="shop-usecase__body">
+          <h3>Roadtrips</h3>
+          <div class="shop-usecase__stat">
+            <strong>96%</strong>
+            <span>koopt nooit meer een wegwerpcamera na hun eerste 1970cam.</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="shop-section">
+    <h2>Waarom 1970cam <span style="color:var(--shop-accent-deep)">de perfecte keuze is.</span></h2>
+    <p class="shop-section__lead">De camera die voelt als vroeger — maar werkt als nu.</p>
+    <div class="shop-compare">
+      <table>
+        <thead>
+          <tr>
+            <th>Kenmerk</th>
+            <th class="shop-compare__ours">1970cam</th>
+            <th>Wegwerpcamera</th>
+            <th>Telefoon</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Direct op je telefoon</td><td class="shop-compare__ours">✓</td><td>✕</td><td>✓</td></tr>
+          <tr><td>Echte film-look zonder filter</td><td class="shop-compare__ours">✓</td><td>✓</td><td>✕</td></tr>
+          <tr><td>Geen scherm / afleiding</td><td class="shop-compare__ours">✓</td><td>✓</td><td>✕</td></tr>
+          <tr><td>Herbruikbaar (niet weggooien)</td><td class="shop-compare__ours">✓</td><td>✕</td><td>✓</td></tr>
+          <tr><td>Geen ontwikkelkosten</td><td class="shop-compare__ours">✓</td><td>✕</td><td>✓</td></tr>
+          <tr><td>Deelbaar met vrienden in app</td><td class="shop-compare__ours">✓</td><td>✕</td><td>△</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="shop-section shop-faq">
+    <h2>Vragen?</h2>
+    <p class="shop-section__lead">We hebben antwoorden.</p>
+    <details>
+      <summary>Hoe komen de foto's op mijn telefoon?</summary>
+      <p>Scan de QR in de doos, koppel in ±1 minuut, en elke foto landt direct in de app — klaar om te delen.</p>
+    </details>
+    <details>
+      <summary>Heb ik nog een rolletje of ontwikkelen nodig?</summary>
+      <p>Nee. Geen rolletje, geen lab, geen wachten. Schieten en klaar.</p>
+    </details>
+    <details>
+      <summary>Wat als ik 'm niks vind?</summary>
+      <p>60 dagen thuis proberen. Niet tevreden? Geld terug. Plus 1 jaar garantie.</p>
+    </details>
+    <details>
+      <summary>Werkt het in NL en België?</summary>
+      <p>Ja — gratis verzending naar NL &amp; BE, levering in 2–5 werkdagen.</p>
+    </details>
+  </section>
+
+  <footer class="shop-footer">
+    <a href="/legal/algemene-voorwaarden.html">Voorwaarden</a>
+    <a href="/legal/privacybeleid.html">Privacy</a>
+    <a href="/legal/verzending.html">Verzending</a>
+    <a href="/legal/retourbeleid.html">Retour</a>
+    <p style="margin-top:14px">© 1970cam</p>
+  </footer>
+
+  <div class="shop-drawer-backdrop" id="shop-drawer-backdrop"></div>
+  <aside class="shop-drawer" id="shop-drawer" aria-label="Winkelwagen">
+    <div class="shop-drawer__head">
+      <h2>Winkelwagen</h2>
+      <button type="button" class="shop-icon-btn" id="shop-drawer-close" aria-label="Sluiten">×</button>
+    </div>
+    <div class="shop-drawer__body" id="shop-drawer-body"></div>
+    <div class="shop-drawer__foot">
+      <div class="shop-drawer__total"><span>Totaal</span><span id="shop-drawer-total">€ 0,00</span></div>
+      <button type="button" class="shop-drawer__checkout" id="shop-drawer-checkout" disabled>Afrekenen</button>
+      <p class="shop-drawer__note">Gratis verzending · Veilig betalen via Stripe</p>
+    </div>
+  </aside>
 
   <script src="/track.js"></script>
-  <script src="./1970cam-reviews.js"></script>
-  <script src="./1970cam-dtc-config.js"></script>
-  <script src="./1970cam-site.js"></script>
-  <script src="/dtc/dtc-ui.js"></script>
+  <script src="/1970cam-reviews.js"></script>
+  <script src="/shop.js"></script>
+  <script>
+    (function () {
+      const box = document.getElementById('shop-reviews');
+      if (!box || !window.Cam1970Reviews) return;
+      box.innerHTML = window.Cam1970Reviews.slice(0, 6).map((r) => `
+        <article class="shop-review">
+          <div class="shop-review__head">
+            <img src="${r.avatar}" alt="">
+            <div>
+              <div class="shop-review__name">${r.name}</div>
+              <div class="shop-review__stars">★★★★★</div>
+            </div>
+          </div>
+          <p>${r.text}</p>
+        </article>`).join('');
+    })();
+  </script>
 </body>
 </html>

@@ -389,13 +389,24 @@ async function createCheckoutSession(email, method = 'all') {
   const continueText = document.getElementById('continue-text');
   if (continueText) continueText.textContent = 'Doorverwijzen naar veilige betaling...';
 
+  let quantity = 1;
+  try {
+    const cart = JSON.parse(sessionStorage.getItem('cam1970_checkout_cart') || '{}');
+    if (cart.qty) quantity = Math.max(1, parseInt(cart.qty, 10) || 1);
+  } catch (_) {
+    /* ignore */
+  }
+  const qtyParam = new URLSearchParams(window.location.search).get('qty');
+  if (qtyParam) quantity = Math.max(1, parseInt(qtyParam, 10) || quantity);
+
   const { res, data } = await Api.apiFetch('/api/create-checkout-session', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       email,
       paymentMethod: method || 'all',
-      cancelUrl: window.location.href,
+      quantity,
+      cancelUrl: `${window.location.origin}/checkout`,
       successUrl: `${window.location.origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
       analytics: getCheckoutAnalytics(),
       meta: getMetaCookies(),

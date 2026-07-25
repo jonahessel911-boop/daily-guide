@@ -499,9 +499,18 @@ app.post('/api/create-checkout-session', async (req, res) => {
 
     const productSlug = analytics.productSlug || req.body.productSlug || '1970cam';
     const product = getProduct(productSlug);
+    const quantity = Math.max(1, Math.min(20, parseInt(req.body.quantity, 10) || 1));
     const orderBump = Boolean(req.body.orderBump);
     const bumpCents = orderBump && productSlug === 'hearing' ? 995 : 0;
-    const amountCents = Math.round(Number(product.price) * 100) + bumpCents;
+    // Pair pricing: every 2 cameras = €119.99, leftover = €69.99
+    const unitCents = Math.round(Number(product.price) * 100);
+    const duoCents = 11999;
+    const duos = Math.floor(quantity / 2);
+    const singles = quantity % 2;
+    const amountCents =
+      productSlug === '1970cam'
+        ? duos * duoCents + singles * unitCents + bumpCents
+        : unitCents * quantity + bumpCents;
     const orderId = `${product.orderPrefix}-${Date.now()}`;
     const metadata = buildOrderMetadata({
       product,
@@ -514,6 +523,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
       orderBump,
       orderId,
     });
+    metadata.quantity = String(quantity);
     const stripeShipping = buildStripeShipping(shipping);
 
     // Prefill name + address on Stripe Checkout (still editable there)
@@ -525,8 +535,57 @@ app.post('/api/create-checkout-session', async (req, res) => {
       metadata: {
         order_id: orderId,
         product_slug: productSlug,
+        quantity: String(quantity),
       },
     });
+
+    const lineItems =
+      productSlug === '1970cam' && quantity > 1
+        ? [
+            ...(duos
+              ? [
+                  {
+                    quantity: duos,
+                    price_data: {
+                      currency: 'eur',
+                      unit_amount: duoCents,
+                      product_data: {
+                        name: `2× ${product.name}`,
+                        description: product.description || product.name,
+                      },
+                    },
+                  },
+                ]
+              : []),
+            ...(singles
+              ? [
+                  {
+                    quantity: 1,
+                    price_data: {
+                      currency: 'eur',
+                      unit_amount: unitCents,
+                      product_data: {
+                        name: product.name,
+                        description: product.description || product.name,
+                      },
+                    },
+                  },
+                ]
+              : []),
+          ]
+        : [
+            {
+              quantity,
+              price_data: {
+                currency: 'eur',
+                unit_amount: unitCents + (quantity === 1 ? bumpCents : 0),
+                product_data: {
+                  name: product.name,
+                  description: product.description || product.name,
+                },
+              },
+            },
+          ];
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -538,19 +597,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
       },
       // Omit payment_method_types → Stripe shows every method enabled in the Dashboard
       // (iDEAL, Bancontact, card/Apple Pay/Google Pay, Klarna, etc.)
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: 'eur',
-            unit_amount: amountCents,
-            product_data: {
-              name: product.name,
-              description: product.description || product.name,
-            },
-          },
-        },
-      ],
+      line_items: lineItems,
       billing_address_collection: 'required',
       shipping_address_collection: {
         allowed_countries: ['NL', 'BE'],
@@ -582,7 +629,8 @@ app.post('/api/create-checkout-session', async (req, res) => {
       url: session.url,
       sessionId: session.id,
       orderId,
-      total: product.price,
+      total: amountCents / 100,
+      quantity,
       product,
     });
   } catch (err) {
