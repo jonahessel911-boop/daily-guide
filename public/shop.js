@@ -184,6 +184,94 @@
       .join('');
   }
 
+  /* ---- Written review list + Load more ---- */
+  const REVIEW_PAGE = 3;
+  let reviewVisible = REVIEW_PAGE;
+  let reviewSort = 'recent';
+
+  function getSortedReviews() {
+    const list = [...(window.Cam1970Reviews || [])];
+    if (reviewSort === 'helpful') {
+      list.sort((a, b) => (b.helpful || 0) - (a.helpful || 0));
+    }
+    return list;
+  }
+
+  function reviewCardHtml(r, idx) {
+    const long = (r.text || '').length > 140;
+    return `
+      <article class="shop-rcard" data-idx="${idx}">
+        <div class="shop-rcard__top">
+          <span class="shop-rcard__name">${r.name}</span>
+          <span class="shop-rcard__verified">Verified Buyer</span>
+        </div>
+        <div class="shop-rcard__product">
+          <img src="${r.photo || '/assets/product/1970cam-front.png'}" alt="">
+          <div>
+            <div class="shop-rcard__product-label">Reviewing</div>
+            <div class="shop-rcard__product-name">1970cam</div>
+            <div class="shop-rcard__product-meta">Classic Black · Digital disposable vibe</div>
+          </div>
+        </div>
+        <div class="shop-rcard__rating">
+          <span class="shop-rcard__stars" aria-hidden="true">★★★★★</span>
+          <span class="shop-rcard__when">${r.when || ''}</span>
+        </div>
+        <h3 class="shop-rcard__title">${r.title || 'Review'}</h3>
+        <p class="shop-rcard__text${long ? ' is-clamp' : ''}">${r.text}</p>
+        ${long ? `<button type="button" class="shop-rcard__more" data-expand>Read More</button>` : ''}
+        <div class="shop-rcard__foot">
+          <span>Was this helpful?</span>
+          <button type="button" class="shop-rcard__vote" data-up aria-label="Helpful">👍 <span>${r.helpful || 0}</span></button>
+          <button type="button" class="shop-rcard__vote" data-down aria-label="Not helpful">👎 <span>0</span></button>
+        </div>
+      </article>`;
+  }
+
+  function renderReviewList() {
+    const box = document.getElementById('shop-review-cards');
+    const moreBtn = document.getElementById('shop-review-more');
+    const countEl = document.getElementById('shop-review-count');
+    if (!box) return;
+    const all = getSortedReviews();
+    if (countEl) countEl.textContent = '683';
+    box.innerHTML = all.slice(0, reviewVisible).map(reviewCardHtml).join('');
+    if (moreBtn) moreBtn.hidden = reviewVisible >= all.length;
+  }
+
+  function bindReviewList() {
+    renderReviewList();
+
+    document.getElementById('shop-review-more')?.addEventListener('click', () => {
+      reviewVisible += REVIEW_PAGE;
+      renderReviewList();
+    });
+
+    document.getElementById('shop-review-sort')?.addEventListener('change', (e) => {
+      reviewSort = e.target.value;
+      reviewVisible = REVIEW_PAGE;
+      renderReviewList();
+    });
+
+    document.getElementById('shop-review-cards')?.addEventListener('click', (e) => {
+      const expand = e.target.closest('[data-expand]');
+      if (expand) {
+        const card = expand.closest('.shop-rcard');
+        const text = card?.querySelector('.shop-rcard__text');
+        if (text) {
+          text.classList.remove('is-clamp');
+          expand.remove();
+        }
+        return;
+      }
+      const up = e.target.closest('[data-up]');
+      if (up) {
+        const span = up.querySelector('span');
+        if (span) span.textContent = String((parseInt(span.textContent, 10) || 0) + 1);
+      }
+    });
+  }
+
   function openDrawer() {
     document.getElementById('shop-drawer')?.classList.add('is-open');
     document.getElementById('shop-drawer-backdrop')?.classList.add('is-open');
@@ -298,6 +386,7 @@
     renderUgc();
     renderCart();
     updateStickyPrice();
+    bindReviewList();
 
     document.getElementById('shop-thumbs')?.addEventListener('click', (e) => {
       const btn = e.target.closest('button[data-index]');
