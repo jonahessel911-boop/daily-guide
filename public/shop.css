@@ -808,46 +808,191 @@ ul { list-style: none; }
   to { transform: translateX(-50%); }
 }
 
-.shop-faq__inner { max-width: 720px; }
-.shop-faq details {
-  border-bottom: 1px solid var(--shop-line);
-  padding: 16px 0;
+.shop-faq {
+  background: #fff;
+  text-align: center;
 }
-.shop-faq summary {
+.shop-faq__inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+.shop-faq h2 {
+  font-size: clamp(32px, 6vw, 44px);
+  letter-spacing: -0.04em;
+  margin-bottom: 6px;
+}
+.shop-faq__sub {
+  color: #555;
+  font-size: 16px;
+  margin-bottom: 22px;
+}
+.shop-faq__card {
+  text-align: left;
+  background: #f8efe9;
+  border-radius: 18px;
+  padding: 6px 18px;
+  overflow: hidden;
+}
+.shop-faq__card details {
+  border-bottom: 1px solid rgba(0,0,0,.08);
+  padding: 0;
+}
+.shop-faq__card details:last-child {
+  border-bottom: none;
+}
+.shop-faq__card summary {
   cursor: pointer;
-  font-weight: 650;
+  font-weight: 500;
   list-style: none;
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  align-items: center;
+  gap: 16px;
   font-size: 15px;
+  line-height: 1.35;
+  padding: 18px 4px;
+  color: #111;
 }
-.shop-faq summary::-webkit-details-marker { display: none; }
-.shop-faq summary::after { content: "+"; font-size: 20px; color: #999; }
-.shop-faq details[open] summary::after { content: "–"; }
-.shop-faq p {
-  margin-top: 10px;
-  color: var(--shop-soft);
+.shop-faq__card summary::-webkit-details-marker { display: none; }
+.shop-faq__card summary::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  border-right: 1.5px solid #111;
+  border-bottom: 1.5px solid #111;
+  transform: rotate(45deg);
+  margin-top: -4px;
+  opacity: 0.7;
+}
+.shop-faq__card details[open] summary::after {
+  transform: rotate(-135deg);
+  margin-top: 4px;
+}
+.shop-faq__card p {
+  margin: 0 4px 16px;
+  color: #555;
   font-size: 14px;
-  padding-right: 24px;
+  line-height: 1.55;
+  padding-right: 28px;
 }
 
-.shop-fam { background: #fafafa; text-align: center; }
-.shop-fam__grid {
+.shop-fam {
+  background: #fff;
+  text-align: center;
+  padding-top: 12px;
+}
+.shop-fam h2 {
+  font-size: clamp(28px, 5vw, 40px);
+  letter-spacing: -0.035em;
+  margin-bottom: 22px;
+}
+.shop-fam__feed {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (min-width: 720px) {
+  .shop-fam__feed { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 1100px) {
+  .shop-fam__feed { grid-template-columns: repeat(6, 1fr); }
+}
+.shop-fam__shot {
+  position: relative;
+  margin: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: #f3f3f3;
+}
+.shop-fam__shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.shop-fam__play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.95);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: #111;
+  box-shadow: 0 4px 16px rgba(0,0,0,.12);
+}
+
+.shop-recs {
+  background: #fff;
+  padding-top: 28px;
+}
+.shop-recs__summary {
+  max-width: 360px;
+  margin: 0 auto 28px;
+  text-align: center;
+}
+.shop-recs__bars {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+  text-align: left;
+}
+.shop-recs__row {
+  display: grid;
+  grid-template-columns: 14px 14px 1fr 28px;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  color: #333;
+}
+.shop-recs__star { color: var(--shop-accent-deep); font-size: 12px; }
+.shop-recs__bar {
+  height: 8px;
+  background: #ececec;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.shop-recs__bar i {
+  display: block;
+  height: 100%;
+  background: #d0d0d0;
+  border-radius: 999px;
+}
+.shop-recs__pct {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.shop-recs__label {
+  color: #777;
+  font-size: 15px;
+}
+
+.shop-recs__mosaic {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 18px;
+  gap: 6px;
 }
-@media (min-width: 800px) {
-  .shop-fam__grid { grid-template-columns: repeat(6, 1fr); }
-}
-.shop-fam__grid img {
-  width: 100%;
+.shop-recs__mosaic figure {
+  margin: 0;
+  position: relative;
   aspect-ratio: 1;
-  object-fit: cover;
-  border-radius: 14px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f3f3f3;
 }
+.shop-recs__mosaic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.shop-recs__video .shop-fam__play { width: 34px; height: 34px; }
 
 .shop-footer {
   border-top: 1px solid var(--shop-line);
