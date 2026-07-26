@@ -13,21 +13,40 @@
 
   function postJsonKeepalive(url, data) {
     const body = JSON.stringify(data);
+    const sendXhr = () => {
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.withCredentials = true;
+        xhr.send(body);
+      } catch (_) {
+        /* ignore */
+      }
+    };
+
     fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body,
       keepalive: true,
       credentials: 'same-origin',
-    }).catch(() => {
-      try {
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }));
+    })
+      .then((res) => {
+        if (!res.ok) sendXhr();
+      })
+      .catch(() => {
+        try {
+          if (navigator.sendBeacon) {
+            const ok = navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }));
+            if (!ok) sendXhr();
+          } else {
+            sendXhr();
+          }
+        } catch (_) {
+          sendXhr();
         }
-      } catch (_) {
-        /* ignore */
-      }
-    });
+      });
   }
 
   window.MetaPixel = Object.assign(window.MetaPixel || {}, {
@@ -79,7 +98,7 @@
         /* ignore */
       }
 
-      postJsonKeepalive('/api/meta/add-to-cart', {
+      postJsonKeepalive('/api/track/add-to-cart', {
         eventId: id,
         value: amount,
         contentIds: ids,

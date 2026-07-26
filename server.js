@@ -538,7 +538,7 @@ app.post('/api/track', async (req, res) => {
   res.json(result);
 });
 
-app.post('/api/meta/add-to-cart', async (req, res) => {
+async function handleAddToCartCapi(req, res) {
   const body = req.body || {};
   const eventId = body.eventId || `atc_${Date.now()}`;
   const value = Number(body.value);
@@ -572,8 +572,16 @@ app.post('/api/meta/add-to-cart', async (req, res) => {
     leadSource: body.leadSource || undefined,
   });
 
+  if (!result.ok) {
+    console.error('AddToCart CAPI failed:', eventId, result.skipped ? result.reason : result.error);
+  }
+
   res.json({ ok: Boolean(result.ok), skipped: Boolean(result.skipped), result });
-});
+}
+
+app.post('/api/track/add-to-cart', handleAddToCartCapi);
+// Legacy path — some blockers match /api/meta/*
+app.post('/api/meta/add-to-cart', handleAddToCartCapi);
 
 app.post('/api/admin/login', (req, res) => {
   const token = getAdminToken();
