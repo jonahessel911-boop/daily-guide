@@ -4,13 +4,32 @@
 (function () {
   const STORAGE_KEY = 'hearing_cart_v1';
   const CHECKOUT_KEY = 'hearing_checkout_cart';
-  const UNIT_PRICE = 99;
-  const WAS_PRICE = 179;
   const IMAGE = '/hearing-nl/assets/product/heardirect-open-case.webp';
   const TITLE = 'HearDirect™';
+  const WAS_PRICE = 179;
+
+  const OFFERS = {
+    single: { id: 'single', qty: 1, unitCents: 9900, was: 179, label: '1 Set' },
+    duo: { id: 'duo', qty: 2, unitCents: 8999, was: 179, label: '2 Sets' },
+  };
+
+  let selectedOffer = 'single';
 
   function fmt(n) {
     return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
+  }
+
+  /** Pair pricing: every 2 sets @ €89,99; leftover singles @ €99 */
+  function priceForQty(qty) {
+    const n = Math.max(0, parseInt(qty, 10) || 0);
+    const duos = Math.floor(n / 2);
+    const singles = n % 2;
+    return (duos * OFFERS.duo.unitCents * 2 + singles * OFFERS.single.unitCents) / 100;
+  }
+
+  function unitPriceForQty(qty) {
+    const n = Math.max(1, parseInt(qty, 10) || 1);
+    return priceForQty(n) / n;
   }
 
   function readCart() {
@@ -31,7 +50,7 @@
   }
 
   function cartTotal(items = readCart()) {
-    return items.reduce((s, i) => s + UNIT_PRICE * (i.qty || 0), 0);
+    return priceForQty(cartCount(items));
   }
 
   function ensureDrawer() {
@@ -52,7 +71,7 @@
       <div class="hd-drawer__foot">
         <div class="hd-drawer__total"><span>Totaal</span><span id="hd-drawer-total">€ 0,00</span></div>
         <button type="button" class="hd-drawer__checkout" id="hd-drawer-checkout" disabled>Afrekenen</button>
-        <p class="hd-drawer__note">Gratis verzending · 90 dagen proberen</p>
+        <p class="hd-drawer__note">Gratis verzending · 90 dagen testperiode</p>
       </div>`;
     document.body.appendChild(backdrop);
     document.body.appendChild(drawer);
@@ -97,10 +116,15 @@
           title: TITLE,
           qty,
           image: IMAGE,
-          unitPrice: UNIT_PRICE,
+          unitPrice: unitPriceForQty(qty),
         },
       ]);
     }
+  }
+
+  function addOfferToCart(offerId) {
+    const offer = OFFERS[offerId] || OFFERS.single;
+    addToCart(offer.qty);
   }
 
   function addToCart(qty = 1) {
@@ -108,24 +132,49 @@
     const items = readCart();
     const existing = items.find((i) => i.sku === 'hearing');
     const n = Math.max(1, parseInt(qty, 10) || 1);
-    if (existing) existing.qty += n;
+    const nextQty = (existing?.qty || 0) + n;
+    if (existing) existing.qty = nextQty;
     else {
       items.push({
         sku: 'hearing',
         title: TITLE,
         qty: n,
         image: IMAGE,
-        unitPrice: UNIT_PRICE,
+        unitPrice: unitPriceForQty(n),
       });
     }
+    if (existing) existing.unitPrice = unitPriceForQty(existing.qty);
     writeCart(items);
     window.MetaPixel?.trackAddToCart?.({
-      value: UNIT_PRICE * n,
+      value: priceForQty(n),
       contentIds: ['hearing'],
       contentName: TITLE,
       numItems: n,
     });
     openDrawer();
+  }
+
+  function addSelectedToCart() {
+    addOfferToCart(selectedOffer);
+  }
+
+  function selectOffer(id) {
+    selectedOffer = id === 'duo' ? 'duo' : 'single';
+    document.querySelectorAll('[data-hd-offer]').forEach((el) => {
+      el.classList.toggle('is-selected', el.dataset.hdOffer === selectedOffer);
+      el.setAttribute('aria-pressed', el.dataset.hdOffer === selectedOffer ? 'true' : 'false');
+    });
+    updateStickyPrice();
+  }
+
+  function updateStickyPrice() {
+    const offer = OFFERS[selectedOffer] || OFFERS.single;
+    const unit = offer.unitCents / 100;
+    const total = (offer.unitCents * offer.qty) / 100;
+    const summaryPrice = document.querySelector('.dtc-summary__price');
+    if (summaryPrice) summaryPrice.textContent = fmt(unit);
+    const stickyStrong = document.querySelector('.dtc-sticky-atc__price strong');
+    if (stickyStrong) stickyStrong.textContent = fmt(total);
   }
 
   function renderCart() {
@@ -140,28 +189,30 @@
       body.innerHTML = `<p class="hd-drawer__empty">Je winkelwagen is leeg</p>`;
       if (totalEl) totalEl.textContent = fmt(0);
       if (checkoutBtn) checkoutBtn.disabled = true;
+      updateHeaderBadge();
       return;
     }
 
     body.innerHTML = items
-      .map(
-        (i) => `
+      .map((i) => {
+        const unit = unitPriceForQty(i.qty);
+        return `
       <div class="hd-cart-item">
         <img src="${i.image}" alt="">
         <div>
           <div class="hd-cart-item__title">${i.qty}× ${i.title}</div>
-          <div class="hd-cart-item__meta">${fmt(UNIT_PRICE)} / stuk</div>
+          <div class="hd-cart-item__meta">${fmt(unit)} / stuk${i.qty >= 2 ? ' (bundel)' : ''}</div>
           <div class="hd-cart-item__row">
             <div class="hd-qty">
               <button type="button" data-dec aria-label="Minder">−</button>
               <span>${i.qty}</span>
               <button type="button" data-inc aria-label="Meer">+</button>
             </div>
-            <strong>${fmt(UNIT_PRICE * i.qty)}</strong>
+            <strong>${fmt(priceForQty(i.qty))}</strong>
           </div>
         </div>
-      </div>`
-      )
+      </div>`;
+      })
       .join('');
 
     if (totalEl) totalEl.textContent = fmt(cartTotal(items));
@@ -185,6 +236,7 @@
     const items = readCart();
     if (!items.length) return;
     const qty = cartCount(items);
+    const total = cartTotal(items);
     sessionStorage.setItem(
       CHECKOUT_KEY,
       JSON.stringify({
@@ -192,10 +244,10 @@
           sku: 'hearing',
           qty: i.qty,
           title: i.title,
-          unitPrice: UNIT_PRICE,
+          unitPrice: unitPriceForQty(i.qty),
         })),
         qty,
-        total: cartTotal(items),
+        total,
         productSlug: 'hearing',
         was: WAS_PRICE * qty,
       })
@@ -207,19 +259,29 @@
     window.location.href = url.pathname + url.search;
   }
 
+  function wireOffers() {
+    document.addEventListener('click', (e) => {
+      const offerBtn = e.target.closest('[data-hd-offer]');
+      if (offerBtn) {
+        e.preventDefault();
+        selectOffer(offerBtn.dataset.hdOffer);
+      }
+    });
+  }
+
   function wireAtcButtons() {
     document.addEventListener('click', (e) => {
       const atc = e.target.closest('[data-hd-atc]');
       if (atc) {
         e.preventDefault();
-        addToCart(1);
+        addSelectedToCart();
         return;
       }
       const payLink = e.target.closest('a[href$="pay.html"], a[href*="pay.html"]');
       if (!payLink || payLink.dataset.hdSkip) return;
       if (payLink.closest('.legal-footer')) return;
       e.preventDefault();
-      addToCart(1);
+      addSelectedToCart();
     });
   }
 
@@ -227,10 +289,24 @@
     ensureDrawer();
     renderCart();
     wireAtcButtons();
+    wireOffers();
     wireHeaderCart();
+    selectOffer(selectedOffer);
   }
 
-  window.HearingCart = { addToCart, openDrawer, closeDrawer, goCheckout };
+  window.HearingCart = {
+    addToCart,
+    addOfferToCart,
+    addSelectedToCart,
+    selectOffer,
+    openDrawer,
+    closeDrawer,
+    goCheckout,
+    priceForQty,
+    unitPriceForQty,
+    OFFERS,
+    getSelectedOffer: () => selectedOffer,
+  };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

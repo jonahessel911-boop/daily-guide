@@ -1113,6 +1113,34 @@
       </div>`;
   }
 
+  function renderOfferSets() {
+    const fmtLocal = fmt;
+    return `
+      <div class="hd-offers" role="group" aria-label="Kies je set">
+        <button type="button" class="hd-offer is-selected" data-hd-offer="single" aria-pressed="true">
+          <div class="hd-offer__info">
+            <div class="hd-offer__title">1 Set</div>
+            <div class="hd-offer__meta">HearDirect™ — oplaadcase inclusief</div>
+          </div>
+          <div class="hd-offer__price">
+            <span class="hd-offer__was">${fmtLocal(179)}</span>
+            <span class="hd-offer__now">${fmtLocal(99)}</span>
+          </div>
+        </button>
+        <button type="button" class="hd-offer" data-hd-offer="duo" aria-pressed="false">
+          <span class="hd-offer__badge">Beste deal</span>
+          <div class="hd-offer__info">
+            <div class="hd-offer__title">2 Sets</div>
+            <div class="hd-offer__meta">${fmtLocal(89.99)} / set · totaal ${fmtLocal(179.98)}</div>
+          </div>
+          <div class="hd-offer__price">
+            <span class="hd-offer__was">${fmtLocal(358)}</span>
+            <span class="hd-offer__now">${fmtLocal(179.98)}</span>
+          </div>
+        </button>
+      </div>`;
+  }
+
   function renderMainCta(payUrl) {
     const bp = brandPage();
     const title = bp?.mainCta?.title || 'Voeg toe aan winkelwagen';
@@ -1192,8 +1220,16 @@
     const qtyParam = new URLSearchParams(window.location.search).get('qty');
     if (qtyParam) qty = Math.max(1, parseInt(qtyParam, 10) || qty);
 
-    const total = p.price * qty;
+    const total =
+      typeof window.HearingCart?.priceForQty === 'function'
+        ? window.HearingCart.priceForQty(qty)
+        : (() => {
+            const duos = Math.floor(qty / 2);
+            const singles = qty % 2;
+            return duos * 89.99 * 2 + singles * (p.price || 99);
+          })();
     const was = (p.originalPrice || p.price) * qty;
+    const per = total / qty;
     const set = (id, text) => {
       const el = document.getElementById(id);
       if (el) el.textContent = text;
@@ -1206,7 +1242,7 @@
 
     set('dtc-offer-was', fmt(was));
     set('dtc-offer-now', fmt(total));
-    set('dtc-offer-badge', `${fmt(p.price)} / stuk`);
+    set('dtc-offer-badge', `${fmt(per)} / stuk`);
     set('dtc-pay-was', fmt(was));
     set('dtc-pay-now', fmt(total));
     set('dtc-sum-total', fmt(total));
@@ -1236,6 +1272,7 @@
   function renderPreRightColumn(payUrl) {
     return (
       renderProductSummary() +
+      renderOfferSets() +
       renderMainCta(payUrl) +
       renderBuyCopy() +
       renderBuyAccordion() +

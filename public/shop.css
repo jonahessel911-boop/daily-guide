@@ -361,24 +361,6 @@ ul { list-style: none; }
   margin-bottom: 10px;
 }
 
-.shop-swatches {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-.shop-swatch {
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  border: 2px solid transparent;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,.12);
-  cursor: pointer;
-}
-.shop-swatch.is-selected {
-  border-color: var(--shop-accent-deep);
-  box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--shop-accent-deep);
-}
-
 .shop-ship {
   display: flex;
   align-items: center;

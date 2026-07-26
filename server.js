@@ -130,7 +130,45 @@ function resolveCartTotals(body = {}) {
   const unitCents = Math.round(Number(cameraProduct.price) * 100);
   const duoCents = 11999;
   const printerCents = Math.round(Number(printerProduct.price) * 100);
-  const hearingCents = Math.round(Number(hearingProduct.price) * 100);
+  const hearingSingleCents = Math.round(Number(hearingProduct.price) * 100);
+  const hearingDuoUnitCents = 8999; // €89,99 per set when buying pairs
+
+  function hearingAmountCents(qty) {
+    const duos = Math.floor(qty / 2);
+    const singles = qty % 2;
+    return duos * hearingDuoUnitCents * 2 + singles * hearingSingleCents;
+  }
+
+  function appendHearingItems(qty) {
+    const duos = Math.floor(qty / 2);
+    const singles = qty % 2;
+    if (duos) {
+      lineItems.push({
+        quantity: duos,
+        price_data: {
+          currency: 'eur',
+          unit_amount: hearingDuoUnitCents * 2,
+          product_data: {
+            name: `2× ${hearingProduct.name}`,
+            description: hearingProduct.description,
+          },
+        },
+      });
+    }
+    if (singles) {
+      lineItems.push({
+        quantity: 1,
+        price_data: {
+          currency: 'eur',
+          unit_amount: hearingSingleCents,
+          product_data: {
+            name: hearingProduct.name,
+            description: hearingProduct.description,
+          },
+        },
+      });
+    }
+  }
 
   let lineItems = [];
   let amountCents = 0;
@@ -164,18 +202,8 @@ function resolveCartTotals(body = {}) {
         });
       } else if (sku === 'hearing') {
         hearings += qty;
-        amountCents += hearingCents * qty + (orderBump ? bumpCents : 0);
-        lineItems.push({
-          quantity: qty,
-          price_data: {
-            currency: 'eur',
-            unit_amount: hearingCents + (qty === 1 && orderBump ? bumpCents : 0),
-            product_data: {
-              name: hearingProduct.name,
-              description: hearingProduct.description,
-            },
-          },
-        });
+        amountCents += hearingAmountCents(qty);
+        appendHearingItems(qty);
       } else {
         cameras += qty;
         const duos = Math.floor(qty / 2);
@@ -209,22 +237,38 @@ function resolveCartTotals(body = {}) {
         }
       }
     }
-  } else if (productSlug === 'hearing') {
-    hearings = quantity;
-    amountCents = hearingCents * quantity + bumpCents;
-    lineItems = [
-      {
-        quantity,
+    if (orderBump && hearings > 0) {
+      amountCents += bumpCents;
+      lineItems.push({
+        quantity: 1,
         price_data: {
           currency: 'eur',
-          unit_amount: hearingCents + (quantity === 1 ? bumpCents : 0),
+          unit_amount: bumpCents,
           product_data: {
-            name: hearingProduct.name,
-            description: hearingProduct.description,
+            name: 'Extra optie',
+            description: 'Order bump',
           },
         },
-      },
-    ];
+      });
+    }
+  } else if (productSlug === 'hearing') {
+    hearings = quantity;
+    amountCents = hearingAmountCents(quantity) + bumpCents;
+    lineItems = [];
+    appendHearingItems(quantity);
+    if (bumpCents) {
+      lineItems.push({
+        quantity: 1,
+        price_data: {
+          currency: 'eur',
+          unit_amount: bumpCents,
+          product_data: {
+            name: 'Extra optie',
+            description: 'Order bump',
+          },
+        },
+      });
+    }
   } else {
     cameras = quantity;
     const duos = Math.floor(quantity / 2);

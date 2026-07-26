@@ -89,13 +89,8 @@
     }
     badge.hidden = false;
     badge.classList.add('is-visible');
-    if (n === 1) {
-      badge.textContent = 'Eentje';
-      badge.classList.add('is-word');
-    } else {
-      badge.textContent = String(n);
-      badge.classList.remove('is-word');
-    }
+    badge.classList.remove('is-word');
+    badge.textContent = String(n);
   }
 
   function updateStickyPrice() {
@@ -417,15 +412,6 @@
     document.getElementById('shop-gallery-zoom')?.addEventListener('click', () => {
       const img = document.getElementById('shop-main-image');
       if (img) window.open(img.src, '_blank');
-    });
-
-    document.querySelectorAll('.shop-swatch').forEach((sw) => {
-      sw.addEventListener('click', () => {
-        document.querySelectorAll('.shop-swatch').forEach((s) => s.classList.remove('is-selected'));
-        sw.classList.add('is-selected');
-        const label = document.getElementById('shop-finish-label');
-        if (label) label.textContent = sw.dataset.finish || 'Klassiek zwart';
-      });
     });
 
     document.getElementById('shop-atc')?.addEventListener('click', addSelectedToCart);
