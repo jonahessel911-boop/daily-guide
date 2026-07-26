@@ -8,7 +8,7 @@ const cors = require('cors');
 const path = require('path');
 const { insertEvent, getStats } = require('./lib/analytics');
 const { fulfillPurchase, getSuccessUrl } = require('./lib/fulfill-purchase');
-const { sendPurchaseEvent } = require('./lib/meta-capi');
+const { sendPurchaseEvent, sendAddToCartEvent } = require('./lib/meta-capi');
 const {
   handleRedirect,
   saveVariants,
@@ -536,6 +536,43 @@ app.post('/api/track', async (req, res) => {
   });
 
   res.json(result);
+});
+
+app.post('/api/meta/add-to-cart', async (req, res) => {
+  const body = req.body || {};
+  const eventId = body.eventId || `atc_${Date.now()}`;
+  const value = Number(body.value);
+  if (!Number.isFinite(value) || value < 0) {
+    return res.status(400).json({ ok: false, error: 'Ongeldige value' });
+  }
+
+  const contentIds = Array.isArray(body.contentIds)
+    ? body.contentIds.map(String).filter(Boolean).slice(0, 10)
+    : body.contentId
+      ? [String(body.contentId)]
+      : [];
+
+  const result = await sendAddToCartEvent({
+    eventId,
+    value,
+    contentIds,
+    contentName: body.contentName || undefined,
+    contentType: body.contentType || 'product',
+    numItems: body.numItems || 1,
+    currency: 'EUR',
+    email: body.email || undefined,
+    country: (body.country || 'nl').toLowerCase(),
+    externalId: body.externalId || undefined,
+    fbc: body.fbc || undefined,
+    fbp: body.fbp || undefined,
+    clientIp: req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip,
+    userAgent: req.get('user-agent') || undefined,
+    eventSourceUrl: body.eventSourceUrl || req.get('referer') || undefined,
+    testEventCode: body.testEventCode || undefined,
+    leadSource: body.leadSource || undefined,
+  });
+
+  res.json({ ok: Boolean(result.ok), skipped: Boolean(result.skipped), result });
 });
 
 app.post('/api/admin/login', (req, res) => {
