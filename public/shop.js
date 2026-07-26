@@ -7,6 +7,20 @@
     single: { qty: 1, price: 69.99, was: 99.99, label: '1× 1970cam' },
     duo: { qty: 2, price: 119.99, was: 139.98, label: '2× 1970cam' },
   };
+  const CATALOG = {
+    '1970cam': {
+      sku: '1970cam',
+      title: '1970cam',
+      unitPrice: 69.99,
+      image: '/assets/product/1970cam-front.png',
+    },
+    printer: {
+      sku: 'printer',
+      title: '1970cam Portable Printer',
+      unitPrice: 49.99,
+      image: '/assets/product/printer/printer-front.png',
+    },
+  };
 
   /* Product gallery: square 1:1 assets only (Hears-style PDP) */
   const IMAGES = [
@@ -80,9 +94,22 @@
     return duos * PRICE.duo.price + singles * PRICE.single.price;
   }
 
+  function lineTotal(item) {
+    if (item.sku === '1970cam') return priceForCameras(item.qty);
+    const cat = CATALOG[item.sku];
+    return (cat?.unitPrice || item.unitPrice || 0) * item.qty;
+  }
+
   function cartCount(items = readCart()) {
-    const row = items.find((i) => i.sku === '1970cam');
-    return row ? row.qty : 0;
+    return items.reduce((sum, i) => sum + (i.qty || 0), 0);
+  }
+
+  function cartTotal(items = readCart()) {
+    return items.reduce((sum, i) => sum + lineTotal(i), 0);
+  }
+
+  function cameraQty(items = readCart()) {
+    return items.find((i) => i.sku === '1970cam')?.qty || 0;
   }
 
   function updateBadge() {
@@ -296,9 +323,29 @@
     else {
       items.push({
         sku: '1970cam',
-        title: '1970cam',
+        title: CATALOG['1970cam'].title,
         qty: offer.qty,
-        image: IMAGES[0].src,
+        image: CATALOG['1970cam'].image,
+        unitPrice: CATALOG['1970cam'].unitPrice,
+      });
+    }
+    writeCart(items);
+    openDrawer();
+  }
+
+  function addSkuToCart(sku, qty = 1) {
+    const cat = CATALOG[sku];
+    if (!cat) return;
+    const items = readCart();
+    const existing = items.find((i) => i.sku === sku);
+    if (existing) existing.qty += qty;
+    else {
+      items.push({
+        sku: cat.sku,
+        title: cat.title,
+        qty,
+        image: cat.image,
+        unitPrice: cat.unitPrice,
       });
     }
     writeCart(items);
@@ -309,13 +356,21 @@
     addOfferToCart(selectedOffer);
   }
 
-  function setQty(qty) {
+  function setQty(sku, qty) {
     let items = readCart();
-    if (qty <= 0) items = [];
+    if (qty <= 0) items = items.filter((i) => i.sku !== sku);
     else {
-      const row = items.find((i) => i.sku === '1970cam');
+      const row = items.find((i) => i.sku === sku);
       if (row) row.qty = qty;
-      else items = [{ sku: '1970cam', title: '1970cam', qty, image: IMAGES[0].src }];
+      else if (CATALOG[sku]) {
+        items.push({
+          sku,
+          title: CATALOG[sku].title,
+          qty,
+          image: CATALOG[sku].image,
+          unitPrice: CATALOG[sku].unitPrice,
+        });
+      }
     }
     writeCart(items);
   }
@@ -325,53 +380,91 @@
     const body = document.getElementById('shop-drawer-body');
     const totalEl = document.getElementById('shop-drawer-total');
     const checkoutBtn = document.getElementById('shop-drawer-checkout');
-    const qty = cartCount();
+    const items = readCart();
 
     if (!body) return;
 
-    if (qty <= 0) {
+    if (!items.length) {
       body.innerHTML = `<p class="shop-drawer__empty">Your cart is empty</p>`;
       if (totalEl) totalEl.textContent = fmt(0);
       if (checkoutBtn) checkoutBtn.disabled = true;
       return;
     }
 
-    const total = priceForCameras(qty);
-    const per = total / qty;
-    body.innerHTML = `
-      <div class="shop-cart-item">
-        <img src="${IMAGES[0].src}" alt="">
+    const hasPrinter = items.some((i) => i.sku === 'printer');
+    const crossSell = hasPrinter
+      ? ''
+      : `
+      <div class="shop-cross-sell">
+        <p class="shop-cross-sell__label">Vaak samen gekozen</p>
+        <div class="shop-cross-sell__row">
+          <img src="${CATALOG.printer.image}" alt="">
+          <div class="shop-cross-sell__info">
+            <strong>Portable Printer</strong>
+            <span><s>€ 69,99</s> <b>€ 49,99</b></span>
+          </div>
+          <button type="button" class="shop-cross-sell__btn" id="shop-cart-add-printer">+ Toevoegen</button>
+        </div>
+      </div>`;
+
+    body.innerHTML =
+      items
+        .map((i) => {
+          const total = lineTotal(i);
+          const per = i.sku === '1970cam' ? total / i.qty : i.unitPrice || CATALOG[i.sku]?.unitPrice || 0;
+          return `
+      <div class="shop-cart-item" data-sku="${i.sku}">
+        <img src="${i.image}" alt="">
         <div>
-          <div class="shop-cart-item__title">${qty}× 1970cam</div>
-          <div class="shop-cart-item__meta">${fmt(per)} gem. / stuk</div>
+          <div class="shop-cart-item__title">${i.qty}× ${i.title}</div>
+          <div class="shop-cart-item__meta">${fmt(per)} / stuk</div>
           <div class="shop-cart-item__row">
             <div class="shop-qty">
-              <button type="button" data-dec aria-label="Minder">−</button>
-              <span>${qty}</span>
-              <button type="button" data-inc aria-label="Meer">+</button>
+              <button type="button" data-dec="${i.sku}" aria-label="Minder">−</button>
+              <span>${i.qty}</span>
+              <button type="button" data-inc="${i.sku}" aria-label="Meer">+</button>
             </div>
             <strong>${fmt(total)}</strong>
           </div>
         </div>
       </div>`;
+        })
+        .join('') + crossSell;
 
-    if (totalEl) totalEl.textContent = fmt(total);
+    if (totalEl) totalEl.textContent = fmt(cartTotal(items));
     if (checkoutBtn) checkoutBtn.disabled = false;
+
+    document.getElementById('shop-cart-add-printer')?.addEventListener('click', () => {
+      addSkuToCart('printer', 1);
+    });
   }
 
   function goCheckout() {
-    const qty = cartCount();
-    if (qty <= 0) return;
-    const total = priceForCameras(qty);
+    const items = readCart();
+    if (!items.length) return;
+    const total = cartTotal(items);
+    const cams = cameraQty(items);
+    const primarySlug = cams > 0 ? '1970cam' : items[0]?.sku || '1970cam';
     sessionStorage.setItem(
       'cam1970_checkout_cart',
-      JSON.stringify({ qty, total, productSlug: '1970cam' })
+      JSON.stringify({
+        items: items.map((i) => ({
+          sku: i.sku,
+          qty: i.qty,
+          title: i.title,
+          unitPrice: i.sku === '1970cam' ? null : i.unitPrice || CATALOG[i.sku]?.unitPrice,
+        })),
+        qty: cams,
+        cameras: cams,
+        total,
+        productSlug: primarySlug,
+      })
     );
     const url = new URL('/pay', window.location.origin);
-    url.searchParams.set('p', '1970cam');
+    url.searchParams.set('p', primarySlug);
     url.searchParams.set('c', 'nl');
     url.searchParams.set('l', 'checkout');
-    url.searchParams.set('qty', String(qty));
+    if (cams > 0) url.searchParams.set('qty', String(cams));
     window.location.href = url.pathname + url.search;
   }
 
@@ -412,8 +505,9 @@
 
     document.getElementById('shop-atc')?.addEventListener('click', addSelectedToCart);
     document.getElementById('shop-atc-sticky')?.addEventListener('click', addSelectedToCart);
+    document.getElementById('shop-add-printer')?.addEventListener('click', () => addSkuToCart('printer', 1));
 
-    document.querySelectorAll('.shop-bundle-card__btn').forEach((btn) => {
+    document.querySelectorAll('.shop-bundle-card__hit[data-offer]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.offer || 'single';
         selectOffer(id);
@@ -427,8 +521,18 @@
     document.getElementById('shop-drawer-checkout')?.addEventListener('click', goCheckout);
 
     document.getElementById('shop-drawer-body')?.addEventListener('click', (e) => {
-      if (e.target.closest('[data-inc]')) setQty(cartCount() + 1);
-      if (e.target.closest('[data-dec]')) setQty(cartCount() - 1);
+      const inc = e.target.closest('[data-inc]');
+      const dec = e.target.closest('[data-dec]');
+      if (inc) {
+        const sku = inc.dataset.inc;
+        const row = readCart().find((i) => i.sku === sku);
+        if (row) setQty(sku, row.qty + 1);
+      }
+      if (dec) {
+        const sku = dec.dataset.dec;
+        const row = readCart().find((i) => i.sku === sku);
+        if (row) setQty(sku, row.qty - 1);
+      }
     });
 
     document.getElementById('shop-burger')?.addEventListener('click', () => {

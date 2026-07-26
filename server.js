@@ -32,6 +32,14 @@ const PRODUCTS = {
     originalPrice: 99.99,
     orderPrefix: 'CAM70',
   },
+  printer: {
+    slug: 'printer',
+    name: '1970cam Portable Printer',
+    description: 'Draadloze mini-printer — print je 1970cam-foto’s direct vanaf je telefoon',
+    price: 49.99,
+    originalPrice: 69.99,
+    orderPrefix: 'PRINT',
+  },
 };
 
 function getProduct(slug) {
@@ -500,21 +508,142 @@ app.post('/api/create-checkout-session', async (req, res) => {
     const productSlug = analytics.productSlug || req.body.productSlug || '1970cam';
     const product = getProduct(productSlug);
     const quantity = Math.max(1, Math.min(20, parseInt(req.body.quantity, 10) || 1));
+    const cartItems = Array.isArray(req.body.items) ? req.body.items : null;
     const orderBump = Boolean(req.body.orderBump);
     const bumpCents = orderBump && productSlug === 'hearing' ? 995 : 0;
-    // Pair pricing: every 2 cameras = €119.99, leftover = €69.99
-    const unitCents = Math.round(Number(product.price) * 100);
+
+    const cameraProduct = getProduct('1970cam');
+    const printerProduct = getProduct('printer');
+    const unitCents = Math.round(Number(cameraProduct.price) * 100);
     const duoCents = 11999;
-    const duos = Math.floor(quantity / 2);
-    const singles = quantity % 2;
-    const amountCents =
-      productSlug === '1970cam'
-        ? duos * duoCents + singles * unitCents + bumpCents
-        : unitCents * quantity + bumpCents;
-    const orderId = `${product.orderPrefix}-${Date.now()}`;
+    const printerCents = Math.round(Number(printerProduct.price) * 100);
+
+    let lineItems = [];
+    let amountCents = 0;
+    let cameras = 0;
+    let printers = 0;
+
+    if (cartItems && cartItems.length) {
+      for (const raw of cartItems) {
+        const sku = raw.sku === 'printer' ? 'printer' : '1970cam';
+        const qty = Math.max(1, Math.min(20, parseInt(raw.qty, 10) || 1));
+        if (sku === 'printer') {
+          printers += qty;
+          amountCents += printerCents * qty;
+          lineItems.push({
+            quantity: qty,
+            price_data: {
+              currency: 'eur',
+              unit_amount: printerCents,
+              product_data: {
+                name: printerProduct.name,
+                description: printerProduct.description,
+              },
+            },
+          });
+        } else {
+          cameras += qty;
+          const duos = Math.floor(qty / 2);
+          const singles = qty % 2;
+          amountCents += duos * duoCents + singles * unitCents;
+          if (duos) {
+            lineItems.push({
+              quantity: duos,
+              price_data: {
+                currency: 'eur',
+                unit_amount: duoCents,
+                product_data: {
+                  name: `2× ${cameraProduct.name}`,
+                  description: cameraProduct.description,
+                },
+              },
+            });
+          }
+          if (singles) {
+            lineItems.push({
+              quantity: 1,
+              price_data: {
+                currency: 'eur',
+                unit_amount: unitCents,
+                product_data: {
+                  name: cameraProduct.name,
+                  description: cameraProduct.description,
+                },
+              },
+            });
+          }
+        }
+      }
+    } else {
+      cameras = quantity;
+      const duos = Math.floor(quantity / 2);
+      const singles = quantity % 2;
+      amountCents =
+        productSlug === '1970cam'
+          ? duos * duoCents + singles * unitCents + bumpCents
+          : Math.round(Number(product.price) * 100) * quantity + bumpCents;
+
+      lineItems =
+        productSlug === '1970cam' && quantity > 1
+          ? [
+              ...(duos
+                ? [
+                    {
+                      quantity: duos,
+                      price_data: {
+                        currency: 'eur',
+                        unit_amount: duoCents,
+                        product_data: {
+                          name: `2× ${product.name}`,
+                          description: product.description || product.name,
+                        },
+                      },
+                    },
+                  ]
+                : []),
+              ...(singles
+                ? [
+                    {
+                      quantity: 1,
+                      price_data: {
+                        currency: 'eur',
+                        unit_amount: unitCents,
+                        product_data: {
+                          name: product.name,
+                          description: product.description || product.name,
+                        },
+                      },
+                    },
+                  ]
+                : []),
+            ]
+          : [
+              {
+                quantity,
+                price_data: {
+                  currency: 'eur',
+                  unit_amount:
+                    Math.round(Number(product.price) * 100) + (quantity === 1 ? bumpCents : 0),
+                  product_data: {
+                    name: product.name,
+                    description: product.description || product.name,
+                  },
+                },
+              },
+            ];
+    }
+
+    if (!lineItems.length) {
+      return res.status(400).json({ error: 'Geen producten in winkelwagen' });
+    }
+
+    const orderProduct =
+      cameras === 0 && printers > 0 ? printerProduct : cameras > 0 ? cameraProduct : product;
+    const orderSlug = orderProduct.slug;
+    const orderId = `${orderProduct.orderPrefix}-${Date.now()}`;
     const metadata = buildOrderMetadata({
-      product,
-      productSlug,
+      product: orderProduct,
+      productSlug: orderSlug,
       email,
       shipping,
       paymentMethod: 'stripe_checkout',
@@ -523,7 +652,9 @@ app.post('/api/create-checkout-session', async (req, res) => {
       orderBump,
       orderId,
     });
-    metadata.quantity = String(quantity);
+    metadata.quantity = String(cameras || printers || quantity);
+    metadata.cameras = String(cameras);
+    metadata.printers = String(printers);
     const stripeShipping = buildStripeShipping(shipping);
 
     // Prefill name + address on Stripe Checkout (still editable there)
@@ -534,58 +665,12 @@ app.post('/api/create-checkout-session', async (req, res) => {
       address: stripeShipping?.address,
       metadata: {
         order_id: orderId,
-        product_slug: productSlug,
-        quantity: String(quantity),
+        product_slug: orderSlug,
+        quantity: String(cameras || printers || quantity),
+        cameras: String(cameras),
+        printers: String(printers),
       },
     });
-
-    const lineItems =
-      productSlug === '1970cam' && quantity > 1
-        ? [
-            ...(duos
-              ? [
-                  {
-                    quantity: duos,
-                    price_data: {
-                      currency: 'eur',
-                      unit_amount: duoCents,
-                      product_data: {
-                        name: `2× ${product.name}`,
-                        description: product.description || product.name,
-                      },
-                    },
-                  },
-                ]
-              : []),
-            ...(singles
-              ? [
-                  {
-                    quantity: 1,
-                    price_data: {
-                      currency: 'eur',
-                      unit_amount: unitCents,
-                      product_data: {
-                        name: product.name,
-                        description: product.description || product.name,
-                      },
-                    },
-                  },
-                ]
-              : []),
-          ]
-        : [
-            {
-              quantity,
-              price_data: {
-                currency: 'eur',
-                unit_amount: unitCents + (quantity === 1 ? bumpCents : 0),
-                product_data: {
-                  name: product.name,
-                  description: product.description || product.name,
-                },
-              },
-            },
-          ];
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -620,7 +705,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
       metadata,
       payment_intent_data: {
         metadata,
-        description: `${product.name} (${orderId})`,
+        description: `${orderProduct.name} (${orderId})`,
       },
       locale: 'nl',
     });
@@ -630,8 +715,8 @@ app.post('/api/create-checkout-session', async (req, res) => {
       sessionId: session.id,
       orderId,
       total: amountCents / 100,
-      quantity,
-      product,
+      quantity: cameras || printers || quantity,
+      product: orderProduct,
     });
   } catch (err) {
     console.error('Stripe checkout session error:', err.message);

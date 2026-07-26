@@ -97,10 +97,10 @@ window.HearingDTCConfig = {
 
   orderBump: {
     enabled: false,
-    price: 12.95,
+    price: 49.99,
     badge: 'Vaak samen gekozen',
-    title: 'Voeg een extra polsband toe',
-    description: 'Handig als reserve — zodat je altijd een band paraat hebt.',
+    title: 'Portable Printer',
+    description: 'Print je 1970cam-foto’s direct vanaf je telefoon.',
   },
 
   productImages: [

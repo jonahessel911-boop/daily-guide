@@ -1041,48 +1041,173 @@
   }
 
   function initPayPage() {
-    const p = cfg().product;
-    const img = cfg().productImages?.[0];
-    if (img) {
-      const offerImg = document.getElementById('dtc-offer-img');
-      if (offerImg) {
-        offerImg.src = img.src;
-        offerImg.alt = img.alt;
-      }
-    }
-    const set = (id, text) => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = text;
+    const CART_KEY = 'cam1970_checkout_cart';
+    const PRINTER = {
+      sku: 'printer',
+      title: '1970cam Portable Printer',
+      unitPrice: 49.99,
+      was: 69.99,
+      image: '/assets/product/printer/printer-front.png',
     };
 
-    let qty = 1;
-    try {
-      const cart = JSON.parse(sessionStorage.getItem('cam1970_checkout_cart') || '{}');
-      if (cart.qty) qty = Math.max(1, parseInt(cart.qty, 10) || 1);
-    } catch (_) {
-      /* ignore */
+    function readCart() {
+      try {
+        return JSON.parse(sessionStorage.getItem(CART_KEY) || '{}');
+      } catch (_) {
+        return {};
+      }
     }
-    const qtyParam = new URLSearchParams(window.location.search).get('qty');
-    if (qtyParam) qty = Math.max(1, parseInt(qtyParam, 10) || qty);
 
-    const duos = Math.floor(qty / 2);
-    const singles = qty % 2;
-    const total = duos * 119.99 + singles * (p.price || 69.99);
-    const was = qty * (p.originalPrice || 99.99);
-    const per = total / qty;
+    function writeCart(cart) {
+      sessionStorage.setItem(CART_KEY, JSON.stringify(cart));
+    }
 
-    const offerLabel = `${qty}× ${brandName()}`;
-    const offerNameEl = document.querySelector('.dtc-offer-card__name');
-    if (offerNameEl) offerNameEl.textContent = offerLabel;
-    const payProductEl = document.getElementById('dtc-pay-product-label');
-    if (payProductEl) payProductEl.textContent = offerLabel;
+    function cartCounts() {
+      const cart = readCart();
+      let qty = 1;
+      if (cart.qty != null && cart.qty !== '') qty = Math.max(0, parseInt(cart.qty, 10) || 0);
+      const qtyParam = new URLSearchParams(window.location.search).get('qty');
+      if (qtyParam) qty = Math.max(0, parseInt(qtyParam, 10) || qty);
 
-    set('dtc-offer-was', fmt(was));
-    set('dtc-offer-now', fmt(total));
-    set('dtc-offer-badge', `${fmt(per)} / stuk`);
-    set('dtc-pay-was', fmt(was));
-    set('dtc-pay-now', fmt(total));
-    set('dtc-sum-total', fmt(total));
+      const items = Array.isArray(cart.items) ? cart.items : null;
+      const cameras = items
+        ? items.filter((i) => i.sku !== 'printer').reduce((s, i) => s + (i.qty || 0), 0)
+        : qty || 1;
+      const printers = items
+        ? items.filter((i) => i.sku === 'printer').reduce((s, i) => s + (i.qty || 0), 0)
+        : 0;
+      return { cart, items, cameras, printers };
+    }
+
+    function setPrinterSelected(on) {
+      const { cart, items, cameras } = cartCounts();
+      let next = Array.isArray(items) ? items.map((i) => ({ ...i })) : [];
+      if (!next.length && cameras > 0) {
+        next.push({
+          sku: '1970cam',
+          qty: cameras,
+          title: brandName(),
+          unitPrice: null,
+        });
+      }
+      const existing = next.find((i) => i.sku === 'printer');
+      if (on) {
+        if (existing) existing.qty = Math.max(1, existing.qty || 1);
+        else {
+          next.push({
+            sku: PRINTER.sku,
+            qty: 1,
+            title: PRINTER.title,
+            unitPrice: PRINTER.unitPrice,
+          });
+        }
+      } else {
+        next = next.filter((i) => i.sku !== 'printer');
+      }
+      const cams = next.filter((i) => i.sku !== 'printer').reduce((s, i) => s + (i.qty || 0), 0);
+      writeCart({
+        ...cart,
+        items: next,
+        qty: cams,
+        cameras: cams,
+        productSlug: cams > 0 ? '1970cam' : 'printer',
+      });
+    }
+
+    function refreshPayOffer() {
+      const p = cfg().product;
+      const { cameras, printers } = cartCounts();
+
+      const img =
+        cameras === 0 && printers > 0
+          ? { src: PRINTER.image, alt: PRINTER.title }
+          : cfg().productImages?.[0];
+      if (img) {
+        const offerImg = document.getElementById('dtc-offer-img');
+        if (offerImg) {
+          offerImg.src = img.src;
+          offerImg.alt = img.alt;
+        }
+      }
+
+      const set = (id, text) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+      };
+
+      const duos = Math.floor(cameras / 2);
+      const singles = cameras % 2;
+      const cameraTotal = duos * 119.99 + singles * (p.price || 69.99);
+      const printerTotal = printers * PRINTER.unitPrice;
+      const total = cameraTotal + printerTotal;
+      const was = cameras * (p.originalPrice || 99.99) + printers * PRINTER.was;
+      const per = cameras > 0 ? cameraTotal / cameras : PRINTER.unitPrice;
+
+      const mainLabel =
+        cameras > 0
+          ? `${cameras}× ${brandName()}`
+          : printers > 0
+            ? `${printers}× Portable Printer`
+            : `1× ${brandName()}`;
+      const offerNameEl = document.querySelector('.dtc-offer-card__name');
+      if (offerNameEl) offerNameEl.textContent = mainLabel;
+
+      const summaryParts = [];
+      if (cameras > 0) summaryParts.push(`${cameras}× ${brandName()}`);
+      if (printers > 0) summaryParts.push(`${printers}× Portable Printer`);
+      const summaryLabel = summaryParts.join(' + ') || mainLabel;
+      const payProductEl = document.getElementById('dtc-pay-product-label');
+      if (payProductEl) payProductEl.textContent = summaryLabel;
+
+      set('dtc-offer-was', fmt(cameras > 0 ? cameras * (p.originalPrice || 99.99) : was));
+      set('dtc-offer-now', fmt(cameras > 0 ? cameraTotal : total));
+      set('dtc-offer-badge', cameras > 0 ? `${fmt(per)} / camera` : fmt(PRINTER.unitPrice));
+      set('dtc-pay-was', fmt(was));
+      set('dtc-pay-now', fmt(total));
+      set('dtc-sum-total', fmt(total));
+
+      document.querySelectorAll('[data-checkout-price]').forEach((el) => {
+        el.textContent = fmt(total);
+      });
+
+      renderCrossSell(cameras, printers);
+    }
+
+    function renderCrossSell(cameras, printers) {
+      const wrap = document.getElementById('dtc-cross-sell');
+      if (!wrap) return;
+      if (cameras <= 0) {
+        wrap.innerHTML = '';
+        return;
+      }
+      const on = printers > 0;
+      wrap.innerHTML = `
+        <label class="dtc-cross-sell${on ? ' is-on' : ''}">
+          <input type="checkbox" id="dtc-add-printer" ${on ? 'checked' : ''}>
+          <img class="dtc-cross-sell__img" src="${PRINTER.image}" alt="">
+          <div class="dtc-cross-sell__info">
+            <span class="dtc-cross-sell__badge">Vaak samen gekozen</span>
+            <strong class="dtc-cross-sell__title">Portable Printer toevoegen</strong>
+            <span class="dtc-cross-sell__desc">Print je foto’s direct vanaf je telefoon</span>
+          </div>
+          <div class="dtc-cross-sell__prices">
+            <span class="dtc-cross-sell__was">${fmt(PRINTER.was)}</span>
+            <span class="dtc-cross-sell__now">+ ${fmt(PRINTER.unitPrice)}</span>
+          </div>
+        </label>`;
+
+      const box = document.getElementById('dtc-add-printer');
+      const label = wrap.querySelector('.dtc-cross-sell');
+      box?.addEventListener('change', () => {
+        setPrinterSelected(box.checked);
+        refreshPayOffer();
+      });
+      label?.addEventListener('click', (e) => {
+        if (e.target === box) return;
+      });
+    }
+
+    refreshPayOffer();
 
     const sidebar = document.getElementById('dtc-pay-sidebar');
     if (sidebar) sidebar.innerHTML = renderPaySidebar();
@@ -1101,6 +1226,7 @@
         .join('');
     }
 
+    const p = cfg().product;
     const socialStrong = document.querySelector('.dtc-pay-social strong');
     const socialSpan = document.querySelector('.dtc-pay-social span');
     const count = p.reviewCount || 683;
@@ -1112,7 +1238,6 @@
     }
 
     initStockCount();
-    updateOrderSummary();
   }
 
   function renderPreRightColumn(payUrl) {

@@ -168,6 +168,97 @@
   color: #9a3412;
 }
 
+.dtc-cross-sell-wrap {
+  margin-top: 12px;
+}
+
+.dtc-cross-sell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 2px dashed #d6d3d1;
+  border-radius: var(--dtc-radius-sm);
+  background: #fff;
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.dtc-cross-sell.is-on {
+  border-style: solid;
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.dtc-cross-sell input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--dtc-navy);
+  flex-shrink: 0;
+}
+
+.dtc-cross-sell__img {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f5f5f4;
+  flex-shrink: 0;
+}
+
+.dtc-cross-sell__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.dtc-cross-sell__badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #9a3412;
+  background: #ffedd5;
+  border-radius: 6px;
+  padding: 3px 7px;
+  margin-bottom: 4px;
+}
+
+.dtc-cross-sell__title {
+  display: block;
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.dtc-cross-sell__desc {
+  display: block;
+  font-size: 12px;
+  color: #78716c;
+  margin-top: 2px;
+  line-height: 1.35;
+}
+
+.dtc-cross-sell__prices {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.dtc-cross-sell__was {
+  display: block;
+  font-size: 12px;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.dtc-cross-sell__now {
+  display: block;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--dtc-red);
+}
+
 .dtc-stock-alert__dot {
   width: 8px;
   height: 8px;
