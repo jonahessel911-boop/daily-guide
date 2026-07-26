@@ -509,3 +509,5 @@ a { color: inherit; text-decoration: none; }
 .offer-footer a:hover { color: var(--brand); }
 
 .hidden { display: none !important; }
+.hd-logo img { height: 36px; width: auto; display: block; }
+.site-header { display:flex; align-items:center; justify-content:center; padding:14px 16px; background:#fff; border-bottom:1px solid #eee; }

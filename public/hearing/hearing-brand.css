@@ -1,0 +1,28 @@
+/* HearDirect shared brand */
+
+:root {
+  --hd-brand: #0070e7;
+  --hd-brand-dark: #005bbd;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.hd-logo {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+  text-decoration: none;
+}
+
+.hd-logo img {
+  height: 36px;
+  width: auto;
+  display: block;
+}

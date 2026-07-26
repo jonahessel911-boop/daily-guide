@@ -1,5 +1,5 @@
 /**
- * 1970cam shop — Hears-style gallery, offers, side cart, UGC
+ * 1970cam shop — Hears-style gallery, offers, side cart
  */
 (function () {
   const STORAGE_KEY = 'cam1970_cart_v1';
@@ -31,41 +31,6 @@
     { src: '/assets/product/1970cam-phone-gallery.png', alt: '1970cam in de app' },
     { src: '/assets/product/1970cam-vs-concurrentie.png', alt: '1970cam vs concurrentie' },
     { src: '/assets/product/1970cam-lifestyle.png', alt: '1970cam lifestyle' },
-  ];
-
-  const LOVED = [
-    '/assets/reviews/emma-photo.png',
-    '/assets/reviews/lisa-photo.png',
-    '/assets/reviews/daan-photo.png',
-    '/assets/gallery/huisfeest.png',
-    '/assets/gallery/festival.png',
-    '/assets/gallery/terras.png',
-    '/assets/product/1970cam-lifestyle.png',
-    '/assets/gallery/zomer.png',
-  ];
-
-  const UGC = [
-    {
-      name: 'Fleur',
-      title: 'Nooit meer kabel-gedoe',
-      text: window.Cam1970Reviews?.[0]?.text || 'Foto\'s stonden direct op m\'n telefoon.',
-      photo: '/assets/reviews/emma-photo.png',
-      avatar: '/assets/reviews/emma-avatar.png',
-    },
-    {
-      name: 'Daan',
-      title: 'Kwaliteit is bizar',
-      text: window.Cam1970Reviews?.[1]?.text || 'De kwaliteit is echt bizar.',
-      photo: '/assets/reviews/daan-photo.png',
-      avatar: '/assets/reviews/daan-avatar.png',
-    },
-    {
-      name: 'Lisa',
-      title: 'Elke vrijdag een droom',
-      text: window.Cam1970Reviews?.[2]?.text || 'Eindelijk avondjes weg zonder scherm.',
-      photo: '/assets/reviews/lisa-photo.png',
-      avatar: '/assets/reviews/lisa-avatar.png',
-    },
   ];
 
   let imageIndex = 0;
@@ -135,8 +100,7 @@
 
   function updateStickyPrice() {
     const el = document.getElementById('shop-sticky-price');
-    const offer = PRICE[selectedOffer] || PRICE.single;
-    if (el) el.textContent = fmt(offer.price);
+    if (el) el.textContent = fmt(PRICE.single.price);
   }
 
   function setMainImage(i) {
@@ -163,50 +127,6 @@
     ).join('');
   }
 
-  function renderLoved() {
-    const row = document.getElementById('shop-loved-row');
-    if (!row) return;
-    row.innerHTML = LOVED.map(
-      (src) => `
-      <div class="shop-loved__card">
-        <img src="${src}" alt="" loading="lazy">
-        <span class="shop-loved__play" aria-hidden="true">▶</span>
-      </div>`
-    ).join('');
-  }
-
-  function renderUgc() {
-    const box = document.getElementById('shop-ugc');
-    if (!box) return;
-    const reviews = window.Cam1970Reviews || [];
-    const cards = UGC.map((u, i) => {
-      const r = reviews[i] || {};
-      return {
-        ...u,
-        text: r.text || u.text,
-        name: r.name || u.name,
-        avatar: r.avatar || u.avatar,
-      };
-    });
-    box.innerHTML = cards
-      .map(
-        (c) => `
-      <article class="shop-ugc-card">
-        <img src="${c.photo}" alt="">
-        <div class="shop-ugc-card__body">
-          <div class="shop-ugc-card__meta">
-            <img src="${c.avatar}" alt="">
-            <span><strong>${c.name}</strong> · Verified Buyer</span>
-          </div>
-          <h4>${c.title}</h4>
-          <p>${c.text}</p>
-          <div class="shop-ugc-card__stars">★★★★★</div>
-        </div>
-      </article>`
-      )
-      .join('');
-  }
-
   /* ---- Written review list + Load more ---- */
   const REVIEW_PAGE = 3;
   let reviewVisible = REVIEW_PAGE;
@@ -226,14 +146,14 @@
       <article class="shop-rcard" data-idx="${idx}">
         <div class="shop-rcard__top">
           <span class="shop-rcard__name">${r.name}</span>
-          <span class="shop-rcard__verified">Verified Buyer</span>
+          <span class="shop-rcard__verified">Geverifieerde koper</span>
         </div>
         <div class="shop-rcard__product">
-          <img src="${r.photo || '/assets/product/1970cam-front.png'}" alt="">
+          <img src="/assets/product/1970cam-front.png" alt="1970cam">
           <div>
-            <div class="shop-rcard__product-label">Reviewing</div>
+            <div class="shop-rcard__product-label">Review over</div>
             <div class="shop-rcard__product-name">1970cam</div>
-            <div class="shop-rcard__product-meta">Classic Black · Digital disposable vibe</div>
+            <div class="shop-rcard__product-meta">Klassiek zwart · Digitale wegwerpvibe</div>
           </div>
         </div>
         <div class="shop-rcard__rating">
@@ -242,11 +162,11 @@
         </div>
         <h3 class="shop-rcard__title">${r.title || 'Review'}</h3>
         <p class="shop-rcard__text${long ? ' is-clamp' : ''}">${r.text}</p>
-        ${long ? `<button type="button" class="shop-rcard__more" data-expand>Read More</button>` : ''}
+        ${long ? `<button type="button" class="shop-rcard__more" data-expand>Lees meer</button>` : ''}
         <div class="shop-rcard__foot">
-          <span>Was this helpful?</span>
-          <button type="button" class="shop-rcard__vote" data-up aria-label="Helpful">👍 <span>${r.helpful || 0}</span></button>
-          <button type="button" class="shop-rcard__vote" data-down aria-label="Not helpful">👎 <span>0</span></button>
+          <span>Was dit behulpzaam?</span>
+          <button type="button" class="shop-rcard__vote" data-up aria-label="Behulpzaam">👍 <span>${r.helpful || 0}</span></button>
+          <button type="button" class="shop-rcard__vote" data-down aria-label="Niet behulpzaam">👎 <span>0</span></button>
         </div>
       </article>`;
   }
@@ -308,11 +228,20 @@
   }
 
   function selectOffer(id) {
-    selectedOffer = id;
-    document.querySelectorAll('.shop-offer').forEach((o) => {
-      o.classList.toggle('is-selected', o.dataset.offer === id);
-    });
+    selectedOffer = id === 'duo' ? 'duo' : 'single';
     updateStickyPrice();
+  }
+
+  function trackMetaAddToCart(sku, qty) {
+    const cat = CATALOG[sku];
+    const unit = cat?.unitPrice || 0;
+    const n = Math.max(1, parseInt(qty, 10) || 1);
+    window.MetaPixel?.trackAddToCart?.({
+      value: unit * n,
+      contentIds: [sku],
+      contentName: cat?.title || sku,
+      numItems: n,
+    });
   }
 
   function addOfferToCart(offerId) {
@@ -330,6 +259,7 @@
       });
     }
     writeCart(items);
+    trackMetaAddToCart('1970cam', offer.qty);
     openDrawer();
   }
 
@@ -349,11 +279,12 @@
       });
     }
     writeCart(items);
+    trackMetaAddToCart(sku, qty);
     openDrawer();
   }
 
   function addSelectedToCart() {
-    addOfferToCart(selectedOffer);
+    addOfferToCart('single');
   }
 
   function setQty(sku, qty) {
@@ -385,7 +316,7 @@
     if (!body) return;
 
     if (!items.length) {
-      body.innerHTML = `<p class="shop-drawer__empty">Your cart is empty</p>`;
+      body.innerHTML = `<p class="shop-drawer__empty">Je winkelwagen is leeg</p>`;
       if (totalEl) totalEl.textContent = fmt(0);
       if (checkoutBtn) checkoutBtn.disabled = true;
       return;
@@ -471,8 +402,6 @@
   function bind() {
     renderThumbs();
     setMainImage(0);
-    renderLoved();
-    renderUgc();
     renderCart();
     updateStickyPrice();
     bindReviewList();
@@ -490,30 +419,18 @@
       if (img) window.open(img.src, '_blank');
     });
 
-    document.querySelectorAll('.shop-offer').forEach((el) => {
-      el.addEventListener('click', () => selectOffer(el.dataset.offer));
-    });
-
     document.querySelectorAll('.shop-swatch').forEach((sw) => {
       sw.addEventListener('click', () => {
         document.querySelectorAll('.shop-swatch').forEach((s) => s.classList.remove('is-selected'));
         sw.classList.add('is-selected');
         const label = document.getElementById('shop-finish-label');
-        if (label) label.textContent = sw.dataset.finish || 'Classic Black';
+        if (label) label.textContent = sw.dataset.finish || 'Klassiek zwart';
       });
     });
 
     document.getElementById('shop-atc')?.addEventListener('click', addSelectedToCart);
     document.getElementById('shop-atc-sticky')?.addEventListener('click', addSelectedToCart);
     document.getElementById('shop-add-printer')?.addEventListener('click', () => addSkuToCart('printer', 1));
-
-    document.querySelectorAll('.shop-bundle-card__hit[data-offer]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const id = btn.dataset.offer || 'single';
-        selectOffer(id);
-        addOfferToCart(id);
-      });
-    });
 
     document.getElementById('shop-cart-open')?.addEventListener('click', openDrawer);
     document.getElementById('shop-drawer-close')?.addEventListener('click', closeDrawer);

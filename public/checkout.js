@@ -301,34 +301,54 @@ function formatEuroPrice(amount) {
 
 async function loadProductConfig() {
   const slug = getProductSlug();
+  const hearingCfg = window.HearingDTCConfig?.product;
+
+  // Hearing pages: prefer local config defaults over camera fallbacks
+  if ((slug === 'hearing' || document.body.dataset.trackProduct === 'hearing') && hearingCfg?.price) {
+    productConfig = {
+      slug: 'hearing',
+      name: hearingCfg.name || 'HearDirect™',
+      price: hearingCfg.price,
+      originalPrice: hearingCfg.originalPrice || hearingCfg.price * 2,
+      amountCents: Math.round(Number(hearingCfg.price) * 100),
+    };
+  }
 
   try {
     const { res, data } = await Api.apiFetch(`/api/config?p=${encodeURIComponent(slug)}`);
     if (res.ok && data.product) {
-      productConfig = {
-        ...data.product,
-        slug: data.product.slug || slug,
-        amountCents: Math.round(data.product.price * 100),
-      };
-    }
-  } catch (_) {
-    /* keep defaults */
-  }
-
-  document.querySelectorAll('[data-checkout-price]').forEach((el) => {
-    el.textContent = formatEuroPrice(productConfig.price);
-  });
-
-  if (window.HearingDTC?.updateOrderSummary) {
-    if (window.HearingDTCConfig?.product) {
-      window.HearingDTCConfig.product.price = productConfig.price;
-      window.HearingDTCConfig.product.originalPrice = productConfig.originalPrice || productConfig.price * 2;
-      window.HearingDTCConfig.product.name = productConfig.name;
-      if (productConfig.slug === '1970cam') {
-        window.HearingDTCConfig.product.offerLabel = `1× ${window.HearingDTCConfig.brand?.name || '1970cam'}`;
+      const apiSlug = data.product.slug || slug;
+      // Don't apply a mismatched product (e.g. camera defaults on hearing pay)
+      if (!(isHearingCheckout() && apiSlug !== 'hearing') && !(is1970camCheckout() && apiSlug === 'hearing')) {
+        productConfig = {
+          ...data.product,
+          slug: apiSlug,
+          amountCents: Math.round(data.product.price * 100),
+        };
       }
     }
-    window.HearingDTC.updateOrderSummary();
+  } catch (_) {
+    /* keep defaults / HearingDTCConfig */
+  }
+
+  // Pay pages compute qty/cart totals in DTC UI — don't overwrite with unit price.
+  if (!isDtcPayPage()) {
+    document.querySelectorAll('[data-checkout-price]').forEach((el) => {
+      el.textContent = formatEuroPrice(productConfig.price);
+    });
+  }
+
+  if (window.HearingDTC?.updateOrderSummary) {
+    if (hearingCfg && productConfig.slug === 'hearing') {
+      hearingCfg.price = productConfig.price;
+      hearingCfg.originalPrice = productConfig.originalPrice || productConfig.price * 2;
+      hearingCfg.name = productConfig.name;
+    }
+    if (isDtcPayPage() && typeof window.HearingDTC.syncPayTotals === 'function') {
+      window.HearingDTC.syncPayTotals();
+    } else if (!isDtcPayPage()) {
+      window.HearingDTC.updateOrderSummary();
+    }
   }
 
   const nameEl = document.getElementById('checkout-product-name');
@@ -385,21 +405,79 @@ function getMetaCookies() {
   return { fbc: read('_fbc'), fbp: read('_fbp') };
 }
 
-async function createCheckoutSession(email, method = 'all') {
-  const continueText = document.getElementById('continue-text');
-  if (continueText) continueText.textContent = 'Doorverwijzen naar veilige betaling...';
+function getSelectedPaymentMethod() {
+  const checked = document.querySelector('input[name="payment-method"]:checked');
+  if (checked?.value) return checked.value;
+  return selectedMethod || defaultPaymentMethod();
+}
 
+function getCartPayload() {
   let quantity = 1;
   let cartItems = null;
-  try {
-    const cart = JSON.parse(sessionStorage.getItem('cam1970_checkout_cart') || '{}');
-    if (cart.qty) quantity = Math.max(1, parseInt(cart.qty, 10) || 1);
-    if (Array.isArray(cart.items) && cart.items.length) cartItems = cart.items;
-  } catch (_) {
-    /* ignore */
+
+  // Never mix brand carts — prefer the cart that matches this checkout.
+  const keys = isHearingCheckout()
+    ? ['hearing_checkout_cart']
+    : is1970camCheckout()
+      ? ['cam1970_checkout_cart']
+      : ['cam1970_checkout_cart', 'hearing_checkout_cart'];
+
+  for (const key of keys) {
+    try {
+      const cart = JSON.parse(sessionStorage.getItem(key) || '{}');
+      if (Array.isArray(cart.items) && cart.items.length) {
+        cartItems = cart.items;
+        if (cart.qty) quantity = Math.max(1, parseInt(cart.qty, 10) || 1);
+        break;
+      }
+      if (cart.qty) {
+        quantity = Math.max(1, parseInt(cart.qty, 10) || 1);
+      }
+    } catch (_) {
+      /* ignore */
+    }
   }
+
+  // Hearing pay without a cart session → still charge 1× HearDirect
+  if (isHearingCheckout() && (!cartItems || !cartItems.length)) {
+    const qtyParam = new URLSearchParams(window.location.search).get('qty');
+    quantity = Math.max(1, parseInt(qtyParam, 10) || quantity || 1);
+    cartItems = [{ sku: 'hearing', qty: quantity, unitPrice: productConfig.price || 99 }];
+  }
+
   const qtyParam = new URLSearchParams(window.location.search).get('qty');
-  if (qtyParam) quantity = Math.max(1, parseInt(qtyParam, 10) || quantity);
+  if (qtyParam) {
+    quantity = Math.max(1, parseInt(qtyParam, 10) || quantity);
+    if (isHearingCheckout() && Array.isArray(cartItems) && cartItems.length === 1) {
+      cartItems = [{ ...cartItems[0], sku: 'hearing', qty: quantity }];
+    }
+  }
+
+  return { quantity, cartItems, productSlug: getProductSlug() };
+}
+
+function isHearingCheckout() {
+  return (
+    document.body.dataset.trackProduct === 'hearing' ||
+    productConfig.slug === 'hearing'
+  );
+}
+
+function isDirectPayCheckout() {
+  return is1970camCheckout() || isHearingCheckout();
+}
+
+function usesDirectRedirect(method) {
+  if (!isDirectPayCheckout()) return false;
+  if (method === 'ideal' || method === 'klarna' || method === 'bancontact') return true;
+  return false;
+}
+
+async function createCheckoutSession(email, method = 'all') {
+  const continueText = document.getElementById('continue-text');
+  if (continueText) continueText.textContent = redirectPaymentLabel(method);
+
+  const { quantity, cartItems } = getCartPayload();
 
   const { res, data } = await Api.apiFetch('/api/create-checkout-session', {
     method: 'POST',
@@ -409,6 +487,7 @@ async function createCheckoutSession(email, method = 'all') {
       paymentMethod: method || 'all',
       quantity,
       items: cartItems,
+      productSlug: getProductSlug(),
       cancelUrl: `${window.location.origin}/checkout`,
       successUrl: `${window.location.origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
       analytics: getCheckoutAnalytics(),
@@ -423,6 +502,72 @@ async function createCheckoutSession(email, method = 'all') {
   }
 
   window.location.assign(data.url);
+}
+
+async function payDirectRedirect(email, method) {
+  const continueText = document.getElementById('continue-text');
+  if (continueText) continueText.textContent = redirectPaymentLabel(method);
+
+  const { quantity, cartItems } = getCartPayload();
+  const { res, data } = await Api.apiFetch('/api/create-payment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email,
+      paymentMethod: method,
+      quantity,
+      items: cartItems,
+      productSlug: getProductSlug(),
+      analytics: getCheckoutAnalytics(),
+      meta: getMetaCookies(),
+      shipping: shippingInfo,
+      orderBump: getOrderBumpSelected(),
+    }),
+  });
+
+  if (!res.ok || !data.clientSecret) {
+    throw new Error(data.error || 'Kon betaling niet starten');
+  }
+
+  clientSecret = data.clientSecret;
+  if (!stripe) stripe = Stripe(STRIPE_PK);
+
+  const billing = buildStripeBillingDetails();
+  const returnUrl = `${window.location.origin}/success.html`;
+  const confirmParams = {
+    return_url: returnUrl,
+  };
+
+  let result;
+  if (method === 'ideal') {
+    result = await stripe.confirmIdealPayment(clientSecret, {
+      payment_method: {
+        ideal: {},
+        billing_details: billing,
+      },
+      ...confirmParams,
+    });
+  } else if (method === 'klarna') {
+    result = await stripe.confirmKlarnaPayment(clientSecret, {
+      payment_method: {
+        billing_details: billing,
+      },
+      ...confirmParams,
+    });
+  } else if (method === 'bancontact') {
+    result = await stripe.confirmBancontactPayment(clientSecret, {
+      payment_method: {
+        billing_details: billing,
+      },
+      ...confirmParams,
+    });
+  } else {
+    throw new Error('Onbekende betaalmethode');
+  }
+
+  if (result.error) {
+    throw new Error(result.error.message || 'Betaling mislukt');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -475,7 +620,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     showMessage('select-message', null);
 
     try {
-      await createCheckoutSession(email, 'all');
+      const method = getSelectedPaymentMethod();
+      selectedMethod = method;
+      if (usesDirectRedirect(method)) {
+        await payDirectRedirect(email, method);
+      } else if (usesCheckoutSession(method)) {
+        await createCheckoutSession(email, method);
+      } else {
+        await createCheckoutSession(email, method || 'all');
+      }
     } catch (err) {
       showMessage('select-message', err.message);
       const label = document.getElementById('continue-text');
@@ -486,6 +639,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       setContinueLoading(false);
     }
   });
+
+  document.querySelectorAll('input[name="payment-method"]').forEach((input) => {
+    input.addEventListener('change', () => {
+      selectMethod(input.value);
+      document.querySelectorAll('.dtc-pm-card').forEach((card) => {
+        card.classList.toggle('is-selected', card.querySelector('input')?.checked);
+      });
+    });
+  });
+
+  const initialMethod = getSelectedPaymentMethod();
+  if (initialMethod) {
+    selectedMethod = initialMethod;
+    selectMethod(initialMethod);
+  }
 });
 
 function selectMethod(method) {
@@ -557,12 +725,16 @@ async function createPaymentIntent(email, method, options = {}) {
     destroyStripeElements();
   }
 
+  const { quantity, cartItems } = getCartPayload();
   const { res, data } = await Api.apiFetch('/api/create-payment', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       email,
       paymentMethod: method,
+      quantity,
+      items: cartItems,
+      productSlug: getProductSlug(),
       analytics: getCheckoutAnalytics(),
       meta: getMetaCookies(),
       shipping: shippingInfo,
@@ -785,7 +957,7 @@ function is1970camCheckout() {
 }
 
 function dtcPrimaryColor() {
-  return is1970camCheckout() ? '#2A2622' : '#172b4d';
+  return is1970camCheckout() ? '#2A2622' : '#0070e7';
 }
 
 function getStripeAppearance() {

@@ -296,6 +296,61 @@
 
 .dtc-pay-summary__row--total span:last-child { color: var(--dtc-navy); }
 
+.dtc-pm-pick {
+  margin: 16px 0 4px;
+}
+.dtc-pm-pick__label {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #444;
+}
+.dtc-pm-pick__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.dtc-pm-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 10px;
+  border: 2px solid #e7e5e4;
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  min-width: 0;
+}
+.dtc-pm-card input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.dtc-pm-card img {
+  width: 100%;
+  max-width: 120px;
+  height: 64px;
+  object-fit: contain;
+  display: block;
+}
+.dtc-pm-card__name {
+  font-size: 13px;
+  font-weight: 700;
+}
+.dtc-pm-card:hover {
+  border-color: #a8a29e;
+}
+.dtc-pm-card.is-selected,
+.dtc-pm-card:has(input:checked) {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
 .dtc-pay .btn-checkout {
   margin-top: 16px;
   display: flex;

@@ -31,16 +31,16 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
         </button>
         <nav class="shop-nav-desktop" aria-label="Hoofdmenu">
-          <a href="/checkout">Shop all</a>
-          <a href="/missie">Why 1970cam</a>
-          <a href="/about">About</a>
+          <a href="/checkout">Shop</a>
+          <a href="/missie">Waarom 1970cam</a>
+          <a href="/about">Over ons</a>
           <a href="#faq">FAQ</a>
         </nav>
       </div>
       <a href="/" class="shop-logo">1970cam</a>
       <div class="shop-header__right">
         <nav class="shop-nav-desktop shop-nav-desktop--right">
-          <a href="/feed">Discover</a>
+          <a href="/feed">Ontdekken</a>
           <a href="mailto:support@1970cam.nl">Support</a>
         </nav>
         <button type="button" class="shop-icon-btn" id="shop-cart-open" aria-label="Winkelwagen">
@@ -53,11 +53,11 @@
 
   <div class="shop-mobile-nav" id="shop-mobile-nav">
     <button type="button" class="shop-icon-btn" id="shop-mobile-nav-close" aria-label="Sluiten">×</button>
-    <a href="/checkout">Shop all</a>
-    <a href="/missie">Why 1970cam</a>
-    <a href="/about">About</a>
+    <a href="/checkout">Shop</a>
+    <a href="/missie">Waarom 1970cam</a>
+    <a href="/about">Over ons</a>
     <a href="#faq">FAQ</a>
-    <a href="/feed">Discover</a>
+    <a href="/feed">Ontdekken</a>
     <a href="mailto:support@1970cam.nl">Support</a>
   </div>
 
@@ -68,7 +68,7 @@
         <div class="shop-gallery__stage">
           <div class="shop-gallery__badges">
             <span class="shop-pill shop-pill--dark">Probeer 60 dagen gratis</span>
-            <span class="shop-pill shop-pill--accent">Bestseller</span>
+            <span class="shop-pill shop-pill--accent">Meest verkocht</span>
           </div>
           <img id="shop-main-image" src="/assets/product/1970cam-front.png" alt="1970cam" width="1024" height="1024">
           <button type="button" class="shop-gallery__nav" id="shop-gallery-prev" aria-label="Vorige">‹</button>
@@ -76,7 +76,7 @@
           <button type="button" class="shop-gallery__zoom" id="shop-gallery-zoom" aria-label="Vergroot">+</button>
         </div>
         <div class="shop-thumbs" id="shop-thumbs"></div>
-        <p class="shop-gallery__note">Een deel van elke bestelling gaat naar nieuwe 1970cam-features voor de community.</p>
+        <p class="shop-gallery__note">Een deel van elke bestelling gaat naar nieuwe 1970cam-functies voor de community.</p>
       </section>
 
       <!-- RIGHT: buy column -->
@@ -85,7 +85,7 @@
         <h1 class="shop-buybox__title">1970cam</h1>
         <div class="shop-rating">
           <span class="shop-stars" aria-hidden="true">★★★★★</span>
-          <a href="#reviews">683 Reviews</a>
+          <a href="#written-reviews">683 reviews</a>
         </div>
 
         <ul class="shop-usps">
@@ -95,47 +95,62 @@
         </ul>
 
         <div class="shop-variant">
-          <p class="shop-label">Look: <strong id="shop-finish-label">Classic Black</strong></p>
+          <p class="shop-label">Uitvoering: <strong id="shop-finish-label">Klassiek zwart</strong></p>
           <div class="shop-swatches" role="list">
-            <button type="button" class="shop-swatch is-selected" data-finish="Classic Black" aria-label="Classic Black" style="background:#1a1a1a"></button>
-            <button type="button" class="shop-swatch" data-finish="Film Silver" aria-label="Film Silver" style="background:#c5c5c5"></button>
-            <button type="button" class="shop-swatch" data-finish="Party Red" aria-label="Party Red" style="background:#c45c4a"></button>
+            <button type="button" class="shop-swatch is-selected" data-finish="Klassiek zwart" aria-label="Klassiek zwart" style="background:#1a1a1a"></button>
+            <button type="button" class="shop-swatch" data-finish="Film zilver" aria-label="Film zilver" style="background:#c5c5c5"></button>
+            <button type="button" class="shop-swatch" data-finish="Feest rood" aria-label="Feest rood" style="background:#c45c4a"></button>
           </div>
         </div>
 
         <p class="shop-ship"><span class="shop-ship__icon" aria-hidden="true">🚚</span> Bestel vandaag, ontvang binnen 2–5 werkdagen</p>
 
-        <div class="shop-offer-grid">
-          <button type="button" class="shop-offer is-selected" data-offer="single">
-            <div>
-              <div class="shop-offer__title">1 Set</div>
-            </div>
-            <div class="shop-offer__price">
-              <span class="shop-offer__now">€ 69,99</span>
-              <span class="shop-offer__per">Per set</span>
-            </div>
-          </button>
-          <button type="button" class="shop-offer" data-offer="duo">
-            <span class="shop-offer__badge">Most popular</span>
-            <div>
-              <div class="shop-offer__title">Koop 2, deel er één</div>
-              <div class="shop-offer__meta">
-                <span class="shop-tag">Je bespaart 14%</span>
-                <span class="shop-tag">Free gift vibe</span>
-                <span class="shop-tag">Gratis verzending</span>
-              </div>
-            </div>
-            <div class="shop-offer__price">
-              <span class="shop-offer__was">€ 139,98</span>
-              <span class="shop-offer__now">€ 119,99</span>
-              <span class="shop-offer__per">€ 60,00 / set</span>
-            </div>
-          </button>
+        <div class="shop-set" aria-label="1 Set">
+          <div class="shop-set__info">
+            <div class="shop-set__title">1 Set</div>
+            <div class="shop-set__meta">1970cam - USB-C oplader - Polsband</div>
+          </div>
+          <div class="shop-set__price">
+            <span class="shop-set__was">€ 99,99</span>
+            <span class="shop-set__now">€ 69,99</span>
+          </div>
         </div>
 
-        <div class="shop-freebar">
-          <span>+ FREE polsband &amp; QR-setupkaart</span>
-          <span>€ 0,00</span>
+        <div class="shop-extras">
+          <h3>Extra's</h3>
+          <p>Print je 1970cam-foto’s direct vanaf je telefoon.</p>
+          <div class="shop-addon">
+            <img src="/assets/product/printer/printer-front.png" alt="Portable Printer" width="112" height="112" loading="lazy">
+            <div class="shop-addon__info">
+              <strong>Portable Printer</strong>
+              <div class="shop-addon__price">
+                <s>€ 69,99</s>
+                <b>€ 49,99</b>
+                <span class="shop-tag">29% korting</span>
+              </div>
+            </div>
+            <button type="button" class="shop-addon__btn" id="shop-add-printer">Toevoegen</button>
+          </div>
+          <details class="shop-extras__more">
+            <summary>Meer info +</summary>
+            <div class="shop-extras__body">
+              <img
+                class="shop-extras__how"
+                src="/assets/product/printer/printer-how.png"
+                alt="Camera → app → portable printer"
+                width="1024"
+                height="1024"
+                loading="lazy"
+              >
+              <ol class="shop-extras__steps">
+                <li><strong>Schiet</strong> met je 1970cam</li>
+                <li><strong>Bekijk</strong> je foto’s direct in de app</li>
+                <li><strong>Print</strong> vanuit de app op de Portable Printer</li>
+              </ol>
+              <p>Geen kabel, geen lab — gewoon draadloos printen vanaf je telefoon.</p>
+              <p><strong>Inclusief:</strong> 10 rollen printpapier (ong. 100 foto’s).</p>
+            </div>
+          </details>
         </div>
 
         <p class="shop-stock">Op voorraad — klaar om te verzenden</p>
@@ -168,7 +183,7 @@
                 <li><strong>Inhoud:</strong> 1970cam camera, USB-kabel, polsband, QR-setupkaart</li>
                 <li><strong>Setup:</strong> Koppelen in ±1 minuut via de app</li>
                 <li><strong>Capaciteit:</strong> Tot 1.000 foto’s op één lading</li>
-                <li><strong>Look:</strong> Warme filmkorrel + imperfecte 1970-kleuren, out of camera</li>
+                <li><strong>Look:</strong> Warme filmkorrel + imperfecte 1970-kleuren, direct uit de camera</li>
                 <li><strong>Scherm:</strong> Geen — richten, klikken, in het moment blijven</li>
                 <li><strong>Garantie:</strong> 1 jaar + 60 dagen geld-terug</li>
                 <li><strong>Levering:</strong> Opgeladen geleverd, klaar om te klikken</li>
@@ -208,85 +223,16 @@
               <span class="shop-acc__chev" aria-hidden="true"></span>
             </summary>
             <div class="shop-acc__body shop-acc__body--payments">
-              <img
-                class="shop-pay-methods"
-                src="/assets/payment-methods.png"
-                alt="iDEAL, Visa, Mastercard, American Express, Klarna, Apple Pay, Bancontact, Google Pay"
-                width="612"
-                height="408"
-                loading="lazy"
-                decoding="async"
-              >
+              <div class="shop-pay-logos" aria-label="Beschikbare betaalmethoden">
+                <img src="/assets/payment/ideal-wero.png" alt="iDEAL" width="120" height="120" loading="lazy">
+                <img src="/assets/payment/klarna.png" alt="Klarna" width="160" height="80" loading="lazy">
+              </div>
             </div>
           </details>
-        </div>
-
-        <!-- Exclusive offers (Hears-style add-ons) -->
-        <div class="shop-exclusive">
-          <h3>Exclusive offers</h3>
-          <p>Combineer essentials met je 1970cam en krijg extra voordeel.</p>
-          <div class="shop-addon">
-            <img src="/assets/product/1970cam-contents.png" alt="">
-            <div class="shop-addon__info">
-              <strong>Extra polsband</strong>
-              <div class="shop-addon__price"><s>€ 12,95</s> <b>€ 0,00</b> <span class="shop-tag">Inbegrepen</span></div>
-            </div>
-            <button type="button" class="shop-addon__btn" disabled>In set</button>
-          </div>
-          <div class="shop-addon">
-            <img src="/assets/product/1970cam-setup.png" alt="">
-            <div class="shop-addon__info">
-              <strong>QR setup-kaart</strong>
-              <div class="shop-addon__price"><s>€ 4,00</s> <b>€ 0,00</b> <span class="shop-tag">Gratis</span></div>
-            </div>
-            <button type="button" class="shop-addon__btn" disabled>In set</button>
-          </div>
-        </div>
-
-        <!-- Loved by -->
-        <div class="shop-loved" id="reviews">
-          <h3>Loved by 683+ happy customers.</h3>
-          <div class="shop-loved__row" id="shop-loved-row"></div>
-        </div>
-
-        <!-- Hears-style compact add-ons -->
-        <div class="shop-bundles">
-          <div class="shop-bundles__head">
-            <h3>Bundle and save more!</h3>
-          </div>
-          <div class="shop-bundles__row">
-            <article class="shop-bundle-card">
-              <button type="button" class="shop-bundle-card__hit" id="shop-add-printer" aria-label="Portable Printer toevoegen">
-                <img src="/assets/product/printer/printer-front.png" alt="1970cam Portable Printer" width="512" height="512" loading="lazy">
-                <h4>Portable Printer</h4>
-                <p><s>€ 69,99</s> <strong>€ 49,99</strong> <span class="shop-tag">29% OFF</span></p>
-              </button>
-            </article>
-            <article class="shop-bundle-card">
-              <button type="button" class="shop-bundle-card__hit" data-offer="duo" aria-label="Duo Set toevoegen">
-                <img src="/assets/product/1970cam-contents.png" alt="2× 1970cam Duo Set" width="512" height="512" loading="lazy">
-                <h4>The Duo Set</h4>
-                <p><s>€ 139,98</s> <strong>€ 119,99</strong> <span class="shop-tag">14% OFF</span></p>
-              </button>
-            </article>
-          </div>
-          <div class="shop-bundles__donate">
-            <span class="shop-bundles__donate-icon" aria-hidden="true">♡</span>
-            <p>Een deel van elke bestelling gaat naar nieuwe 1970cam-features voor de community.</p>
-          </div>
         </div>
       </section>
     </div>
   </main>
-
-  <!-- Join the revolution / UGC -->
-  <section class="shop-band shop-revolution">
-    <div class="shop-band__inner">
-      <h2>Join the 1970cam revolution</h2>
-      <p class="shop-section__lead">Hoor van mensen overal hoe 1970cam hun avondjes veranderde.</p>
-      <div class="shop-ugc" id="shop-ugc"></div>
-    </div>
-  </section>
 
   <!-- Feature block -->
   <section class="shop-band shop-features">
@@ -295,7 +241,7 @@
         <img src="/assets/product/1970cam-phone-gallery.png" alt="1970cam foto's op telefoon" loading="lazy">
       </div>
       <div class="shop-features__copy">
-        <h2>Shoot clearly. Stay present.</h2>
+        <h2>Scherp schieten. In het moment blijven.</h2>
         <p>
           Geen scherm dat je uit het moment trekt. Geen filter die alles kapot “perfect” maakt.
           Alleen richten, klikken, en later alles terugzien — direct op je telefoon.
@@ -312,7 +258,7 @@
             <span class="shop-feature-list__icon" aria-hidden="true">◐</span>
             <div>
               <strong>Echte film-look</strong>
-              <p>Korrel, warmte en datumstempel — out of camera.</p>
+              <p>Korrel, warmte en datumstempel — direct uit de camera.</p>
             </div>
           </li>
           <li>
@@ -330,12 +276,12 @@
   <!-- Use cases -->
   <section class="shop-band">
     <div class="shop-band__inner">
-      <h2>One camera. Endless use cases.</h2>
+      <h2>Eén camera. Oneindig veel momenten.</h2>
       <div class="shop-usecases shop-usecases--scroll">
         <article class="shop-usecase">
           <img src="/assets/gallery/huisfeest.png" alt="Huisfeest" loading="lazy">
           <div class="shop-usecase__body">
-            <h3>Music &amp; huisfeesten</h3>
+            <h3>Muziek &amp; huisfeesten</h3>
             <div class="shop-usecase__stat">
               <strong>94%</strong>
               <span>zegt dat de foto’s écht voelen zoals die avond was — korrelig, warm, ongefilterd.</span>
@@ -355,7 +301,7 @@
         <article class="shop-usecase">
           <img src="/assets/gallery/terras.png" alt="Terras" loading="lazy">
           <div class="shop-usecase__body">
-            <h3>Everyday nights out</h3>
+            <h3>Avondjes weg</h3>
             <div class="shop-usecase__stat">
               <strong>89%</strong>
               <span>deelt liever vanuit de 1970cam-app dan vanaf de telefooncamera.</span>
@@ -379,13 +325,13 @@
   <!-- Comparison -->
   <section class="shop-band shop-compare-band">
     <div class="shop-band__inner">
-      <h2 class="shop-compare-title">Why 1970cam is the <em>perfect choice.</em></h2>
+      <h2 class="shop-compare-title">Waarom 1970cam de <em>perfecte keuze</em> is.</h2>
       <p class="shop-section__lead shop-center">De camera die voelt als vroeger — maar werkt als nu.</p>
       <div class="shop-compare">
         <table>
           <thead>
             <tr>
-              <th>Features</th>
+              <th>Kenmerken</th>
               <th class="shop-compare__ours">1970cam</th>
               <th>Wegwerp</th>
               <th>Telefoon</th>
@@ -434,7 +380,7 @@
         </details>
         <details>
           <summary>Heb ik nog een rolletje of ontwikkelen nodig?</summary>
-          <p>Nee. Geen rolletje, geen lab, geen wachten. Schieten en klaar — met die echte film-look out of camera.</p>
+          <p>Nee. Geen rolletje, geen lab, geen wachten. Schieten en klaar — met die echte film-look direct uit de camera.</p>
         </details>
         <details>
           <summary>Is 1970cam geschikt voor festivals, feestjes en avondjes weg?</summary>
@@ -451,7 +397,7 @@
   <!-- Join the fam — Instagram-style feed -->
   <section class="shop-band shop-fam">
     <div class="shop-band__inner">
-      <h2>Join the #1970camfam</h2>
+      <h2>Word lid van #1970camfam</h2>
       <div class="shop-fam__feed">
         <figure class="shop-fam__shot"><img src="/assets/gallery/huisfeest.png" alt="@huisfeest" loading="lazy"></figure>
         <figure class="shop-fam__shot"><img src="/assets/gallery/festival.png" alt="@festival" loading="lazy"></figure>
@@ -484,7 +430,7 @@
           <div class="shop-recs__row"><span>1</span><span class="shop-recs__star">★</span><div class="shop-recs__bar"><i style="width:0%"></i></div><span>0</span></div>
         </div>
         <p class="shop-recs__pct">100%</p>
-        <p class="shop-recs__label">would recommend these products</p>
+        <p class="shop-recs__label">zou deze producten aanbevelen</p>
       </div>
 
       <div class="shop-recs__mosaic">
@@ -513,15 +459,15 @@
       <div class="shop-reviewlist__toolbar">
         <p class="shop-reviewlist__count"><strong id="shop-review-count">683</strong> reviews</p>
         <label class="shop-reviewlist__sort">
-          Sort
+          Sorteren
           <select id="shop-review-sort" aria-label="Sorteer reviews">
-            <option value="recent">Most Recent</option>
-            <option value="helpful">Most Helpful</option>
+            <option value="recent">Meest recent</option>
+            <option value="helpful">Meest behulpzaam</option>
           </select>
         </label>
       </div>
       <div class="shop-reviewlist__cards" id="shop-review-cards"></div>
-      <button type="button" class="shop-reviewlist__more" id="shop-review-more">Load more</button>
+      <button type="button" class="shop-reviewlist__more" id="shop-review-more">Meer laden</button>
     </div>
   </section>
 
@@ -547,7 +493,7 @@
   <div class="shop-drawer-backdrop" id="shop-drawer-backdrop"></div>
   <aside class="shop-drawer" id="shop-drawer" aria-label="Winkelwagen">
     <div class="shop-drawer__head">
-      <h2>Your cart</h2>
+      <h2>Jouw winkelwagen</h2>
       <button type="button" class="shop-icon-btn" id="shop-drawer-close" aria-label="Sluiten">×</button>
     </div>
     <div class="shop-drawer__body" id="shop-drawer-body"></div>
