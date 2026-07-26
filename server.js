@@ -562,7 +562,7 @@ app.get('/api/postcode-lookup', async (req, res) => {
 });
 
 app.post('/api/track', async (req, res) => {
-  const { eventType, country, landerSlug, sessionId } = req.body || {};
+  const { eventType, country, landerSlug, sessionId, productSlug } = req.body || {};
   const allowed = ['lander_view', 'checkout_view'];
   if (!allowed.includes(eventType)) {
     return res.status(400).json({ ok: false, error: 'Ongeldig event type' });
@@ -571,9 +571,12 @@ app.post('/api/track', async (req, res) => {
     return res.status(400).json({ ok: false, error: 'sessionId ontbreekt' });
   }
 
+  const allowedProducts = ['1970cam', 'hearing', 'printer'];
+  const product = allowedProducts.includes(productSlug) ? productSlug : '1970cam';
+
   const result = await insertEvent({
     eventType,
-    productSlug: '1970cam',
+    productSlug: product,
     country: country || 'NL',
     landerSlug: landerSlug || 'checkout',
     sessionId,
