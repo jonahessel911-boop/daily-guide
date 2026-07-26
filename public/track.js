@@ -24,18 +24,21 @@
   function readFromDom() {
     const el = document.body;
     return {
-      product: el.dataset.trackProduct || DEFAULT_PRODUCT,
-      country: (el.dataset.trackCountry || 'nl').toLowerCase(),
+      // null when unset — don't force 1970cam over a stored hearing attribution
+      product: el.dataset.trackProduct || null,
+      country: (el.dataset.trackCountry || '').toLowerCase() || null,
       lander: el.dataset.trackLander || null,
     };
   }
 
   function readFromUrl() {
     const p = new URLSearchParams(window.location.search);
+    const lander = p.get('l');
     return {
       product: p.get('p'),
       country: p.get('c'),
-      lander: p.get('l'),
+      // Ignore malformed l= values (e.g. accidental query leftovers)
+      lander: lander && !lander.includes('?') && !lander.includes('test_event') ? lander : null,
     };
   }
 
@@ -44,10 +47,11 @@
     const dom = readFromDom();
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
 
+    // Prefer current page (DOM) over stale localStorage from another product funnel
     const merged = {
-      product: url.product || stored.product || dom.product || DEFAULT_PRODUCT,
-      country: (url.country || stored.country || dom.country || 'nl').toLowerCase(),
-      lander: url.lander || stored.lander || dom.lander || null,
+      product: url.product || dom.product || stored.product || DEFAULT_PRODUCT,
+      country: (url.country || dom.country || stored.country || 'nl').toLowerCase(),
+      lander: url.lander || dom.lander || stored.lander || null,
     };
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
