@@ -114,3 +114,112 @@ body {
   border-top: 1px solid var(--legal-border);
   padding-top: 20px;
 }
+
+/* Pay page contact footer (two-column) */
+.dtc-pay-contact {
+  background: #fff;
+  border-top: 1px solid var(--legal-border);
+  margin-top: 40px;
+  padding: 40px 16px 48px;
+  color: #1a1a1a;
+}
+
+.dtc-pay-contact__inner {
+  max-width: 920px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 36px;
+}
+
+@media (min-width: 720px) {
+  .dtc-pay-contact__inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 48px 64px;
+  }
+}
+
+.dtc-pay-contact__title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 18px;
+  color: #111;
+}
+
+.dtc-pay-contact__address {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #222;
+}
+
+.dtc-pay-contact__pin {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  color: #e11d48;
+}
+
+.dtc-pay-contact__line {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #222;
+}
+
+.dtc-pay-contact__line a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.dtc-pay-contact__line a:hover {
+  text-decoration: underline;
+}
+
+.dtc-pay-contact__hours {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #333;
+}
+
+.dtc-pay-contact__clock {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  color: #9ca3af;
+}
+
+.dtc-pay-contact__promise {
+  margin: 20px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #111;
+}
+
+.dtc-pay-contact__links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dtc-pay-contact__links a {
+  font-size: 14px;
+  color: #222;
+  text-decoration: none;
+  line-height: 1.4;
+}
+
+.dtc-pay-contact__links a:hover {
+  text-decoration: underline;
+}
+
