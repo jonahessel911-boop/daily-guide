@@ -52,31 +52,10 @@ function rangeToDates(value) {
 function getStatsQuery() {
   const range = document.getElementById('filter-range').value;
   const { from } = rangeToDates(range);
-  const product = document.getElementById('filter-product').value;
-
   const params = new URLSearchParams();
   if (from) params.set('from', from);
-  if (product && product !== 'all') params.set('product', product);
-
   const qs = params.toString();
   return qs ? `?${qs}` : '';
-}
-
-function syncProductOptions(products, selected) {
-  const select = document.getElementById('filter-product');
-  const options = ['<option value="all">Alle producten</option>'].concat(
-    (products || []).map((p) => `<option value="${p.slug}">${p.name}</option>`)
-  );
-  const markup = options.join('');
-  if (select.innerHTML === markup) return;
-  select.innerHTML = markup;
-  select.value = selected || 'all';
-}
-
-function pageLabel(landerSlug) {
-  if (landerSlug === 'checkout') return 'Checkout (ads)';
-  if (landerSlug === 'pay') return 'Pay';
-  return landerSlug || '—';
 }
 
 async function loadStats() {
@@ -87,37 +66,28 @@ async function loadStats() {
 
     if (!data.ok) {
       document.getElementById('stats-body').innerHTML =
-        `<tr><td colspan="9" class="empty">${data.error || 'Fout bij laden'}</td></tr>`;
+        `<tr><td colspan="4" class="empty">${data.error || 'Fout bij laden'}</td></tr>`;
       return;
     }
 
-    syncProductOptions(data.products, data.product);
-
     const t = data.totals;
-    document.getElementById('kpi-views').textContent = t.lander_views;
-    document.getElementById('kpi-checkout').textContent = t.checkout_views;
-    document.getElementById('kpi-ctr').textContent = t.ctr;
+    document.getElementById('kpi-views').textContent = t.views ?? t.lander_views;
     document.getElementById('kpi-sales').textContent = t.purchases;
+    document.getElementById('kpi-cr').textContent = t.conversion_rate || t.cr;
     document.getElementById('kpi-revenue').textContent = `€${t.revenue}`;
-    document.getElementById('kpi-cr').textContent = t.cr;
 
     const tbody = document.getElementById('stats-body');
     if (!data.rows.length) {
       tbody.innerHTML =
-        '<tr><td colspan="9" class="empty">Nog geen data — bezoek /checkout of /pay om te starten.</td></tr>';
+        '<tr><td colspan="4" class="empty">Nog geen data.</td></tr>';
     } else {
       tbody.innerHTML = data.rows
         .map(
           (r) => `<tr>
-          <td><strong>${pageLabel(r.lander_slug)}</strong><br><span class="muted" style="font-size:12px;">${r.product_slug}</span></td>
-          <td>${r.country}</td>
-          <td>${r.lander_views}</td>
-          <td>${r.checkout_views}</td>
-          <td>${r.ctr_lander_to_checkout}</td>
-          <td>${r.purchases}</td>
+          <td><strong>${r.product_name || r.product_slug}</strong></td>
+          <td>${r.views}</td>
+          <td>${r.conversion_rate}</td>
           <td>€${r.revenue}</td>
-          <td>${r.cr_lander_to_sale}</td>
-          <td>${r.cr_checkout_to_sale}</td>
         </tr>`
         )
         .join('');
@@ -125,7 +95,7 @@ async function loadStats() {
   } catch (err) {
     if (err.message !== 'Sessie verlopen') {
       document.getElementById('stats-body').innerHTML =
-        `<tr><td colspan="9" class="empty">${err.message}</td></tr>`;
+        `<tr><td colspan="4" class="empty">${err.message}</td></tr>`;
     }
   }
 }
@@ -134,9 +104,6 @@ document.getElementById('btn-refresh').addEventListener('click', () => {
   loadStats();
 });
 document.getElementById('filter-range').addEventListener('change', () => {
-  loadStats();
-});
-document.getElementById('filter-product').addEventListener('change', () => {
   loadStats();
 });
 document.getElementById('btn-logout').addEventListener('click', () => {
@@ -170,11 +137,11 @@ document.getElementById('btn-test-purchase').addEventListener('click', async () 
     else if (data.capi?.skipped) parts.push('Server: overgeslagen (geen Meta token)');
 
     resultEl.textContent = `${parts.join(' · ') || data.message} — event_id: ${data.eventId}`;
-    resultEl.className = `meta-test-result ${browserFired || data.ok ? 'ok' : 'err'}`;
+    resultEl.className = `meta-test-result ${data.ok ? 'ok' : 'err'}`;
     resultEl.hidden = false;
   } catch (err) {
-    resultEl.textContent = (browserFired ? 'Browser Purchase verstuurd. ' : '') + (err.message || 'CAPI mislukt');
-    resultEl.className = `meta-test-result ${browserFired ? 'ok' : 'err'}`;
+    resultEl.textContent = err.message || 'CAPI mislukt';
+    resultEl.className = 'meta-test-result err';
     resultEl.hidden = false;
   } finally {
     btn.disabled = false;

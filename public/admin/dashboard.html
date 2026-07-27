@@ -18,12 +18,9 @@
     <header class="dash-header">
       <div>
         <h1>Funnel analytics</h1>
-        <p class="muted">Lander → Pay → Sales · 1970cam &amp; HearDirect</p>
+        <p class="muted">Per product · views → conversie · omzet</p>
       </div>
       <div class="dash-actions">
-        <select id="filter-product">
-          <option value="all">Alle producten</option>
-        </select>
         <select id="filter-range">
           <option value="7">Laatste 7 dagen</option>
           <option value="30" selected>Laatste 30 dagen</option>
@@ -37,59 +34,46 @@
 
     <section class="kpi-grid" id="kpi-grid">
       <div class="kpi-card">
-        <span class="kpi-label">Checkout views</span>
+        <span class="kpi-label">Views</span>
         <span class="kpi-value" id="kpi-views">—</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-label">Pay views</span>
-        <span class="kpi-value" id="kpi-checkout">—</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-label">CTR → pay</span>
-        <span class="kpi-value" id="kpi-ctr">—</span>
       </div>
       <div class="kpi-card">
         <span class="kpi-label">Sales</span>
         <span class="kpi-value" id="kpi-sales">—</span>
       </div>
       <div class="kpi-card">
-        <span class="kpi-label">Omzet</span>
-        <span class="kpi-value" id="kpi-revenue">—</span>
+        <span class="kpi-label">Conversie %</span>
+        <span class="kpi-value" id="kpi-cr">—</span>
       </div>
       <div class="kpi-card">
-        <span class="kpi-label">CR (checkout → sale)</span>
-        <span class="kpi-value" id="kpi-cr">—</span>
+        <span class="kpi-label">Omzet</span>
+        <span class="kpi-value" id="kpi-revenue">—</span>
       </div>
     </section>
 
     <section class="panel">
-      <h2>Per pagina</h2>
+      <h2>Omzet per product</h2>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Pagina</th>
-              <th>Land</th>
-              <th>Checkout</th>
-              <th>Pay</th>
-              <th>CTR</th>
-              <th>Sales</th>
+              <th>Product</th>
+              <th>Views</th>
+              <th>Conversie %</th>
               <th>Omzet</th>
-              <th>CR</th>
-              <th>Pay CR</th>
             </tr>
           </thead>
           <tbody id="stats-body">
-            <tr><td colspan="9" class="empty">Laden…</td></tr>
+            <tr><td colspan="4" class="empty">Laden…</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="hint">Checkout = lander vanuit ads (<code>/checkout</code>). Pay = betaalpagina (<code>/pay</code>).</p>
+      <p class="hint">Views = lander/checkout views. Conversie % = sales ÷ views.</p>
     </section>
 
     <section class="panel">
       <h2>Meta conversies</h2>
-      <p class="hint" style="margin-top:0;margin-bottom:12px;">Test Purchase via browser pixel + server CAPI. Open Events Manager → Test Events en plak je testcode hieronder.</p>
+      <p class="hint" style="margin-top:0;margin-bottom:12px;">Test Purchase via server CAPI. Open Events Manager → Test Events en plak je testcode hieronder.</p>
       <label class="meta-test-label" for="meta-test-code">Test event code</label>
       <input type="text" id="meta-test-code" class="meta-test-input" placeholder="bijv. TEST37197" autocomplete="off">
       <button type="button" id="btn-test-purchase" class="btn-test">Send test purchase</button>
