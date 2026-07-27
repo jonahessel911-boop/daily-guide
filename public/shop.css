@@ -15,6 +15,94 @@
   --shop-font: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+/* Portable Printer — HearDirect brand blues */
+body.shop-page[data-shop-sku="printer"] {
+  --shop-accent: #0070e7;
+  --shop-accent-deep: #005bbd;
+  --shop-muted: #ffffff;
+  --shop-bg: #ffffff;
+  background: #fff;
+}
+body.shop-page[data-shop-sku="printer"] .shop-promo {
+  background: linear-gradient(90deg, #3d8ff0, #0070e7 55%, #005bbd);
+}
+body.shop-page[data-shop-sku="printer"] .shop-pill--accent {
+  color: #fff;
+}
+body.shop-page[data-shop-sku="printer"] .shop-tag {
+  background: #e8f2fe;
+  color: var(--shop-accent-deep);
+}
+body.shop-page[data-shop-sku="printer"] .shop-compare th.shop-compare__ours,
+body.shop-page[data-shop-sku="printer"] .shop-compare td.shop-compare__ours {
+  color: #fff;
+}
+body.shop-page[data-shop-sku="printer"] .shop-thumbs button.is-active {
+  border-color: var(--shop-accent-deep);
+}
+body.shop-page[data-shop-sku="printer"] .shop-atc {
+  background: var(--shop-accent);
+}
+body.shop-page[data-shop-sku="printer"] .shop-atc:hover {
+  background: var(--shop-accent-deep);
+}
+body.shop-page[data-shop-sku="printer"] .shop-gallery__stage,
+body.shop-page[data-shop-sku="printer"] .shop-thumbs button,
+body.shop-page[data-shop-sku="printer"] .shop-cart-item img,
+body.shop-page[data-shop-sku="printer"] .shop-cross-sell__row img,
+body.shop-page[data-shop-sku="printer"] .shop-rcard__photo {
+  background: #fff;
+}
+body.shop-page[data-shop-sku="printer"] .shop-faq__card {
+  background: #fff;
+  border: 1px solid var(--shop-line);
+}
+body.shop-page[data-shop-sku="printer"] .shop-drawer,
+body.shop-page[data-shop-sku="printer"] .shop-drawer__body,
+body.shop-page[data-shop-sku="printer"] .shop-drawer__foot {
+  background: #fff;
+}
+body.shop-page[data-shop-sku="printer"] .shop-extras,
+body.shop-page[data-shop-sku="printer"] .shop-set,
+body.shop-page[data-shop-sku="printer"] .shop-compare td:first-child,
+body.shop-page[data-shop-sku="printer"] .shop-compare th:first-child {
+  background: #fff;
+}
+body.shop-page[data-shop-sku="printer"] .shop-trust-marquee,
+body.shop-page[data-shop-sku="printer"] .shop-cross-sell__row,
+body.shop-page[data-shop-sku="printer"] .shop-recs,
+body.shop-page[data-shop-sku="printer"] .shop-reviewlist,
+body.shop-page[data-shop-sku="printer"] .shop-sticky-atc {
+  background: #fff;
+}
+body.shop-page[data-shop-sku="printer"] .shop-drawer__checkout {
+  background: var(--shop-accent);
+}
+body.shop-page[data-shop-sku="printer"] .shop-drawer__checkout:hover {
+  background: var(--shop-accent-deep);
+}
+body.shop-page[data-shop-sku="printer"] .shop-cart-badge {
+  background: var(--shop-accent);
+  color: #fff;
+}
+body.shop-page[data-shop-sku="printer"] .shop-qty {
+  border-color: var(--shop-accent);
+  background: #fff;
+}
+body.shop-page[data-shop-sku="printer"] .shop-qty button {
+  background: #fff;
+  color: var(--shop-accent-deep);
+}
+body.shop-page[data-shop-sku="printer"] .shop-cart-item__note {
+  color: var(--shop-accent-deep);
+}
+body.shop-page[data-shop-sku="printer"] .shop-drawer__head {
+  border-bottom-color: #e8f2fe;
+}
+body.shop-page[data-shop-sku="printer"] .shop-drawer__foot {
+  border-top-color: #e8f2fe;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html {
   -webkit-text-size-adjust: 100%;
@@ -71,6 +159,12 @@ ul { list-style: none; }
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 12px;
+}
+
+.shop-header--minimal .shop-header__inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .shop-header__left,
@@ -862,19 +956,59 @@ ul { list-style: none; }
   overflow: hidden;
   min-height: 280px;
 }
-
-@media (max-width: 899px) {
-  .shop-features__media {
-    max-width: 260px;
-    margin-inline: auto;
-    min-height: 0;
-    aspect-ratio: 1;
-  }
-}
 .shop-features__media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+.shop-features__grid--flow {
+  grid-template-columns: 1fr;
+}
+.shop-features__headline {
+  font-size: clamp(26px, 5.5vw, 40px);
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  text-align: center;
+  margin: 0 0 8px;
+  max-width: 22ch;
+  margin-inline: auto;
+}
+.shop-features__subhead {
+  font-size: clamp(20px, 3.5vw, 28px);
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+@media (min-width: 900px) {
+  .shop-features__grid--flow {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
+.shop-features__media--flow {
+  min-height: 0;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 8px 4px;
+  overflow: hidden;
+  max-width: 560px;
+  margin-inline: auto;
+  width: 100%;
+}
+.shop-features__media--flow img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 819 / 1024;
+  object-fit: contain;
+  display: block;
+}
+@media (min-width: 600px) {
+  .shop-features__media--flow {
+    padding: 12px 8px;
+    max-width: 640px;
+  }
 }
 .shop-feature-list { margin-top: 22px; display: grid; gap: 16px; }
 .shop-feature-list li { display: flex; gap: 12px; }
@@ -926,13 +1060,16 @@ ul { list-style: none; }
 .shop-usecase__stat strong { font-size: 28px; line-height: 1; }
 
 .shop-compare-band { background: #fff; }
-.shop-compare-title { text-align: center; }
+.shop-compare-title {
+  text-align: center;
+  font-size: clamp(28px, 5vw, 40px);
+}
 .shop-compare-title em {
   font-style: normal;
   color: var(--shop-accent-deep);
 }
 .shop-compare {
-  margin-top: 8px;
+  margin-top: 14px;
   max-width: 100%;
   overflow-x: auto;
   overscroll-behavior-x: contain;
@@ -943,11 +1080,11 @@ ul { list-style: none; }
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed;
-  font-size: 14px;
+  font-size: 16px;
 }
 .shop-compare th,
 .shop-compare td {
-  padding: 14px 12px;
+  padding: 16px 14px;
   text-align: center;
   vertical-align: middle;
 }
@@ -974,36 +1111,36 @@ ul { list-style: none; }
   background: var(--shop-accent-deep);
 }
 .shop-compare thead th:not(:first-child):not(.shop-compare__ours) {
-  font-size: 13px;
+  font-size: 15px;
   color: #555;
   font-weight: 700;
 }
 
 @media (max-width: 640px) {
   .shop-compare table {
-    font-size: 12px;
+    font-size: 14px;
     min-width: 0;
   }
   .shop-compare th,
   .shop-compare td {
-    padding: 10px 4px;
+    padding: 13px 6px;
   }
   .shop-compare th:first-child,
   .shop-compare td:first-child {
     width: 34%;
-    padding: 10px 8px 10px 6px;
-    font-size: 11px;
-    line-height: 1.3;
+    padding: 13px 10px 13px 8px;
+    font-size: 13px;
+    line-height: 1.35;
     letter-spacing: -0.01em;
   }
   .shop-compare thead th:not(:first-child) {
-    font-size: 11px;
-    line-height: 1.2;
-    padding: 10px 2px;
+    font-size: 13px;
+    line-height: 1.25;
+    padding: 12px 4px;
     word-break: break-word;
   }
   .shop-compare td:not(:first-child) {
-    font-size: 14px;
+    font-size: 17px;
   }
 }
 
@@ -1105,6 +1242,20 @@ ul { list-style: none; }
   font-size: clamp(28px, 5vw, 40px);
   letter-spacing: -0.035em;
   margin-bottom: 22px;
+}
+.shop-fam__hero {
+  margin: 0 auto;
+  max-width: 920px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f3f3f3;
+}
+.shop-fam__hero img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
 }
 .shop-fam__feed {
   display: grid;
@@ -1506,6 +1657,12 @@ ul { list-style: none; }
   background: var(--shop-muted);
 }
 .shop-cart-item__title { font-weight: 700; font-size: 14px; }
+.shop-cart-item__note {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--shop-soft);
+  margin: 2px 0 0;
+}
 .shop-cart-item__meta { font-size: 12px; color: var(--shop-soft); margin: 4px 0 8px; }
 .shop-cart-item__row {
   display: flex;

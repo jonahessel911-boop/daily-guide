@@ -20,8 +20,8 @@
     printer: {
       sku: 'printer',
       title: '1970cam Portable Printer',
-      unitPrice: 49.99,
-      was: 69.99,
+      unitPrice: 89.99,
+      was: 119.99,
       image: '/assets/product/printer/printer-front-new.jpg',
     },
   };
@@ -41,8 +41,6 @@
       { src: '/assets/product/printer/printer-kit-new.jpg', alt: 'Portable Printer complete set' },
       { src: '/assets/product/printer/printer-phone-new.jpg', alt: 'Print vanaf je telefoon' },
       { src: '/assets/product/printer/printer-print-new.jpg', alt: 'Foto komt uit de printer' },
-      { src: '/assets/product/printer/printer-how-new.jpg', alt: 'Zo werkt de Portable Printer' },
-      { src: '/assets/product/printer/printer-cafe.jpg', alt: 'Printer op tafel' },
       { src: '/assets/product/printer/printer-wall.jpg', alt: 'Prints aan de muur' },
     ],
   };
@@ -207,7 +205,7 @@
     if (!box) return;
     const all = getSortedReviews();
     if (countEl) {
-      countEl.textContent = PAGE_SKU === 'printer' ? String(all.length || 9) : '683';
+      countEl.textContent = PAGE_SKU === 'printer' ? '382' : '683';
     }
     box.innerHTML = all.slice(0, reviewVisible).map(reviewCardHtml).join('');
     if (moreBtn) moreBtn.hidden = reviewVisible >= all.length;
@@ -357,34 +355,23 @@
       return;
     }
 
-    const hasCamera = items.some((i) => i.sku === '1970cam');
-    let crossSell = '';
-    // Alleen op de printer-PDP camera cross-sellen — geen printer-upsell op 1970cam
-    if (PAGE_SKU === 'printer' && !hasCamera) {
-      crossSell = `
-      <div class="shop-cross-sell">
-        <p class="shop-cross-sell__label">Vaak samen gekozen</p>
-        <div class="shop-cross-sell__row">
-          <img src="${CATALOG['1970cam'].image}" alt="">
-          <div class="shop-cross-sell__info">
-            <strong>1970cam</strong>
-            <span><s>€ 99,99</s> <b>€ 69,99</b></span>
-          </div>
-          <button type="button" class="shop-cross-sell__btn" id="shop-cart-add-camera">+ Toevoegen</button>
-        </div>
-      </div>`;
-    }
+    const crossSell = '';
 
     body.innerHTML =
       items
         .map((i) => {
           const total = lineTotal(i);
           const per = i.sku === '1970cam' ? total / i.qty : i.unitPrice || CATALOG[i.sku]?.unitPrice || 0;
+          const note =
+            i.sku === 'printer'
+              ? `<div class="shop-cart-item__note">Incl. 10 rollen — ongeveer 100 foto’s om te printen</div>`
+              : '';
           return `
       <div class="shop-cart-item" data-sku="${i.sku}">
         <img src="${i.image}" alt="">
         <div>
           <div class="shop-cart-item__title">${i.qty}× ${i.title}</div>
+          ${note}
           <div class="shop-cart-item__meta">${fmt(per)} / stuk</div>
           <div class="shop-cart-item__row">
             <div class="shop-qty">
@@ -401,10 +388,6 @@
 
     if (totalEl) totalEl.textContent = fmt(cartTotal(items));
     if (checkoutBtn) checkoutBtn.disabled = false;
-
-    document.getElementById('shop-cart-add-camera')?.addEventListener('click', () => {
-      addSkuToCart('1970cam', 1);
-    });
   }
 
   function goCheckout() {
@@ -459,7 +442,6 @@
 
     document.getElementById('shop-atc')?.addEventListener('click', addSelectedToCart);
     document.getElementById('shop-atc-sticky')?.addEventListener('click', addSelectedToCart);
-    document.getElementById('shop-add-camera')?.addEventListener('click', () => addSkuToCart('1970cam', 1));
 
     document.getElementById('shop-cart-open')?.addEventListener('click', openDrawer);
     document.getElementById('shop-drawer-close')?.addEventListener('click', closeDrawer);

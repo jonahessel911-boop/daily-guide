@@ -97,7 +97,7 @@ window.HearingDTCConfig = {
 
   orderBump: {
     enabled: false,
-    price: 49.99,
+    price: 89.99,
     badge: 'Vaak samen gekozen',
     title: 'Portable Printer',
     description: 'Print je 1970cam-foto’s direct vanaf je telefoon.',

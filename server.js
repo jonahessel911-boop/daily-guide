@@ -7,6 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { insertEvent, getStats } = require('./lib/analytics');
+const { listOrders, updateOrderDeliveryStatus } = require('./lib/orders');
 const { fulfillPurchase, getSuccessUrl } = require('./lib/fulfill-purchase');
 const { sendPurchaseEvent, sendAddToCartEvent } = require('./lib/meta-capi');
 const {
@@ -36,8 +37,8 @@ const PRODUCTS = {
     slug: 'printer',
     name: '1970cam Portable Printer',
     description: 'Draadloze mini-printer — print je 1970cam-foto’s direct vanaf je telefoon',
-    price: 49.99,
-    originalPrice: 69.99,
+    price: 89.99,
+    originalPrice: 119.99,
     orderPrefix: 'PRINT',
   },
   hearing: {
@@ -648,6 +649,26 @@ app.get('/api/admin/stats', requireAdmin, async (req, res) => {
   const { from, to, product } = req.query;
   const stats = await getStats({ from, to, product });
   res.json(stats);
+});
+
+app.get('/api/admin/orders', requireAdmin, async (req, res) => {
+  const { from, limit } = req.query;
+  const result = await listOrders({
+    from: from || undefined,
+    limit: limit ? Number(limit) : 100,
+    stripe,
+  });
+  res.json(result);
+});
+
+app.patch('/api/admin/orders/:paymentIntentId/delivery', requireAdmin, async (req, res) => {
+  const paymentIntentId = req.params.paymentIntentId;
+  const deliveryStatus = req.body?.delivery_status;
+  const result = await updateOrderDeliveryStatus(paymentIntentId, deliveryStatus);
+  if (!result.ok) {
+    return res.status(result.error === 'Order niet gevonden' ? 404 : 400).json(result);
+  }
+  res.json(result);
 });
 
 app.post('/api/admin/test-purchase', requireAdmin, async (req, res) => {

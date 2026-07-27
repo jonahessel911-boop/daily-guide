@@ -17,8 +17,8 @@
   <div class="dashboard">
     <header class="dash-header">
       <div>
-        <h1>Funnel analytics</h1>
-        <p class="muted">Per product · views → conversie · omzet</p>
+        <h1>Admin</h1>
+        <p class="muted">Analytics · orders · Meta</p>
       </div>
       <div class="dash-actions">
         <select id="filter-range">
@@ -32,53 +32,72 @@
       </div>
     </header>
 
-    <section class="kpi-grid" id="kpi-grid">
-      <div class="kpi-card">
-        <span class="kpi-label">Views</span>
-        <span class="kpi-value" id="kpi-views">—</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-label">Sales</span>
-        <span class="kpi-value" id="kpi-sales">—</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-label">Conversie %</span>
-        <span class="kpi-value" id="kpi-cr">—</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-label">Omzet</span>
-        <span class="kpi-value" id="kpi-revenue">—</span>
-      </div>
-    </section>
+    <nav class="dash-tabs" aria-label="Admin secties">
+      <button type="button" class="dash-tab is-active" data-tab="analytics">Analytics</button>
+      <button type="button" class="dash-tab" data-tab="orders">Orders</button>
+    </nav>
 
-    <section class="panel">
-      <h2>Omzet per product</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Views</th>
-              <th>Conversie %</th>
-              <th>Omzet</th>
-            </tr>
-          </thead>
-          <tbody id="stats-body">
-            <tr><td colspan="4" class="empty">Laden…</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="hint">Views = lander/checkout views. Conversie % = sales ÷ views.</p>
-    </section>
+    <div class="dash-panel is-active" id="tab-analytics" data-panel="analytics">
+      <section class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-label">Views</span>
+          <span class="kpi-value" id="kpi-views">—</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Sales</span>
+          <span class="kpi-value" id="kpi-sales">—</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Conversie %</span>
+          <span class="kpi-value" id="kpi-cr">—</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Omzet</span>
+          <span class="kpi-value" id="kpi-revenue">—</span>
+        </div>
+      </section>
 
-    <section class="panel">
-      <h2>Meta conversies</h2>
-      <p class="hint" style="margin-top:0;margin-bottom:12px;">Test Purchase via server CAPI. Open Events Manager → Test Events en plak je testcode hieronder.</p>
-      <label class="meta-test-label" for="meta-test-code">Test event code</label>
-      <input type="text" id="meta-test-code" class="meta-test-input" placeholder="bijv. TEST37197" autocomplete="off">
-      <button type="button" id="btn-test-purchase" class="btn-test">Send test purchase</button>
-      <p id="meta-test-result" class="meta-test-result" hidden></p>
-    </section>
+      <section class="panel">
+        <h2>Omzet per product</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Views</th>
+                <th>Conversie %</th>
+                <th>Omzet</th>
+              </tr>
+            </thead>
+            <tbody id="stats-body">
+              <tr><td colspan="4" class="empty">Laden…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="hint">Views = lander/checkout views. Conversie % = sales ÷ views.</p>
+      </section>
+
+      <section class="panel">
+        <h2>Meta conversies</h2>
+        <p class="hint" style="margin-top:0;margin-bottom:12px;">Test Purchase via server CAPI. Open Events Manager → Test Events en plak je testcode hieronder.</p>
+        <label class="meta-test-label" for="meta-test-code">Test event code</label>
+        <input type="text" id="meta-test-code" class="meta-test-input" placeholder="bijv. TEST37197" autocomplete="off">
+        <button type="button" id="btn-test-purchase" class="btn-test">Send test purchase</button>
+        <p id="meta-test-result" class="meta-test-result" hidden></p>
+      </section>
+    </div>
+
+    <div class="dash-panel" id="tab-orders" data-panel="orders" hidden>
+      <section class="panel">
+        <div class="orders-toolbar">
+          <h2>Orders</h2>
+          <p class="hint" id="orders-count" style="margin:0">—</p>
+        </div>
+        <div id="orders-list" class="orders-list">
+          <p class="empty">Laden…</p>
+        </div>
+      </section>
+    </div>
   </div>
 
   <script src="dashboard.js"></script>

@@ -3,6 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    (function () {
+      try {
+        var p = new URLSearchParams(location.search).get('p');
+        var cart = JSON.parse(sessionStorage.getItem('cam1970_checkout_cart') || '{}');
+        if (p === 'printer' || cart.productSlug === 'printer') {
+          document.body.setAttribute('data-track-product', 'printer');
+          document.body.setAttribute('data-track-lander', 'portable-printer');
+        }
+      } catch (_) {}
+    })();
+  </script>
   <script src="/meta-pixel.js"></script>
   <title>Afrekenen | 1970cam</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,6 +53,7 @@
               <img class="dtc-offer-card__img" id="dtc-offer-img" src="" alt="">
               <div class="dtc-offer-card__info">
                 <div class="dtc-offer-card__name">1× 1970cam</div>
+                <div class="dtc-offer-card__note" id="dtc-offer-note" hidden></div>
               </div>
               <div class="dtc-offer-card__prices">
                 <span class="dtc-offer-card__was" id="dtc-offer-was">€ 99,99</span>

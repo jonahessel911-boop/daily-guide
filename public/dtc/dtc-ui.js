@@ -1004,9 +1004,9 @@
     const PRINTER = {
       sku: 'printer',
       title: '1970cam Portable Printer',
-      unitPrice: 49.99,
-      was: 69.99,
-      image: '/assets/product/printer/printer-front.png',
+      unitPrice: 89.99,
+      was: 119.99,
+      image: '/assets/product/printer/printer-front-new.jpg',
     };
 
     function readCart() {
@@ -1073,7 +1073,26 @@
       });
     }
 
+    function applyPayBrand() {
+      const { cameras, printers } = cartCounts();
+      const params = new URLSearchParams(window.location.search);
+      const isPrinterPay =
+        (cameras === 0 && printers > 0) ||
+        params.get('p') === 'printer' ||
+        readCart().productSlug === 'printer';
+      if (isPrinterPay) {
+        document.body.setAttribute('data-track-product', 'printer');
+        document.body.setAttribute('data-track-lander', 'portable-printer');
+      } else {
+        document.body.setAttribute('data-track-product', '1970cam');
+        if (!document.body.getAttribute('data-track-lander')) {
+          document.body.setAttribute('data-track-lander', 'checkout');
+        }
+      }
+    }
+
     function refreshPayOffer() {
+      applyPayBrand();
       const p = cfg().product;
       const { cameras, printers } = cartCounts();
 
@@ -1110,6 +1129,17 @@
             : `1× ${brandName()}`;
       const offerNameEl = document.querySelector('.dtc-offer-card__name');
       if (offerNameEl) offerNameEl.textContent = mainLabel;
+
+      const noteEl = document.getElementById('dtc-offer-note');
+      if (noteEl) {
+        if (cameras === 0 && printers > 0) {
+          noteEl.hidden = false;
+          noteEl.textContent = 'Incl. 10 rollen — ongeveer 100 foto’s om te printen';
+        } else {
+          noteEl.hidden = true;
+          noteEl.textContent = '';
+        }
+      }
 
       const summaryParts = [];
       if (cameras > 0) summaryParts.push(`${cameras}× ${brandName()}`);
