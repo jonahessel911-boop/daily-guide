@@ -151,7 +151,7 @@ document.getElementById('btn-test-purchase').addEventListener('click', async () 
   if (testCode) sessionStorage.setItem('meta_test_event_code', testCode);
 
   const eventId = `test-admin-${Date.now()}`;
-  const browserFired = window.MetaPixel?.trackPurchase(17, eventId) || false;
+  const browserFired = false;
 
   btn.disabled = true;
   btn.textContent = 'Versturen…';
@@ -165,7 +165,7 @@ document.getElementById('btn-test-purchase').addEventListener('click', async () 
     });
 
     const parts = [];
-    if (browserFired) parts.push('Browser: Purchase');
+    parts.push('Browser Purchase: uit');
     if (data.capi?.ok) parts.push('Server: Purchase (CAPI)');
     else if (data.capi?.skipped) parts.push('Server: overgeslagen (geen Meta token)');
 

@@ -58,18 +58,9 @@
       return sessionStorage.getItem('meta_test_event_code') || '';
     },
 
-    trackPurchase(value, eventId) {
-      if (typeof fbq !== 'function') return false;
-      fbq(
-        'track',
-        'Purchase',
-        {
-          currency: 'EUR',
-          value: Number(value) || 17,
-        },
-        { eventID: eventId }
-      );
-      return true;
+    // Browser Purchase uit: alleen server-CAPI stuurt Purchase (voorkomt dubbele conversies in Meta).
+    trackPurchase(_value, _eventId) {
+      return false;
     },
 
     trackAddToCart({ value, contentIds, contentName, contentType, numItems, eventId } = {}) {

@@ -37,12 +37,8 @@
     const paymentIntent = params.get('payment_intent');
     const sessionId = params.get('session_id');
 
-    function trackMetaPurchase(paymentId, amount) {
-      const key = `meta_purchase_${paymentId}`;
-      if (!paymentId || sessionStorage.getItem(key)) return;
-      if (window.MetaPixel?.trackPurchase(amount, paymentId)) {
-        sessionStorage.setItem(key, '1');
-      }
+    function trackMetaPurchase(_paymentId, _amount) {
+      // Browser Purchase uitgeschakeld — Meta krijgt Purchase alleen via server CAPI.
     }
 
     function showSuccess(data) {
