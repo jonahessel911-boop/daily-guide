@@ -10,7 +10,9 @@
 (function () {
   const STORAGE_KEY = 'funnel_attribution';
   const SESSION_KEY = 'funnel_session_id';
+  const META_CLICK_KEY = 'meta_click_by_product';
   const DEFAULT_PRODUCT = '1970cam';
+  const META_CLICK_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
   function getSessionId() {
     let id = localStorage.getItem(SESSION_KEY);
@@ -19,6 +21,104 @@
       localStorage.setItem(SESSION_KEY, id);
     }
     return id;
+  }
+
+  function readCookie(name) {
+    const match = document.cookie.match(
+      new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1') + '=([^;]*)')
+    );
+    return match ? decodeURIComponent(match[1]) : '';
+  }
+
+  function writeCookie(name, value, maxAgeSec) {
+    const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie =
+      `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAgeSec}; SameSite=Lax${secure}`;
+  }
+
+  function readMetaClickStore() {
+    try {
+      return JSON.parse(localStorage.getItem(META_CLICK_KEY) || '{}');
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function writeMetaClickStore(store) {
+    localStorage.setItem(META_CLICK_KEY, JSON.stringify(store));
+  }
+
+  function buildFbc(fbclid, ts = Date.now()) {
+    return `fb.1.${ts}.${fbclid}`;
+  }
+
+  function saveProductClick(product, fbc, fbclid) {
+    if (!product || !fbc) return;
+    const store = readMetaClickStore();
+    store[product] = {
+      fbc,
+      fbclid: fbclid || (fbc.split('.').slice(3).join('.') || null),
+      capturedAt: Date.now(),
+    };
+    writeMetaClickStore(store);
+  }
+
+  /**
+   * Leg de Meta click-id vast per product. Zelfde pixel/domein mag: een hearing-click
+   * mag nooit mee met een 1970cam-purchase (en andersom).
+   */
+  function captureMetaClickId(product) {
+    const slug = product || DEFAULT_PRODUCT;
+    const params = new URLSearchParams(window.location.search);
+    const fbclid = params.get('fbclid');
+
+    if (fbclid) {
+      const fbc = buildFbc(fbclid);
+      saveProductClick(slug, fbc, fbclid);
+      writeCookie('_fbc', fbc, 90 * 24 * 60 * 60);
+      return { fbc, fbp: readCookie('_fbp') || null, fbclid };
+    }
+
+    return getMetaClickIds(slug);
+  }
+
+  /** Op landers: als Meta-pixel _fbc al zette vanuit de ad-click, claim die voor dit product. */
+  function adoptCookieClickForProduct(product, page) {
+    const isLander = page === 'lander' || page === 'checkout-lander';
+    if (!isLander) return;
+
+    const store = readMetaClickStore();
+    const existing = store[product];
+    if (existing?.fbc && Date.now() - (existing.capturedAt || 0) < META_CLICK_TTL_MS) return;
+
+    const cookieFbc = readCookie('_fbc');
+    if (!cookieFbc || !cookieFbc.startsWith('fb.')) return;
+
+    const fbclid = cookieFbc.split('.').slice(3).join('.') || null;
+    saveProductClick(product, cookieFbc, fbclid);
+  }
+
+  function getMetaClickIds(product) {
+    const slug = product || getAttribution().product || DEFAULT_PRODUCT;
+    const store = readMetaClickStore();
+    const entry = store[slug];
+    const fbp = readCookie('_fbp') || null;
+
+    if (entry?.fbc && Date.now() - (entry.capturedAt || 0) < META_CLICK_TTL_MS) {
+      return { fbc: entry.fbc, fbp, fbclid: entry.fbclid || null };
+    }
+
+    // Alleen URL-fbclid — géén globale _fbc-cookie (die kan van het andere product zijn)
+    const params = new URLSearchParams(window.location.search);
+    const fbclid = params.get('fbclid');
+    if (fbclid) {
+      const fbc = buildFbc(fbclid);
+      saveProductClick(slug, fbc, fbclid);
+      writeCookie('_fbc', fbc, 90 * 24 * 60 * 60);
+      return { fbc, fbp, fbclid };
+    }
+
+    return { fbc: null, fbp, fbclid: null };
   }
 
   function readFromDom() {
@@ -109,6 +209,9 @@
 
   function initPageTracking() {
     const page = document.body.dataset.trackPage;
+    const attr = getAttribution();
+    captureMetaClickId(attr.product);
+    adoptCookieClickForProduct(attr.product, page);
     patchCheckoutLinks();
 
     // Ads lander = /checkout
@@ -126,6 +229,8 @@
     buildCheckoutUrl,
     track,
     initPageTracking,
+    captureMetaClickId,
+    getMetaClickIds,
   };
 
   if (document.readyState === 'loading') {

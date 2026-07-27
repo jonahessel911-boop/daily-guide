@@ -98,6 +98,12 @@
         /* ignore */
       }
 
+      const product =
+        document.body?.dataset?.trackProduct ||
+        window.FunnelTrack?.getAttribution?.()?.product ||
+        undefined;
+      const clickIds = window.FunnelTrack?.getMetaClickIds?.(product) || {};
+
       postJsonKeepalive('/api/track/add-to-cart', {
         eventId: id,
         value: amount,
@@ -105,8 +111,8 @@
         contentName: contentName || undefined,
         contentType: contentType || 'product',
         numItems: n,
-        fbp: readCookie('_fbp') || undefined,
-        fbc: readCookie('_fbc') || undefined,
+        fbp: clickIds.fbp || readCookie('_fbp') || undefined,
+        fbc: clickIds.fbc || undefined,
         eventSourceUrl: window.location.href,
         testEventCode: window.MetaPixel.getTestEventCode() || undefined,
         country: (document.body?.dataset?.trackCountry || 'nl').toLowerCase(),

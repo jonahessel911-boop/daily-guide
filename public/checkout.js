@@ -396,6 +396,11 @@ function getCheckoutAnalytics() {
 }
 
 function getMetaCookies() {
+  // Product-scoped click-id (niet de globale _fbc-cookie — die kan van hearing/cam door elkaar lopen)
+  if (window.FunnelTrack?.getMetaClickIds) {
+    const ids = window.FunnelTrack.getMetaClickIds(getProductSlug());
+    return { fbc: ids.fbc || null, fbp: ids.fbp || null };
+  }
   const read = (name) => {
     const match = document.cookie.match(
       new RegExp('(?:^|; )' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '=([^;]*)')
