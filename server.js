@@ -645,8 +645,8 @@ app.post('/api/admin/login', (req, res) => {
 });
 
 app.get('/api/admin/stats', requireAdmin, async (req, res) => {
-  const { from, to } = req.query;
-  const stats = await getStats({ from, to });
+  const { from, to, product } = req.query;
+  const stats = await getStats({ from, to, product });
   res.json(stats);
 });
 
@@ -947,6 +947,7 @@ app.get('/api/checkout-status', async (req, res) => {
 
     res.json({
       status: session.payment_status,
+      paymentIntentId: intent?.id || null,
       orderId: session.metadata?.order_id || intent?.metadata?.order_id,
       amount: (session.amount_total || 0) / 100,
       email: session.customer_details?.email || session.metadata?.customer_email,
@@ -985,6 +986,7 @@ app.get('/api/payment-status', async (req, res) => {
 
     res.json({
       status: intent.status,
+      paymentIntentId: intent.id,
       orderId: intent.metadata.order_id,
       amount: intent.amount / 100,
       email: intent.metadata.customer_email,
@@ -1028,6 +1030,10 @@ app.get('/:page', (req, res, next) => {
   res.sendFile(filePath);
 });
 
+app.get('/checkout/v2', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'checkout', 'v2', 'index.html'));
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/admin', (_req, res) => {
@@ -1037,6 +1043,13 @@ app.get('/admin', (_req, res) => {
 app.get('/admin/dashboard', (_req, res) => {
   res.redirect('/admin/dashboard.html');
 });
+
+if (process.env.META_TEST_EVENT_CODE) {
+  console.warn(
+    'META_TEST_EVENT_CODE is gezet en wordt genegeerd — anders zou elke verkoop als Meta test event ' +
+      'binnenkomen en niet meetellen in Ads Manager. Verwijder de variabele uit je omgeving.'
+  );
+}
 
 module.exports = app;
 

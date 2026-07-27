@@ -49,9 +49,11 @@
       if (data.status !== 'succeeded' && data.status !== 'paid') return;
       const amount = `€${data.amount.toFixed(2).replace('.', ',')}`;
       const email = data.email || 'je e-mailadres';
+      const product = data.product || 'bestelling';
       document.getElementById('success-message').textContent =
-        `Je betaling van ${amount} is gelukt! Bevestiging gaat naar ${email}. Je 1970cam wordt zo snel mogelijk verzonden.`;
-      trackMetaPurchase(sessionId || paymentIntent, data.amount);
+        `Je betaling van ${amount} is gelukt! Bevestiging gaat naar ${email}. Je ${product} wordt zo snel mogelijk verzonden.`;
+      // Zelfde event_id als de server-CAPI (payment intent), anders telt Meta de aankoop dubbel.
+      trackMetaPurchase(data.paymentIntentId || paymentIntent || sessionId, data.amount);
     }
 
     if (sessionId) {

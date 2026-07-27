@@ -52,7 +52,25 @@ function rangeToDates(value) {
 function getStatsQuery() {
   const range = document.getElementById('filter-range').value;
   const { from } = rangeToDates(range);
-  return from ? `?from=${encodeURIComponent(from)}` : '';
+  const product = document.getElementById('filter-product').value;
+
+  const params = new URLSearchParams();
+  if (from) params.set('from', from);
+  if (product && product !== 'all') params.set('product', product);
+
+  const qs = params.toString();
+  return qs ? `?${qs}` : '';
+}
+
+function syncProductOptions(products, selected) {
+  const select = document.getElementById('filter-product');
+  const options = ['<option value="all">Alle producten</option>'].concat(
+    (products || []).map((p) => `<option value="${p.slug}">${p.name}</option>`)
+  );
+  const markup = options.join('');
+  if (select.innerHTML === markup) return;
+  select.innerHTML = markup;
+  select.value = selected || 'all';
 }
 
 function pageLabel(landerSlug) {
@@ -72,6 +90,8 @@ async function loadStats() {
         `<tr><td colspan="9" class="empty">${data.error || 'Fout bij laden'}</td></tr>`;
       return;
     }
+
+    syncProductOptions(data.products, data.product);
 
     const t = data.totals;
     document.getElementById('kpi-views').textContent = t.lander_views;
@@ -114,6 +134,9 @@ document.getElementById('btn-refresh').addEventListener('click', () => {
   loadStats();
 });
 document.getElementById('filter-range').addEventListener('change', () => {
+  loadStats();
+});
+document.getElementById('filter-product').addEventListener('change', () => {
   loadStats();
 });
 document.getElementById('btn-logout').addEventListener('click', () => {
