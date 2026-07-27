@@ -22,7 +22,7 @@
       title: '1970cam Portable Printer',
       unitPrice: 49.99,
       was: 69.99,
-      image: '/assets/product/printer/printer-front.png',
+      image: '/assets/product/printer/printer-front-new.jpg',
     },
   };
 
@@ -37,10 +37,13 @@
       { src: '/assets/product/1970cam-lifestyle.png', alt: '1970cam lifestyle' },
     ],
     printer: [
-      { src: '/assets/product/printer/printer-front.png', alt: 'Portable Printer vooraanzicht' },
-      { src: '/assets/product/printer/printer-kit.png', alt: 'Portable Printer complete set' },
-      { src: '/assets/product/printer/printer-phone.png', alt: 'Print vanaf je telefoon' },
-      { src: '/assets/product/printer/printer-how.png', alt: 'Zo werkt de Portable Printer' },
+      { src: '/assets/product/printer/printer-front-new.jpg', alt: 'Portable Printer vooraanzicht' },
+      { src: '/assets/product/printer/printer-kit-new.jpg', alt: 'Portable Printer complete set' },
+      { src: '/assets/product/printer/printer-phone-new.jpg', alt: 'Print vanaf je telefoon' },
+      { src: '/assets/product/printer/printer-print-new.jpg', alt: 'Foto komt uit de printer' },
+      { src: '/assets/product/printer/printer-how-new.jpg', alt: 'Zo werkt de Portable Printer' },
+      { src: '/assets/product/printer/printer-cafe.jpg', alt: 'Printer op tafel' },
+      { src: '/assets/product/printer/printer-wall.jpg', alt: 'Prints aan de muur' },
     ],
   };
 
@@ -143,7 +146,11 @@
   let reviewSort = 'recent';
 
   function getSortedReviews() {
-    const list = [...(window.Cam1970Reviews || [])];
+    const source =
+      PAGE_SKU === 'printer'
+        ? window.PrinterReviews || []
+        : window.Cam1970Reviews || [];
+    const list = [...source];
     if (reviewSort === 'helpful') {
       list.sort((a, b) => (b.helpful || 0) - (a.helpful || 0));
     }
@@ -152,6 +159,18 @@
 
   function reviewCardHtml(r, idx) {
     const long = (r.text || '').length > 140;
+    const product =
+      PAGE_SKU === 'printer'
+        ? {
+            image: '/assets/product/printer/printer-front-new.jpg',
+            name: 'Portable Printer',
+            meta: 'Draadloos · Incl. printpapier',
+          }
+        : {
+            image: '/assets/product/1970cam-front.png',
+            name: '1970cam',
+            meta: 'Klassiek zwart · Digitale wegwerpvibe',
+          };
     return `
       <article class="shop-rcard" data-idx="${idx}">
         <div class="shop-rcard__top">
@@ -159,11 +178,11 @@
           <span class="shop-rcard__verified">Geverifieerde koper</span>
         </div>
         <div class="shop-rcard__product">
-          <img src="/assets/product/1970cam-front.png" alt="1970cam">
+          <img src="${product.image}" alt="${product.name}">
           <div>
             <div class="shop-rcard__product-label">Review over</div>
-            <div class="shop-rcard__product-name">1970cam</div>
-            <div class="shop-rcard__product-meta">Klassiek zwart · Digitale wegwerpvibe</div>
+            <div class="shop-rcard__product-name">${product.name}</div>
+            <div class="shop-rcard__product-meta">${product.meta}</div>
           </div>
         </div>
         <div class="shop-rcard__rating">
@@ -173,6 +192,7 @@
         <h3 class="shop-rcard__title">${r.title || 'Review'}</h3>
         <p class="shop-rcard__text${long ? ' is-clamp' : ''}">${r.text}</p>
         ${long ? `<button type="button" class="shop-rcard__more" data-expand>Lees meer</button>` : ''}
+        ${r.photo ? `<figure class="shop-rcard__photo"><img src="${r.photo}" alt="" loading="lazy"></figure>` : ''}
         <div class="shop-rcard__foot">
           <span>Was dit behulpzaam?</span>
           <button type="button" class="shop-rcard__vote" data-up aria-label="Behulpzaam">👍 <span>${r.helpful || 0}</span></button>
@@ -187,7 +207,7 @@
     const countEl = document.getElementById('shop-review-count');
     if (!box) return;
     const all = getSortedReviews();
-    if (countEl) countEl.textContent = '683';
+    if (countEl) countEl.textContent = String(all.length || (PAGE_SKU === 'printer' ? 9 : 683));
     box.innerHTML = all.slice(0, reviewVisible).map(reviewCardHtml).join('');
     if (moreBtn) moreBtn.hidden = reviewVisible >= all.length;
   }

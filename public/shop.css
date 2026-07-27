@@ -1340,6 +1340,20 @@ ul { list-style: none; }
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.shop-rcard__photo {
+  margin: 12px 0 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f3f0ea;
+}
+
+.shop-rcard__photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
 .shop-rcard__more {
   margin-top: 6px;
   border: none;
