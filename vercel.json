@@ -11,12 +11,12 @@
       "status": 308
     },
     {
-      "src": "/(checkout|pay|missie|feed|about)\\.html",
+      "src": "/(checkout|pay|missie|feed|about|portable-printer)\\.html",
       "dest": "/$1",
       "status": 308
     },
     {
-      "src": "/(checkout|pay|missie|feed|about)/?",
+      "src": "/(checkout|pay|missie|feed|about|portable-printer)/?",
       "dest": "/$1.html"
     },
     { "handle": "filesystem" },

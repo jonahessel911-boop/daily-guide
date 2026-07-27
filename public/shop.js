@@ -1,8 +1,10 @@
 /**
  * 1970cam shop — Hears-style gallery, offers, side cart
+ * PDP product via body[data-shop-sku] (default: 1970cam)
  */
 (function () {
   const STORAGE_KEY = 'cam1970_cart_v1';
+  const PAGE_SKU = document.body?.dataset?.shopSku || '1970cam';
   const PRICE = {
     single: { qty: 1, price: 69.99, was: 99.99, label: '1× 1970cam' },
     duo: { qty: 2, price: 119.99, was: 139.98, label: '2× 1970cam' },
@@ -12,26 +14,38 @@
       sku: '1970cam',
       title: '1970cam',
       unitPrice: 69.99,
+      was: 99.99,
       image: '/assets/product/1970cam-front.png',
     },
     printer: {
       sku: 'printer',
       title: '1970cam Portable Printer',
       unitPrice: 49.99,
+      was: 69.99,
       image: '/assets/product/printer/printer-front.png',
     },
   };
 
+  const GALLERIES = {
+    '1970cam': [
+      { src: '/assets/product/1970cam-front.png', alt: '1970cam vooraanzicht' },
+      { src: '/assets/product/1970cam-contents.png', alt: '1970cam complete set' },
+      { src: '/assets/product/1970cam-benefits.png', alt: '1970cam voordelen' },
+      { src: '/assets/product/1970cam-setup.png', alt: '1970cam koppelen' },
+      { src: '/assets/product/1970cam-phone-gallery.png', alt: '1970cam in de app' },
+      { src: '/assets/product/1970cam-vs-concurrentie.png', alt: '1970cam vs concurrentie' },
+      { src: '/assets/product/1970cam-lifestyle.png', alt: '1970cam lifestyle' },
+    ],
+    printer: [
+      { src: '/assets/product/printer/printer-front.png', alt: 'Portable Printer vooraanzicht' },
+      { src: '/assets/product/printer/printer-kit.png', alt: 'Portable Printer complete set' },
+      { src: '/assets/product/printer/printer-phone.png', alt: 'Print vanaf je telefoon' },
+      { src: '/assets/product/printer/printer-how.png', alt: 'Zo werkt de Portable Printer' },
+    ],
+  };
+
   /* Product gallery: square 1:1 assets only (Hears-style PDP) */
-  const IMAGES = [
-    { src: '/assets/product/1970cam-front.png', alt: '1970cam vooraanzicht' },
-    { src: '/assets/product/1970cam-contents.png', alt: '1970cam complete set' },
-    { src: '/assets/product/1970cam-benefits.png', alt: '1970cam voordelen' },
-    { src: '/assets/product/1970cam-setup.png', alt: '1970cam koppelen' },
-    { src: '/assets/product/1970cam-phone-gallery.png', alt: '1970cam in de app' },
-    { src: '/assets/product/1970cam-vs-concurrentie.png', alt: '1970cam vs concurrentie' },
-    { src: '/assets/product/1970cam-lifestyle.png', alt: '1970cam lifestyle' },
-  ];
+  const IMAGES = GALLERIES[PAGE_SKU] || GALLERIES['1970cam'];
 
   let imageIndex = 0;
   let selectedOffer = 'single';
@@ -95,7 +109,8 @@
 
   function updateStickyPrice() {
     const el = document.getElementById('shop-sticky-price');
-    if (el) el.textContent = fmt(PRICE.single.price);
+    const product = CATALOG[PAGE_SKU] || CATALOG['1970cam'];
+    if (el) el.textContent = fmt(product.unitPrice);
   }
 
   function setMainImage(i) {
@@ -279,6 +294,10 @@
   }
 
   function addSelectedToCart() {
+    if (PAGE_SKU === 'printer') {
+      addSkuToCart('printer', 1);
+      return;
+    }
     addOfferToCart('single');
   }
 
@@ -318,9 +337,23 @@
     }
 
     const hasPrinter = items.some((i) => i.sku === 'printer');
-    const crossSell = hasPrinter
-      ? ''
-      : `
+    const hasCamera = items.some((i) => i.sku === '1970cam');
+    let crossSell = '';
+    if (PAGE_SKU === 'printer' && !hasCamera) {
+      crossSell = `
+      <div class="shop-cross-sell">
+        <p class="shop-cross-sell__label">Vaak samen gekozen</p>
+        <div class="shop-cross-sell__row">
+          <img src="${CATALOG['1970cam'].image}" alt="">
+          <div class="shop-cross-sell__info">
+            <strong>1970cam</strong>
+            <span><s>€ 99,99</s> <b>€ 69,99</b></span>
+          </div>
+          <button type="button" class="shop-cross-sell__btn" id="shop-cart-add-camera">+ Toevoegen</button>
+        </div>
+      </div>`;
+    } else if (!hasPrinter) {
+      crossSell = `
       <div class="shop-cross-sell">
         <p class="shop-cross-sell__label">Vaak samen gekozen</p>
         <div class="shop-cross-sell__row">
@@ -332,6 +365,7 @@
           <button type="button" class="shop-cross-sell__btn" id="shop-cart-add-printer">+ Toevoegen</button>
         </div>
       </div>`;
+    }
 
     body.innerHTML =
       items
@@ -363,6 +397,9 @@
     document.getElementById('shop-cart-add-printer')?.addEventListener('click', () => {
       addSkuToCart('printer', 1);
     });
+    document.getElementById('shop-cart-add-camera')?.addEventListener('click', () => {
+      addSkuToCart('1970cam', 1);
+    });
   }
 
   function goCheckout() {
@@ -370,7 +407,8 @@
     if (!items.length) return;
     const total = cartTotal(items);
     const cams = cameraQty(items);
-    const primarySlug = cams > 0 ? '1970cam' : items[0]?.sku || '1970cam';
+    const primarySlug = cams > 0 ? '1970cam' : items[0]?.sku || PAGE_SKU || '1970cam';
+    const lander = PAGE_SKU === 'printer' ? 'portable-printer' : 'checkout';
     sessionStorage.setItem(
       'cam1970_checkout_cart',
       JSON.stringify({
@@ -389,7 +427,7 @@
     const url = new URL('/pay', window.location.origin);
     url.searchParams.set('p', primarySlug);
     url.searchParams.set('c', 'nl');
-    url.searchParams.set('l', 'checkout');
+    url.searchParams.set('l', lander);
     if (cams > 0) url.searchParams.set('qty', String(cams));
     window.location.href = url.pathname + url.search;
   }
@@ -417,6 +455,7 @@
     document.getElementById('shop-atc')?.addEventListener('click', addSelectedToCart);
     document.getElementById('shop-atc-sticky')?.addEventListener('click', addSelectedToCart);
     document.getElementById('shop-add-printer')?.addEventListener('click', () => addSkuToCart('printer', 1));
+    document.getElementById('shop-add-camera')?.addEventListener('click', () => addSkuToCart('1970cam', 1));
 
     document.getElementById('shop-cart-open')?.addEventListener('click', openDrawer);
     document.getElementById('shop-drawer-close')?.addEventListener('click', closeDrawer);

@@ -74,7 +74,8 @@ function getProductSlug() {
   const domSlug = document.body.dataset.trackProduct;
   const urlSlug = new URLSearchParams(window.location.search).get('p');
   const attr = window.FunnelTrack?.getAttribution?.() || {};
-  return domSlug || urlSlug || attr.product || '1970cam';
+  // URL ?p= wint: pay.html staat standaard op 1970cam, printer-checkout zet p=printer
+  return urlSlug || domSlug || attr.product || '1970cam';
 }
 
 function hasShippingForm() {
@@ -483,6 +484,11 @@ async function createCheckoutSession(email, method = 'all') {
   if (continueText) continueText.textContent = redirectPaymentLabel(method);
 
   const { quantity, cartItems } = getCartPayload();
+  const analytics = getCheckoutAnalytics();
+  const cancelPath =
+    analytics.landerSlug === 'portable-printer' || getProductSlug() === 'printer'
+      ? '/portable-printer'
+      : '/checkout';
 
   const { res, data } = await Api.apiFetch('/api/create-checkout-session', {
     method: 'POST',
@@ -493,9 +499,9 @@ async function createCheckoutSession(email, method = 'all') {
       quantity,
       items: cartItems,
       productSlug: getProductSlug(),
-      cancelUrl: `${window.location.origin}/checkout`,
+      cancelUrl: `${window.location.origin}${cancelPath}`,
       successUrl: `${window.location.origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
-      analytics: getCheckoutAnalytics(),
+      analytics,
       meta: getMetaCookies(),
       shipping: shippingInfo,
       orderBump: getOrderBumpSelected(),
@@ -955,10 +961,8 @@ async function mountWalletCheckout(method) {
 }
 
 function is1970camCheckout() {
-  return (
-    document.body.dataset.trackProduct === '1970cam' ||
-    productConfig.slug === '1970cam'
-  );
+  const slug = document.body.dataset.trackProduct || productConfig.slug;
+  return slug === '1970cam' || slug === 'printer';
 }
 
 function dtcPrimaryColor() {

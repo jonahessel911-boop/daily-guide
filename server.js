@@ -1000,7 +1000,7 @@ app.get('/api/payment-status', async (req, res) => {
   }
 });
 
-const BRAND_PAGES = new Set(['checkout', 'pay', 'missie', 'feed', 'about']);
+const BRAND_PAGES = new Set(['checkout', 'pay', 'missie', 'feed', 'about', 'portable-printer']);
 
 // Legacy /dispocam/* → root brand pages
 app.get('/dispocam', (_req, res) => res.redirect(301, '/'));
