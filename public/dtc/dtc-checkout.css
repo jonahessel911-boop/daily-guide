@@ -249,7 +249,7 @@
 .dtc-checkout .form-group label { font-size: 13px; font-weight: 700; margin-bottom: 6px; display: block; }
 .dtc-checkout .form-group input {
   width: 100%; padding: 12px 14px; border: 1px solid var(--dtc-border);
-  border-radius: var(--dtc-radius-sm); font-size: 15px; font-family: inherit;
+  border-radius: var(--dtc-radius-sm); font-size: 18px; font-family: inherit;
 }
 .dtc-checkout .form-group input:focus {
   outline: none; border-color: var(--dtc-navy);
