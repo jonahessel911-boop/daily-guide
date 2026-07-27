@@ -219,7 +219,8 @@ body.hd-cart-open {
 }
 .dtc-pm-card__name {
   flex: 1;
-  font-size: 18px;
+  min-width: 0;
+  font-size: 16px;
   font-weight: 500;
   color: #202223;
 }
