@@ -192,7 +192,6 @@
         <h3 class="shop-rcard__title">${r.title || 'Review'}</h3>
         <p class="shop-rcard__text${long ? ' is-clamp' : ''}">${r.text}</p>
         ${long ? `<button type="button" class="shop-rcard__more" data-expand>Lees meer</button>` : ''}
-        ${r.photo ? `<figure class="shop-rcard__photo"><img src="${r.photo}" alt="" loading="lazy"></figure>` : ''}
         <div class="shop-rcard__foot">
           <span>Was dit behulpzaam?</span>
           <button type="button" class="shop-rcard__vote" data-up aria-label="Behulpzaam">👍 <span>${r.helpful || 0}</span></button>
@@ -207,7 +206,9 @@
     const countEl = document.getElementById('shop-review-count');
     if (!box) return;
     const all = getSortedReviews();
-    if (countEl) countEl.textContent = String(all.length || (PAGE_SKU === 'printer' ? 9 : 683));
+    if (countEl) {
+      countEl.textContent = PAGE_SKU === 'printer' ? String(all.length || 9) : '683';
+    }
     box.innerHTML = all.slice(0, reviewVisible).map(reviewCardHtml).join('');
     if (moreBtn) moreBtn.hidden = reviewVisible >= all.length;
   }
