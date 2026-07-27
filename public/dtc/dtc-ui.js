@@ -975,33 +975,7 @@
   }
 
   function renderPaySidebar() {
-    const reviews = cfg().reviews || [];
-    if (!reviews.length) return '';
-    const p = cfg().product;
-    const count = p.reviewCount || reviews.length;
-    const brand = brandName();
-    const cards = reviews
-      .slice(0, 3)
-      .map((r) => {
-        const avatar = r.avatar || r.image;
-        return `
-          <div class="dtc-pay-review dtc-pay-review--avatar">
-            <img class="dtc-pay-review__avatar" src="${avatar}" alt="">
-            <div class="dtc-pay-review__body">
-              <div class="dtc-pay-review__name">${r.name}</div>
-              <div class="dtc-pay-review__stars">★★★★★</div>
-              <p class="dtc-pay-review__text">${r.text}</p>
-            </div>
-          </div>`;
-      })
-      .join('');
-
     return `
-      <div class="dtc-pay-trust-head">
-        <p class="dtc-pay-trust-head__title">Vertrouwd door ${count.toLocaleString('nl-NL')} ${brand} gebruikers</p>
-        ${p.rating ? `<p class="dtc-pay-trust-head__score"><span class="dtc-stars" aria-hidden="true">★★★★★</span> ${p.rating.toFixed(1).replace('.', ',')} · ${count.toLocaleString('nl-NL')} reviews</p>` : ''}
-      </div>
-      <div class="dtc-pay-sidebar__reviews">${cards}</div>
       <div class="dtc-pay-guarantee-seal">
         NIET TEVREDEN?<br>
         <strong>${cfg().guaranteeDays || 60} DAGEN</strong>
@@ -1010,22 +984,7 @@
   }
 
   function renderPayReviewsBelow() {
-    const reviews = cfg().reviews || [];
-    if (!reviews.length) return '';
-    const p = cfg().product;
-    const count = p.reviewCount || reviews.length;
-    const brand = brandName();
-    const cards = reviews
-      .slice(0, 6)
-      .map((r) => renderReviewCard(r))
-      .join('');
-
-    return `
-      <section class="dtc-pay-reviews" id="pay-reviews">
-        <h2 class="dtc-pay-reviews__title">Vertrouwd door ${count.toLocaleString('nl-NL')} ${brand} gebruikers</h2>
-        ${p.rating ? `<p class="dtc-pay-reviews__score"><span class="dtc-stars" aria-hidden="true">★★★★★</span> <strong>${p.rating.toFixed(1).replace('.', ',')}</strong> · ${count.toLocaleString('nl-NL')} reviews</p>` : ''}
-        <div class="dtc-pay-reviews__grid">${cards}</div>
-      </section>`;
+    return '';
   }
 
   function initStockCount() {
@@ -1211,31 +1170,6 @@
 
     const sidebar = document.getElementById('dtc-pay-sidebar');
     if (sidebar) sidebar.innerHTML = renderPaySidebar();
-
-    const payReviews = document.getElementById('dtc-pay-reviews');
-    if (payReviews) payReviews.innerHTML = renderPayReviewsBelow();
-
-    const faces = document.getElementById('dtc-pay-faces');
-    if (faces) {
-      const imgs = (cfg().reviews || []).slice(0, 4);
-      faces.innerHTML = imgs
-        .map((r) => {
-          const src = r.avatar || r.image;
-          return `<img class="dtc-pay-social__face" src="${src}" alt="">`;
-        })
-        .join('');
-    }
-
-    const p = cfg().product;
-    const socialStrong = document.querySelector('.dtc-pay-social strong');
-    const socialSpan = document.querySelector('.dtc-pay-social span');
-    const count = p.reviewCount || 683;
-    if (socialStrong) {
-      socialStrong.textContent = `Vertrouwd door ${count.toLocaleString('nl-NL')} ${brandName()} gebruikers`;
-    }
-    if (socialSpan && p.rating) {
-      socialSpan.textContent = `${p.rating.toFixed(1).replace('.', ',')} · ${count.toLocaleString('nl-NL')} reviews`;
-    }
 
     initStockCount();
   }
