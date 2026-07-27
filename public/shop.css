@@ -209,6 +209,31 @@ ul { list-style: none; }
   overflow: hidden;
 }
 
+@media (max-width: 979px) {
+  .shop-gallery__stage {
+    max-width: 240px;
+    margin-inline: auto;
+  }
+
+  .shop-gallery__badges {
+    top: 8px;
+    left: 8px;
+    gap: 6px;
+  }
+
+  .shop-pill {
+    padding: 5px 9px;
+    font-size: 10px;
+  }
+
+  .shop-gallery__nav,
+  .shop-gallery__zoom {
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
+  }
+}
+
 .shop-gallery__stage > img {
   position: absolute;
   inset: 0;
@@ -861,6 +886,15 @@ ul { list-style: none; }
   border-radius: 24px;
   overflow: hidden;
   min-height: 280px;
+}
+
+@media (max-width: 899px) {
+  .shop-features__media {
+    max-width: 260px;
+    margin-inline: auto;
+    min-height: 0;
+    aspect-ratio: 1;
+  }
 }
 .shop-features__media img {
   width: 100%;
