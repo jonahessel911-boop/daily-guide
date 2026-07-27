@@ -1132,38 +1132,8 @@
       renderCrossSell(cameras, printers);
     }
 
-    function renderCrossSell(cameras, printers) {
-      const wrap = document.getElementById('dtc-cross-sell');
-      if (!wrap) return;
-      if (cameras <= 0) {
-        wrap.innerHTML = '';
-        return;
-      }
-      const on = printers > 0;
-      wrap.innerHTML = `
-        <label class="dtc-cross-sell${on ? ' is-on' : ''}">
-          <input type="checkbox" id="dtc-add-printer" ${on ? 'checked' : ''}>
-          <img class="dtc-cross-sell__img" src="${PRINTER.image}" alt="">
-          <div class="dtc-cross-sell__info">
-            <span class="dtc-cross-sell__badge">Vaak samen gekozen</span>
-            <strong class="dtc-cross-sell__title">Portable Printer toevoegen</strong>
-            <span class="dtc-cross-sell__desc">Print je foto’s direct vanaf je telefoon</span>
-          </div>
-          <div class="dtc-cross-sell__prices">
-            <span class="dtc-cross-sell__was">${fmt(PRINTER.was)}</span>
-            <span class="dtc-cross-sell__now">+ ${fmt(PRINTER.unitPrice)}</span>
-          </div>
-        </label>`;
-
-      const box = document.getElementById('dtc-add-printer');
-      const label = wrap.querySelector('.dtc-cross-sell');
-      box?.addEventListener('change', () => {
-        setPrinterSelected(box.checked);
-        refreshPayOffer();
-      });
-      label?.addEventListener('click', (e) => {
-        if (e.target === box) return;
-      });
+    function renderCrossSell(_cameras, _printers) {
+      // Portable Printer cross-sell verwijderd van 1970cam pay
     }
 
     refreshPayOffer();

@@ -356,9 +356,9 @@
       return;
     }
 
-    const hasPrinter = items.some((i) => i.sku === 'printer');
     const hasCamera = items.some((i) => i.sku === '1970cam');
     let crossSell = '';
+    // Alleen op de printer-PDP camera cross-sellen — geen printer-upsell op 1970cam
     if (PAGE_SKU === 'printer' && !hasCamera) {
       crossSell = `
       <div class="shop-cross-sell">
@@ -370,19 +370,6 @@
             <span><s>€ 99,99</s> <b>€ 69,99</b></span>
           </div>
           <button type="button" class="shop-cross-sell__btn" id="shop-cart-add-camera">+ Toevoegen</button>
-        </div>
-      </div>`;
-    } else if (!hasPrinter) {
-      crossSell = `
-      <div class="shop-cross-sell">
-        <p class="shop-cross-sell__label">Vaak samen gekozen</p>
-        <div class="shop-cross-sell__row">
-          <img src="${CATALOG.printer.image}" alt="">
-          <div class="shop-cross-sell__info">
-            <strong>Portable Printer</strong>
-            <span><s>€ 69,99</s> <b>€ 49,99</b></span>
-          </div>
-          <button type="button" class="shop-cross-sell__btn" id="shop-cart-add-printer">+ Toevoegen</button>
         </div>
       </div>`;
     }
@@ -414,9 +401,6 @@
     if (totalEl) totalEl.textContent = fmt(cartTotal(items));
     if (checkoutBtn) checkoutBtn.disabled = false;
 
-    document.getElementById('shop-cart-add-printer')?.addEventListener('click', () => {
-      addSkuToCart('printer', 1);
-    });
     document.getElementById('shop-cart-add-camera')?.addEventListener('click', () => {
       addSkuToCart('1970cam', 1);
     });
@@ -474,7 +458,6 @@
 
     document.getElementById('shop-atc')?.addEventListener('click', addSelectedToCart);
     document.getElementById('shop-atc-sticky')?.addEventListener('click', addSelectedToCart);
-    document.getElementById('shop-add-printer')?.addEventListener('click', () => addSkuToCart('printer', 1));
     document.getElementById('shop-add-camera')?.addEventListener('click', () => addSkuToCart('1970cam', 1));
 
     document.getElementById('shop-cart-open')?.addEventListener('click', openDrawer);
