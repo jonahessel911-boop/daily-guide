@@ -85,27 +85,17 @@ fbq('track', 'PageView');
       return false;
     },
 
+    /**
+     * AddToCart alleen via CAPI. Browser-pixel hangt altijd de gedeelde `_fbc`-cookie
+     * aan het event → hearing €99 ATC werd aan een eerdere 1970cam-click gekoppeld.
+     * Click-id komt uit content_ids[0] (product van de ATC), nooit uit een ander product.
+     */
     trackAddToCart({ value, contentIds, contentName, contentType, numItems, eventId } = {}) {
-      if (typeof fbq !== 'function') return false;
-
       const id = eventId || newEventId('atc');
       const ids = (contentIds || []).map(String).filter(Boolean);
       const n = Math.max(1, parseInt(numItems, 10) || 1);
       const amount = Number(value) || 0;
 
-      const custom = {
-        currency: 'EUR',
-        value: amount,
-        content_type: contentType || 'product',
-        num_items: n,
-      };
-      if (ids.length) custom.content_ids = ids;
-      if (contentName) custom.content_name = contentName;
-
-      // Browser pixel (with eventID for CAPI dedup)
-      fbq('track', 'AddToCart', custom, { eventID: id });
-
-      // Server Conversions API — shows reliably in Events Manager
       let externalId = '';
       try {
         externalId = localStorage.getItem('funnel_session_id') || '';
@@ -113,7 +103,9 @@ fbq('track', 'PageView');
         /* ignore */
       }
 
+      // Product voor click-id = wat er in de cart gaat, niet “default 1970cam”
       const product =
+        ids[0] ||
         document.body?.dataset?.trackProduct ||
         window.FunnelTrack?.getAttribution?.()?.product ||
         undefined;
@@ -133,6 +125,7 @@ fbq('track', 'PageView');
         country: (document.body?.dataset?.trackCountry || 'nl').toLowerCase(),
         externalId: externalId || undefined,
         leadSource: document.body?.dataset?.trackLander || undefined,
+        productSlug: product || undefined,
       });
 
       return true;

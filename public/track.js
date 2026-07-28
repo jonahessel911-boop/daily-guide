@@ -10,7 +10,7 @@
 (function () {
   const STORAGE_KEY = 'funnel_attribution';
   const SESSION_KEY = 'funnel_session_id';
-  const META_CLICK_KEY = 'meta_click_by_product';
+  const META_CLICK_KEY = 'meta_click_by_product_v2';
   const DEFAULT_PRODUCT = '1970cam';
   const META_CLICK_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -65,7 +65,7 @@
 
   /**
    * Leg de Meta click-id vast per product. Zelfde pixel/domein mag: een hearing-click
-   * mag nooit mee met een 1970cam-purchase (en andersom).
+   * mag nooit mee met een 1970cam-event (en andersom).
    */
   function captureMetaClickId(product) {
     const slug = product || DEFAULT_PRODUCT;
@@ -82,10 +82,14 @@
     return getMetaClickIds(slug);
   }
 
-  /** Op landers: als Meta-pixel _fbc al zette vanuit de ad-click, claim die voor dit product. */
+  /**
+   * Op landers zonder fbclid in de URL: claim Meta’s `_fbc` cookie alleen als die
+   * click-id nog van géén ander product is. Nooit een 1970cam-click “overnemen”
+   * voor hearing (dat stuurde €99 ATC naar de cam-campagne).
+   */
   function adoptCookieClickForProduct(product, page) {
     const isLander = page === 'lander' || page === 'checkout-lander';
-    if (!isLander) return;
+    if (!isLander || !product) return;
 
     const store = readMetaClickStore();
     const existing = store[product];
@@ -95,6 +99,13 @@
     if (!cookieFbc || !cookieFbc.startsWith('fb.')) return;
 
     const fbclid = cookieFbc.split('.').slice(3).join('.') || null;
+
+    for (const [other, entry] of Object.entries(store)) {
+      if (other === product || !entry) continue;
+      if (entry.fbc && entry.fbc === cookieFbc) return;
+      if (fbclid && entry.fbclid && entry.fbclid === fbclid) return;
+    }
+
     saveProductClick(product, cookieFbc, fbclid);
   }
 
@@ -108,7 +119,8 @@
       return { fbc: entry.fbc, fbp, fbclid: entry.fbclid || null };
     }
 
-    // Alleen URL-fbclid — géén globale _fbc-cookie (die kan van het andere product zijn)
+    // Alleen URL-fbclid voor DIT product — nooit de globale _fbc-cookie
+    // (die is van de laatste ad-click, vaak een ander product).
     const params = new URLSearchParams(window.location.search);
     const fbclid = params.get('fbclid');
     if (fbclid) {

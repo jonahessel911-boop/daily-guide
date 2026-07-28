@@ -63,24 +63,14 @@
       return false;
     },
 
+    /**
+     * AddToCart alleen via CAPI — zie meta-pixel.js (geen browser-pixel cookie-attributie).
+     */
     trackAddToCart({ value, contentIds, contentName, contentType, numItems, eventId } = {}) {
-      if (typeof fbq !== 'function') return false;
-
       const id = eventId || newEventId('atc');
       const ids = (contentIds || []).map(String).filter(Boolean);
       const n = Math.max(1, parseInt(numItems, 10) || 1);
       const amount = Number(value) || 0;
-
-      const custom = {
-        currency: 'EUR',
-        value: amount,
-        content_type: contentType || 'product',
-        num_items: n,
-      };
-      if (ids.length) custom.content_ids = ids;
-      if (contentName) custom.content_name = contentName;
-
-      fbq('track', 'AddToCart', custom, { eventID: id });
 
       let externalId = '';
       try {
@@ -90,6 +80,7 @@
       }
 
       const product =
+        ids[0] ||
         document.body?.dataset?.trackProduct ||
         window.FunnelTrack?.getAttribution?.()?.product ||
         undefined;
@@ -109,6 +100,7 @@
         country: (document.body?.dataset?.trackCountry || 'nl').toLowerCase(),
         externalId: externalId || undefined,
         leadSource: document.body?.dataset?.trackLander || undefined,
+        productSlug: product || undefined,
       });
 
       return true;
