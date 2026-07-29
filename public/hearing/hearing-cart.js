@@ -158,6 +158,19 @@
     addOfferToCart(selectedOffer);
   }
 
+  /** Advertorial funnel: set offer in cart and go straight to pay (no drawer step). */
+  function addSelectedAndCheckout() {
+    const offer = OFFERS[selectedOffer] || OFFERS.single;
+    setQty(offer.qty);
+    window.MetaPixel?.trackAddToCart?.({
+      value: priceForQty(offer.qty),
+      contentIds: ['hearing'],
+      contentName: TITLE,
+      numItems: offer.qty,
+    });
+    goCheckout();
+  }
+
   function selectOffer(id) {
     selectedOffer = id === 'duo' ? 'duo' : 'single';
     document.querySelectorAll('[data-hd-offer]').forEach((el) => {
@@ -274,14 +287,14 @@
       const atc = e.target.closest('[data-hd-atc]');
       if (atc) {
         e.preventDefault();
-        addSelectedToCart();
+        addSelectedAndCheckout();
         return;
       }
       const payLink = e.target.closest('a[href$="pay.html"], a[href*="pay.html"]');
       if (!payLink || payLink.dataset.hdSkip) return;
       if (payLink.closest('.legal-footer')) return;
       e.preventDefault();
-      addSelectedToCart();
+      addSelectedAndCheckout();
     });
   }
 
@@ -298,6 +311,7 @@
     addToCart,
     addOfferToCart,
     addSelectedToCart,
+    addSelectedAndCheckout,
     selectOffer,
     openDrawer,
     closeDrawer,
