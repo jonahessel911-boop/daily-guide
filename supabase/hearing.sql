@@ -1,7 +1,7 @@
 -- Run in Supabase SQL Editor (na schema.sql)
 
 insert into products (slug, name, country, price_cents) values
-  ('hearing', 'HearDirect™ — Hoortoestellen', 'NL', 14900)
+  ('hearing', 'HearDirect™ — Hoortoestellen', 'NL', 12999)
 on conflict (slug) do update set
   name = excluded.name,
   country = excluded.country,

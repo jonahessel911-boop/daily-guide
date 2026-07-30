@@ -15,9 +15,9 @@ window.HearingDTCConfig = {
     name: 'HearDirect™ | Comfortabele hoortoestellen',
     shortDescription:
       'Hoor elk gesprek duidelijk met een discreet en comfortabel ontwerp dat je de hele dag kunt dragen.',
-    price: 99,
-    originalPrice: 179,
-    discountPercent: 45,
+    price: 129.99,
+    originalPrice: 199.95,
+    discountPercent: 35,
     rating: 4.8,
     reviewCount: 892,
     shippingLabel: 'Gratis',
@@ -180,7 +180,7 @@ window.HearingDTCConfig = {
     },
     ours: {
       label: 'HearDirect™ — direct vanuit de fabrikant',
-      price: 99,
+      price: 129.99,
       highlights: ['Zelfde kerntechnologie', '90 dagen testperiode', 'Oplaadbaar — geen batterijen'],
     },
   },

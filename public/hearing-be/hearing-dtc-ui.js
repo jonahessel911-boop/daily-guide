@@ -462,19 +462,19 @@
             <div class="hd-offer__meta">HearDirect™ — oplaadcase inclusief</div>
           </div>
           <div class="hd-offer__price">
-            <span class="hd-offer__was">${fmt(179)}</span>
-            <span class="hd-offer__now">${fmt(99)}</span>
+            <span class="hd-offer__was">${fmt(199.95)}</span>
+            <span class="hd-offer__now">${fmt(129.99)}</span>
           </div>
         </button>
         <button type="button" class="hd-offer" data-hd-offer="duo" aria-pressed="false">
           <span class="hd-offer__badge">Beste deal</span>
           <div class="hd-offer__info">
             <div class="hd-offer__title">2 Sets</div>
-            <div class="hd-offer__meta">${fmt(89.99)} / set · totaal ${fmt(179.98)}</div>
+            <div class="hd-offer__meta">${fmt(119.99)} / set · totaal ${fmt(239.98)}</div>
           </div>
           <div class="hd-offer__price">
-            <span class="hd-offer__was">${fmt(358)}</span>
-            <span class="hd-offer__now">${fmt(179.98)}</span>
+            <span class="hd-offer__was">${fmt(399.9)}</span>
+            <span class="hd-offer__now">${fmt(239.98)}</span>
           </div>
         </button>
       </div>`;
@@ -539,7 +539,7 @@
         : (() => {
             const duos = Math.floor(qty / 2);
             const singles = qty % 2;
-            return duos * 89.99 * 2 + singles * (p.price || 99);
+            return duos * 119.99 * 2 + singles * (p.price || 129.99);
           })();
     const was = (p.originalPrice || p.price) * qty;
     const per = total / qty;

@@ -6,15 +6,15 @@
   const STORAGE_KEY = 'cam1970_cart_v1';
   const PAGE_SKU = document.body?.dataset?.shopSku || '1970cam';
   const PRICE = {
-    single: { qty: 1, price: 69.99, was: 99.99, label: '1× 1970cam' },
-    duo: { qty: 2, price: 119.99, was: 139.98, label: '2× 1970cam' },
+    single: { qty: 1, price: 89.99, was: 119, label: '1× 1970cam' },
+    duo: { qty: 2, price: 159.99, was: 179.98, label: '2× 1970cam' },
   };
   const CATALOG = {
     '1970cam': {
       sku: '1970cam',
       title: '1970cam',
-      unitPrice: 69.99,
-      was: 99.99,
+      unitPrice: 89.99,
+      was: 119,
       image: '/assets/product/1970cam-front.png',
     },
     printer: {

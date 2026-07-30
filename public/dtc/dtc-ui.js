@@ -1115,10 +1115,10 @@
 
       const duos = Math.floor(cameras / 2);
       const singles = cameras % 2;
-      const cameraTotal = duos * 119.99 + singles * (p.price || 69.99);
+      const cameraTotal = duos * 159.99 + singles * (p.price || 89.99);
       const printerTotal = printers * PRINTER.unitPrice;
       const total = cameraTotal + printerTotal;
-      const was = cameras * (p.originalPrice || 99.99) + printers * PRINTER.was;
+      const was = cameras * (p.originalPrice || 119) + printers * PRINTER.was;
       const per = cameras > 0 ? cameraTotal / cameras : PRINTER.unitPrice;
 
       const mainLabel =
@@ -1148,7 +1148,7 @@
       const payProductEl = document.getElementById('dtc-pay-product-label');
       if (payProductEl) payProductEl.textContent = summaryLabel;
 
-      set('dtc-offer-was', fmt(cameras > 0 ? cameras * (p.originalPrice || 99.99) : was));
+      set('dtc-offer-was', fmt(cameras > 0 ? cameras * (p.originalPrice || 119) : was));
       set('dtc-offer-now', fmt(cameras > 0 ? cameraTotal : total));
       set('dtc-offer-badge', cameras > 0 ? `${fmt(per)} / camera` : fmt(PRINTER.unitPrice));
       set('dtc-pay-was', fmt(was));

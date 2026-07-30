@@ -29,8 +29,8 @@ const PRODUCTS = {
     name: '1970cam — Retro digitale camera',
     description:
       "1970cam — schiet als een wegwerpcamera, bekijk je foto's direct op je telefoon",
-    price: 69.99,
-    originalPrice: 99.99,
+    price: 89.99,
+    originalPrice: 119,
     orderPrefix: 'CAM70',
   },
   printer: {
@@ -45,8 +45,8 @@ const PRODUCTS = {
     slug: 'hearing',
     name: 'HearDirect™ — Hoortoestellen',
     description: 'HearDirect™ — comfortabele digitale hoortoestellen',
-    price: 99,
-    originalPrice: 179,
+    price: 129.99,
+    originalPrice: 199.95,
     orderPrefix: 'HEAR',
   },
 };
@@ -129,10 +129,11 @@ function resolveCartTotals(body = {}) {
   const printerProduct = getProduct('printer');
   const hearingProduct = getProduct('hearing');
   const unitCents = Math.round(Number(cameraProduct.price) * 100);
-  const duoCents = 11999;
+  // Pair deal: €20 off vs 2× single (€179,98 → €159,99)
+  const duoCents = 15999;
   const printerCents = Math.round(Number(printerProduct.price) * 100);
   const hearingSingleCents = Math.round(Number(hearingProduct.price) * 100);
-  const hearingDuoUnitCents = 8999; // €89,99 per set when buying pairs
+  const hearingDuoUnitCents = 11999; // €119,99 per set when buying pairs
 
   function hearingAmountCents(qty) {
     const duos = Math.floor(qty / 2);

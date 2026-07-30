@@ -87,9 +87,9 @@ window.HearingDTCConfig = {
     offerLabel: '1× 1970cam',
     shortDescription:
       'Schiet zoals vroeger — geen scherm, pure nostalgie. Foto\'s staan direct op je telefoon. Nooit meer een nieuwe camera kopen. Deel ze overal, of kijk ze samen terug in de app.',
-    price: 69.99,
-    originalPrice: 99.99,
-    discountPercent: 30,
+    price: 89.99,
+    originalPrice: 119,
+    discountPercent: 25,
     rating: 4.7,
     reviewCount: 683,
     shippingLabel: 'Gratis',
@@ -374,7 +374,7 @@ window.HearingDTCConfig = {
         {
           name: '1970cam',
           variant: 'Classic Black',
-          price: 69.99,
+          price: 89.99,
           image: `${CAM_IMG}/1970cam-front.png`,
           href: '/checkout',
           badge: 'Bestseller',

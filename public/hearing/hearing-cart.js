@@ -6,11 +6,11 @@
   const CHECKOUT_KEY = 'hearing_checkout_cart';
   const IMAGE = '/hearing-nl/assets/product/heardirect-open-case.webp';
   const TITLE = 'HearDirect™';
-  const WAS_PRICE = 179;
+  const WAS_PRICE = 199.95;
 
   const OFFERS = {
-    single: { id: 'single', qty: 1, unitCents: 9900, was: 179, label: '1 Set' },
-    duo: { id: 'duo', qty: 2, unitCents: 8999, was: 179, label: '2 Sets' },
+    single: { id: 'single', qty: 1, unitCents: 12999, was: 199.95, label: '1 Set' },
+    duo: { id: 'duo', qty: 2, unitCents: 11999, was: 199.95, label: '2 Sets' },
   };
 
   let selectedOffer = 'single';
@@ -19,7 +19,7 @@
     return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
   }
 
-  /** Pair pricing: every 2 sets @ €89,99; leftover singles @ €99 */
+  /** Pair pricing: every 2 sets @ €119,99; leftover singles @ €129,99 */
   function priceForQty(qty) {
     const n = Math.max(0, parseInt(qty, 10) || 0);
     const duos = Math.floor(n / 2);

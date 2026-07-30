@@ -291,9 +291,9 @@ function initPostcodeLookup() {
 let productConfig = {
   slug: '1970cam',
   name: '1970cam',
-  price: 69.99,
-  originalPrice: 99.99,
-  amountCents: 6999,
+  price: 89.99,
+  originalPrice: 119,
+  amountCents: 8999,
 };
 
 function formatEuroPrice(amount) {
@@ -448,7 +448,7 @@ function getCartPayload() {
   if (isHearingCheckout() && (!cartItems || !cartItems.length)) {
     const qtyParam = new URLSearchParams(window.location.search).get('qty');
     quantity = Math.max(1, parseInt(qtyParam, 10) || quantity || 1);
-    cartItems = [{ sku: 'hearing', qty: quantity, unitPrice: productConfig.price || 99 }];
+    cartItems = [{ sku: 'hearing', qty: quantity, unitPrice: productConfig.price || 129.99 }];
   }
 
   const qtyParam = new URLSearchParams(window.location.search).get('qty');
