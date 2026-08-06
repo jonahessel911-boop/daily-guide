@@ -1,17 +1,4 @@
 (function () {
-  var toastEl = document.getElementById('zt-toast');
-  var toastTimer;
-
-  function showToast(message) {
-    if (!toastEl) return;
-    toastEl.textContent = message;
-    toastEl.classList.add('is-visible');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () {
-      toastEl.classList.remove('is-visible');
-    }, 2600);
-  }
-
   function goToFunnel(params) {
     var parts = ['from=adv1'];
     if (params) parts.push(params);
@@ -31,10 +18,9 @@
       btn.classList.toggle('is-selected', btn.getAttribute('data-provincie') === name);
     });
 
-    showToast(name + ' geselecteerd — even geduld…');
     setTimeout(function () {
       goToFunnel('provincie=' + encodeURIComponent(name));
-    }, 450);
+    }, 250);
   }
 
   function bindMapClicks(root) {
@@ -73,10 +59,9 @@
       });
       btn.classList.add('is-selected');
       var id = btn.getAttribute('data-stoel') || '';
-      showToast('Stoel geselecteerd — even geduld…');
       setTimeout(function () {
         goToFunnel('stoel=' + encodeURIComponent(id));
-      }, 450);
+      }, 250);
     });
   });
 

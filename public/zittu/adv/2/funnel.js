@@ -170,7 +170,7 @@ function buildLeadForm() {
       </div>
       <p class="lead-error" id="lead-error" role="alert"></p>
       <button type="submit" class="lead-submit">Plan gratis proefzit →</button>
-      <p class="lead-privacy">Door te versturen gaat u akkoord met ons <a href="/legal/privacybeleid.html">privacybeleid</a>. Wij gebruiken uw gegevens alleen om contact op te nemen over de proefzit.</p>
+      <p class="lead-privacy">Wij gebruiken uw gegevens alleen om contact op te nemen over de proefzit.</p>
     </form>
   `;
 }
