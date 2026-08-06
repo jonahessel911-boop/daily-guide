@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/meta-pixel.js"></script>
+  <title>Zittu — Gratis sta-op-stoel uitproberen</title>
+  <meta name="description" content="Gezocht: senioren die deze sta-op-stoel gratis thuis willen uitproberen. Beantwoord 4 korte vragen.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body
+  data-track-page="lander"
+  data-track-product="zittu"
+  data-track-country="nl"
+  data-track-lander="adv-2"
+>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1545607877104793&amp;ev=PageView&amp;noscript=1" alt="" /></noscript>
+
+  <header class="site-header">
+    <a href="#" class="zt-logo" aria-label="Zittu">
+      <img class="zt-logo-img" src="/zittu/assets/logo.png" alt="Zittu" width="56" height="56" decoding="async">
+    </a>
+  </header>
+
+  <!-- Survey phase -->
+  <div id="phase-survey">
+    <div class="survey-wrap">
+      <div class="survey-hero" id="survey-hero">
+        <h1>Gezocht:</h1>
+        <p>55-plussers die deze sta-op-stoel <strong>gratis thuis</strong> willen uitproberen!</p>
+      </div>
+
+      <div class="survey-card">
+        <div class="survey-card-header" id="survey-header">
+          Beantwoord 4 korte vragen om te zien of u of een naaste in aanmerking komt.
+        </div>
+        <div class="survey-body">
+          <p class="survey-question" id="survey-question"></p>
+          <div class="survey-buttons" id="survey-buttons"></div>
+          <div id="survey-form-slot" class="survey-form-slot hidden"></div>
+          <p class="survey-hint" id="survey-hint">Meedoen duurt maar 1 minuut</p>
+        </div>
+      </div>
+
+      <div class="progress-steps" id="progress-steps" aria-hidden="true">
+        <div class="progress-step active" data-step="1">1</div>
+        <div class="progress-line"></div>
+        <div class="progress-step" data-step="2">2</div>
+        <div class="progress-line"></div>
+        <div class="progress-step" data-step="3">3</div>
+        <div class="progress-line"></div>
+        <div class="progress-step" data-step="4">4</div>
+      </div>
+    </div>
+
+    <div class="survey-content" id="survey-content">
+      <div class="product-visual">
+        <img class="product-img" src="assets/hero-2.jpg" alt="Adviseur meet een sta-op-stoel bij een senior thuis" width="1024" height="768" loading="lazy">
+        <ul class="feature-list">
+          <li><span class="feature-check" aria-hidden="true">✓</span> Eenvoudig en zelfstandig opstaan — zonder hulp</li>
+          <li><span class="feature-check" aria-hidden="true">✓</span> Op maat gemeten op 7 persoonlijke meetpunten</li>
+          <li><span class="feature-check" aria-hidden="true">✓</span> Gratis proefzit bij u thuis — volledig vrijblijvend</li>
+          <li><span class="feature-check" aria-hidden="true">✓</span> Beperkt tot 250 plaatsen in uw regio*</li>
+        </ul>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="testimonial-name" id="testimonial-name">Maria V.</div>
+        <div class="stars" aria-label="5 van 5 sterren">
+          <span aria-hidden="true">★</span><span aria-hidden="true">★</span><span aria-hidden="true">★</span><span aria-hidden="true">★</span><span aria-hidden="true">★</span>
+        </div>
+        <p class="testimonial-quote" id="testimonial-text">“Ik kan eindelijk weer zelfstandig opstaan zonder hulp. Dat geeft zoveel rust.”</p>
+        <hr class="testimonial-divider" />
+        <div class="testimonial-nav">
+          <button type="button" id="testimonial-prev" aria-label="Vorige">‹</button>
+          <span class="testimonial-counter" id="testimonial-counter">1/3</span>
+          <button type="button" id="testimonial-next" aria-label="Volgende">›</button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="page-footer" id="survey-footer">
+      <p class="disclaimer">* De gratis proefzit is beperkt tot 250 deelnemers. Na aanmelding nemen wij contact op om een afspraak in te plannen. U zit nergens aan vast.</p>
+      <nav class="footer-links">
+        <a href="/legal/algemene-voorwaarden.html">Contact</a>
+        <a href="/legal/algemene-voorwaarden.html">Terms of Service</a>
+        <a href="/legal/privacybeleid.html">Privacy Policy</a>
+      </nav>
+      <p class="campaign">Campaign by Fio Ads</p>
+    </footer>
+  </div>
+
+  <!-- Loading phase (rondje) -->
+  <div id="phase-loading" class="hidden">
+    <div class="loading-screen">
+      <div class="loading-spinner" id="loading-spinner" aria-hidden="true"></div>
+      <p class="loading-status" id="loading-status">Controleren of u in aanmerking komt....</p>
+    </div>
+  </div>
+
+  <!-- Contact form phase -->
+  <div id="phase-contact" class="hidden">
+    <div class="survey-wrap contact-wrap">
+      <div class="contact-congrats">
+        <h2>Gefeliciteerd! Je komt in aanmerking om thuis deze stoel uit te mogen proberen</h2>
+      </div>
+      <div class="survey-card">
+        <div class="survey-body contact-body">
+          <p class="survey-question">Hoe kunnen we contact met u opnemen?</p>
+          <div id="contact-form-slot" class="survey-form-slot"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thank you / confirmed -->
+  <div id="phase-done" class="hidden">
+    <div class="done-wrap">
+      <div class="done-icon" aria-hidden="true">✓</div>
+      <h2>Bedankt! Wij nemen contact met u op</h2>
+      <p>We hebben uw aanvraag ontvangen. Een adviseur plant zo snel mogelijk de gratis proefzit bij u thuis in.</p>
+      <ul class="done-list">
+        <li>Persoonlijke intake van ±30 minuten</li>
+        <li>Stoel afgesteld op uw lengte en zitwensen</li>
+        <li>Volledig vrijblijvend — u zit nergens aan vast</li>
+      </ul>
+      <footer class="page-footer">
+        <nav class="footer-links">
+          <a href="/legal/algemene-voorwaarden.html">Contact</a>
+          <a href="/legal/algemene-voorwaarden.html">Terms of Service</a>
+          <a href="/legal/privacybeleid.html">Privacy Policy</a>
+        </nav>
+        <p class="campaign">Campaign by Fio Ads</p>
+      </footer>
+    </div>
+  </div>
+
+  <script src="/track.js"></script>
+  <script src="funnel.js"></script>
+</body>
+</html>
