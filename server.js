@@ -9,7 +9,7 @@ const path = require('path');
 const { insertEvent, getStats } = require('./lib/analytics');
 const { listOrders, updateOrderDeliveryStatus } = require('./lib/orders');
 const { fulfillPurchase, getSuccessUrl } = require('./lib/fulfill-purchase');
-const { sendPurchaseEvent, sendAddToCartEvent } = require('./lib/meta-capi');
+const { sendPurchaseEvent, sendAddToCartEvent, sendLeadEvent } = require('./lib/meta-capi');
 const {
   handleRedirect,
   saveVariants,
@@ -787,7 +787,35 @@ app.post('/api/leads', async (req, res) => {
     return res.status(status).json(result);
   }
 
-  res.json({ ok: true });
+  // Meta Lead CAPI — alleen Zittu lead-gen pixel/token
+  let metaLead = { ok: false, skipped: true };
+  if (productSlug === 'zittu') {
+    const eventId =
+      String(body.eventId || '').trim() ||
+      `lead_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+    try {
+      metaLead = await sendLeadEvent({
+        eventId,
+        email,
+        phone: telefoon,
+        country: String(body.country || 'nl').toLowerCase(),
+        fbp: body.fbp || undefined,
+        fbc: body.fbc || undefined,
+        clientIp: req.headers['x-forwarded-for']?.toString().split(',')[0]?.trim() || req.ip,
+        userAgent: req.get('user-agent') || undefined,
+        eventSourceUrl: body.eventSourceUrl || undefined,
+        contentName: body.contentName || 'zittu-lead',
+        leadSource: body.landerSlug || body.source || 'zittu',
+        externalId: body.externalId || undefined,
+        testEventCode: body.testEventCode || undefined,
+      });
+    } catch (err) {
+      console.error('Meta Lead CAPI failed:', err.message);
+      metaLead = { ok: false, error: err.message };
+    }
+  }
+
+  res.json({ ok: true, metaLead: { ok: Boolean(metaLead.ok), skipped: Boolean(metaLead.skipped) } });
 });
 
 app.get('/api/admin/leads', requireAdmin, async (req, res) => {

@@ -235,6 +235,15 @@ function bindLeadForm() {
       sessionStorage.setItem('zittu_lead', JSON.stringify(answers));
     } catch (_) { /* ignore */ }
 
+    let meta = {};
+    try {
+      if (typeof window.trackEvent === 'function') {
+        meta = window.trackEvent('Lead', { content_name: 'zittu-proefzit', lander }) || {};
+      } else if (window.MetaPixelLeads?.trackLead) {
+        meta = window.MetaPixelLeads.trackLead({ content_name: 'zittu-proefzit', lander }) || {};
+      }
+    } catch (_) { /* ignore */ }
+
     try {
       await fetch('/api/leads', {
         method: 'POST',
@@ -247,16 +256,17 @@ function bindLeadForm() {
           provincie: answers.provincie || null,
           stoel: answers.stoel || null,
           source: 'adv-2-funnel',
+          contentName: 'zittu-proefzit',
+          eventId: meta.eventId || undefined,
+          fbp: meta.fbp || undefined,
+          fbc: meta.fbc || undefined,
+          eventSourceUrl: meta.eventSourceUrl || window.location.href,
+          externalId: meta.externalId || undefined,
+          testEventCode: meta.testEventCode || undefined,
         }),
         keepalive: true,
       });
     } catch (_) { /* ignore network */ }
-
-    if (typeof window.trackEvent === 'function') {
-      try {
-        window.trackEvent('Lead', { content_name: 'zittu-proefzit', lander });
-      } catch (_) { /* ignore */ }
-    }
 
     showDone();
   });

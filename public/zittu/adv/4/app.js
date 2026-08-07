@@ -62,6 +62,15 @@
       }));
     } catch (_) { /* ignore */ }
 
+    var meta = {};
+    try {
+      if (typeof window.trackEvent === 'function') {
+        meta = window.trackEvent('Lead', { content_name: 'zittu-demonstratie', lander: lander }) || {};
+      } else if (window.MetaPixelLeads && window.MetaPixelLeads.trackLead) {
+        meta = window.MetaPixelLeads.trackLead({ content_name: 'zittu-demonstratie', lander: lander }) || {};
+      }
+    } catch (_) { /* ignore */ }
+
     try {
       await fetch('/api/leads', {
         method: 'POST',
@@ -76,16 +85,17 @@
           postcode: data.postcode,
           huisnr: data.huisnr,
           source: 'adv-4',
+          contentName: 'zittu-demonstratie',
+          eventId: meta.eventId || undefined,
+          fbp: meta.fbp || undefined,
+          fbc: meta.fbc || undefined,
+          eventSourceUrl: meta.eventSourceUrl || window.location.href,
+          externalId: meta.externalId || undefined,
+          testEventCode: meta.testEventCode || undefined,
         }),
         keepalive: true,
       });
     } catch (_) { /* ignore */ }
-
-    if (typeof window.trackEvent === 'function') {
-      try {
-        window.trackEvent('Lead', { content_name: 'zittu-demonstratie', lander: lander });
-      } catch (_) { /* ignore */ }
-    }
 
     phaseForm.classList.add('hidden');
     phaseForm.hidden = true;
