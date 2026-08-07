@@ -1114,6 +1114,11 @@ app.get('/checkout/v2', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'checkout', 'v2', 'index.html'));
 });
 
+/* Root homepage: 404 — not the camera shop */
+app.get(['/', '/index.html'], (_req, res) => {
+  res.status(404).sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/admin', (_req, res) => {
