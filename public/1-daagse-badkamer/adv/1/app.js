@@ -3,7 +3,7 @@
     var parts = [];
     if (params) parts.push(params);
     var qs = parts.length ? '?' + parts.join('&') : '';
-    window.location.href = 'form/1/' + qs;
+    window.location.href = '../../form/1/' + qs;
   }
 
   /* Before / after slider */
@@ -85,7 +85,7 @@
 
   var wrap = document.getElementById('bb-map-wrap');
   if (wrap) {
-    fetch('assets/nl-map.svg')
+    fetch('../../assets/nl-map.svg')
       .then(function (r) { return r.text(); })
       .then(function (svg) {
         wrap.innerHTML = svg.replace(/class="zt-map"/, 'class="bb-map"');

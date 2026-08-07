@@ -204,7 +204,7 @@ function buildLeadForm() {
         </div>
       </div>
       <p class="lead-error" id="lead-error" role="alert"></p>
-      <button type="submit" class="lead-submit">Vraag vrijblijvend advies aan →</button>
+      <button type="submit" class="lead-submit">Claim mijn plek</button>
       <p class="lead-privacy">Wij gebruiken uw gegevens alleen om contact op te nemen over de badkamerrenovatie.</p>
     </form>
   `;
