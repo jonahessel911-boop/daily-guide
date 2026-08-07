@@ -16,6 +16,7 @@ const {
   getAdminTrafficSplits,
   ROUTE_SLUG,
 } = require('./lib/traffic-splits');
+const { insertLead, getLeadStats } = require('./lib/leads');
 
 const app = express();
 const PORT = process.env.PORT || 8081;
@@ -573,7 +574,7 @@ app.post('/api/track', async (req, res) => {
     return res.status(400).json({ ok: false, error: 'sessionId ontbreekt' });
   }
 
-  const allowedProducts = ['1970cam', 'hearing', 'printer'];
+  const allowedProducts = ['1970cam', 'hearing', 'printer', 'zittu', 'badkamer'];
   const product = allowedProducts.includes(productSlug) ? productSlug : '1970cam';
 
   const result = await insertEvent({
@@ -740,6 +741,63 @@ app.get('/hearing-checker-be', (req, res) => {
     console.error('Hearing BE checker error:', err.message);
     res.status(500).send('Hearing BE checker mislukt');
   });
+});
+
+app.get('/zittu-checker', (req, res) => {
+  handleRedirect(req, res, 'zittu').catch((err) => {
+    console.error('Zittu checker error:', err.message);
+    res.status(500).send('Zittu checker mislukt');
+  });
+});
+
+app.post('/api/leads', async (req, res) => {
+  const body = req.body || {};
+  const naam = String(body.naam || '').trim();
+  const telefoon = String(body.telefoon || '').trim();
+  const email = String(body.email || '').trim();
+  const postcode = String(body.postcode || '').trim();
+  const huisnr = String(body.huisnr || '').trim();
+
+  if (!naam || !telefoon || !email) {
+    return res.status(400).json({ ok: false, error: 'Naam, telefoon en e-mail zijn verplicht' });
+  }
+
+  const allowedProducts = ['zittu', 'badkamer'];
+  const productSlug = allowedProducts.includes(body.productSlug) ? body.productSlug : 'zittu';
+
+  const result = await insertLead({
+    productSlug,
+    country: body.country || 'NL',
+    landerSlug: body.landerSlug || null,
+    naam,
+    telefoon,
+    email,
+    postcode,
+    huisnr,
+    metadata: {
+      provincie: body.provincie || null,
+      stoel: body.stoel || null,
+      source: body.source || null,
+      ...(body.metadata && typeof body.metadata === 'object' ? body.metadata : {}),
+    },
+  });
+
+  if (!result.ok) {
+    const status = result.error === 'not_configured' ? 503 : 500;
+    return res.status(status).json(result);
+  }
+
+  res.json({ ok: true });
+});
+
+app.get('/api/admin/leads', requireAdmin, async (req, res) => {
+  const { from, to, product } = req.query;
+  const stats = await getLeadStats({
+    from,
+    to,
+    product: product || 'zittu',
+  });
+  res.json(stats);
 });
 
 app.post('/api/create-payment', async (req, res) => {

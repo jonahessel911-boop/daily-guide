@@ -5,7 +5,19 @@
 
   if (!form) return;
 
-  form.addEventListener('submit', function (e) {
+  function resolveLander() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var lander = params.get('l');
+      if (!lander && window.FunnelTrack) lander = window.FunnelTrack.getAttribution().lander;
+      if (!lander) lander = document.body.dataset.trackLander || 'adv-4';
+      return lander;
+    } catch (_) {
+      return 'adv-4';
+    }
+  }
+
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
     var errorEl = document.getElementById('lead-error');
     var data = {
@@ -40,18 +52,38 @@
     }
 
     errorEl.textContent = '';
+    var lander = resolveLander();
 
     try {
       sessionStorage.setItem('zittu_lead', JSON.stringify({
-        lander: 'adv-4',
+        lander: lander,
         contact: data,
         createdAt: new Date().toISOString(),
       }));
     } catch (_) { /* ignore */ }
 
+    try {
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productSlug: 'zittu',
+          country: 'NL',
+          landerSlug: lander,
+          naam: data.naam,
+          telefoon: data.telefoon,
+          email: data.email,
+          postcode: data.postcode,
+          huisnr: data.huisnr,
+          source: 'adv-4',
+        }),
+        keepalive: true,
+      });
+    } catch (_) { /* ignore */ }
+
     if (typeof window.trackEvent === 'function') {
       try {
-        window.trackEvent('Lead', { content_name: 'zittu-demonstratie', lander: 'adv-4' });
+        window.trackEvent('Lead', { content_name: 'zittu-demonstratie', lander: lander });
       } catch (_) { /* ignore */ }
     }
 

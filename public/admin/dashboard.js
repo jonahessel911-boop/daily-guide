@@ -159,6 +159,45 @@ function renderOrderCard(order, statuses) {
   </article>`;
 }
 
+async function loadLeadStats() {
+  const tbody = document.getElementById('leads-body');
+  const totalEl = document.getElementById('leads-total');
+  if (!tbody) return;
+
+  try {
+    const qs = getStatsQuery();
+    const sep = qs ? '&' : '?';
+    const { data } = await api(`/api/admin/leads${qs}${sep}product=zittu`);
+
+    if (!data.ok) {
+      tbody.innerHTML = `<tr><td colspan="3" class="empty">${esc(data.error || 'Fout bij laden')}</td></tr>`;
+      if (totalEl) totalEl.textContent = 'Totaal: —';
+      return;
+    }
+
+    const rows = data.rows || [];
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="3" class="empty">Nog geen Zittu-leads in deze periode.</td></tr>';
+    } else {
+      tbody.innerHTML = rows
+        .map(
+          (r, i) => `<tr>
+          <td><strong>${esc(r.lander_slug)}</strong>${i === 0 ? ' <span class="muted">← meeste</span>' : ''}</td>
+          <td>${r.leads}</td>
+          <td>${esc(r.share)}</td>
+        </tr>`
+        )
+        .join('');
+    }
+
+    if (totalEl) totalEl.textContent = `Totaal: ${data.totals?.leads ?? 0} leads`;
+  } catch (err) {
+    if (err.message !== 'Sessie verlopen') {
+      tbody.innerHTML = `<tr><td colspan="3" class="empty">${esc(err.message)}</td></tr>`;
+    }
+  }
+}
+
 async function loadStats() {
   const qs = getStatsQuery();
 
@@ -199,6 +238,8 @@ async function loadStats() {
         `<tr><td colspan="4" class="empty">${err.message}</td></tr>`;
     }
   }
+
+  await loadLeadStats();
 }
 
 async function loadOrders() {

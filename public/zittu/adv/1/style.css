@@ -1,14 +1,15 @@
-/* Zittu advertorial — match info-promotie LP look, orange brand */
+/* Zittu adv/1 — advertorial layout (oranje),zelfde structuur/type/grootte als badkamer-referentie */
 
 :root {
   --brand: #f97316;
   --brand-dark: #ea580c;
+  --brand-deep: #c2410c;
   --brand-soft: #fff7ed;
+  --map-bg: #e8ddd4;
   --text: #1a1a1a;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --bg: #ffffff;
-  --box: #f3f4f6;
+  --muted: #555;
+  --white: #ffffff;
+  --grey: #f2f2f2;
   --chair-bg: #f5f5f5;
 }
 
@@ -21,32 +22,27 @@ html {
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background: var(--bg);
+  background: var(--white);
   color: var(--text);
-  line-height: 1.7;
-  font-size: 18px;
-  overflow-x: hidden;
-  min-height: 100vh;
+  line-height: 1.55;
+  font-size: 17px;
 }
 
 img { max-width: 100%; height: auto; display: block; }
+a { color: var(--brand-deep); }
 
-a { color: var(--brand); }
-
-/* Top bar */
 .zt-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  background: #fff;
-  max-width: 680px;
+  padding: 14px 16px;
+  max-width: 720px;
   margin: 0 auto;
+  background: var(--white);
 }
 
 .zt-logo {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
   text-decoration: none;
@@ -56,184 +52,164 @@ a { color: var(--brand); }
 .zt-logo-img {
   width: 44px;
   height: 44px;
-  border-radius: 0;
   object-fit: contain;
-  display: block;
-  background: transparent;
+  flex-shrink: 0;
 }
 
 .zt-logo-text {
-  font-weight: 700;
-  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
 }
 
-.zt-advertorial {
-  font-size: 13px;
-  color: #9ca3af;
+.zt-logo-text strong {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.zt-logo-text small {
+  font-size: 11px;
+  color: var(--muted);
   font-weight: 500;
 }
 
-/* Wrap — same narrow advertorial column as reference */
-.zt-wrap {
-  width: 100%;
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 18px 18px 72px;
-}
-
-/* Title */
-.zt-title {
-  font-size: 24px;
+.zt-advertorial {
+  font-size: 15px;
   font-weight: 700;
-  line-height: 1.35;
-  margin-bottom: 16px;
-  color: #111;
+  color: #333;
 }
 
-.zt-title u {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 3px;
+.zt-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding-bottom: 48px;
 }
 
-/* Hero + overlay CTA */
+.zt-title {
+  font-size: clamp(26px, 6.2vw, 34px);
+  font-weight: 800;
+  line-height: 1.22;
+  padding: 8px 16px 18px;
+  letter-spacing: -0.02em;
+}
+
+.zt-gezocht {
+  color: var(--brand);
+  display: inline;
+}
+
 .zt-hero-block {
-  position: relative;
-  margin: 0 0 28px;
   width: 100%;
 }
 
-.zt-hero {
-  margin: 0;
-  display: block;
-}
-
-.zt-hero img {
+.zt-hero-img {
   width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 10;
-  max-height: 340px;
+  aspect-ratio: 4 / 3;
+  min-height: 280px;
+  max-height: 520px;
   object-fit: cover;
-  object-position: center;
   background: #eee;
+}
+
+.zt-cta-bar {
   display: block;
-}
-
-.zt-cta-hero {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
   width: 100%;
-  margin: 0;
-  border-radius: 0;
-  padding: 16px 18px;
-  font-size: 17px;
-}
-
-/* CTA */
-.zt-cta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 15px 18px;
   background: var(--brand);
   color: #fff !important;
-  font-size: 17px;
-  font-weight: 700;
-  text-decoration: none;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-family: inherit;
   text-align: center;
-  line-height: 1.3;
-  transition: background 0.15s;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.4;
+  padding: 16px 14px;
 }
 
-.zt-cta:hover { background: var(--brand-dark); }
+.zt-cta-bar:hover { background: var(--brand-dark); }
 
-.zt-cta-pill {
-  border-radius: 999px;
-  margin: 22px 0 8px;
-  padding: 16px 22px;
-  font-size: 17px;
+.zt-body {
+  padding: 28px 18px 8px;
 }
 
-/* Body copy — short paragraphs, generous spacing like reference */
 .zt-body p {
-  margin-bottom: 18px;
-  font-size: 18px;
-  line-height: 1.7;
-  color: #222;
+  margin-bottom: 16px;
+  font-size: 17px;
+  line-height: 1.6;
 }
 
-.zt-body .lead {
-  color: #444;
-}
-
-.zt-quote {
-  font-style: italic;
-  color: #333;
-  margin: 18px 0;
-}
-
-.zt-expert {
-  margin: 8px 0 20px;
-}
-
-.zt-expert p { margin-bottom: 14px; }
-
-.zt-bullets {
-  list-style: none;
-  margin: 8px 0 24px;
-}
-
-.zt-bullets li {
-  position: relative;
-  padding-left: 1.15em;
-  margin-bottom: 10px;
-  font-size: 18px;
-  line-height: 1.65;
-}
-
-.zt-bullets li::before {
-  content: "–";
-  position: absolute;
-  left: 0;
-  font-weight: 700;
-}
-
-/* Selecteer uw test-stoel */
-.zt-stoel-heading {
-  font-size: 22px;
-  font-weight: 700;
-  margin: 36px 0 18px;
+.zt-mid {
+  padding: 12px 16px 28px;
   text-align: center;
-  color: #111;
-  line-height: 1.3;
+}
+
+.zt-mid-img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  max-height: 380px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 18px;
+  background: #eee;
+}
+
+.zt-mid-text {
+  margin-bottom: 16px;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.zt-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand);
+  color: #fff !important;
+  text-decoration: none !important;
+  font-weight: 800;
+  font-size: 16px;
+  padding: 16px 28px;
+  border-radius: 999px;
+  box-shadow: 0 4px 0 var(--brand-deep);
+  min-width: min(100%, 320px);
+}
+
+.zt-pill:hover { background: var(--brand-dark); }
+
+/* Chair picker — 2x2, grote tiles */
+.zt-chairs {
+  padding: 8px 16px 28px;
+  text-align: center;
+}
+
+.zt-chairs h2 {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.zt-chairs-sub {
+  color: #777;
+  font-size: 14px;
+  margin-bottom: 16px;
 }
 
 .zt-chair-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-bottom: 36px;
+  max-width: 520px;
+  margin: 0 auto 14px;
 }
 
 .zt-chair {
   display: block;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
   overflow: hidden;
-  background: #f5f5f5;
+  background: var(--chair-bg);
   cursor: pointer;
   padding: 0;
-  transition: box-shadow 0.15s, border-color 0.15s;
   font: inherit;
-  color: inherit;
-  text-align: center;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -243,57 +219,175 @@ a { color: var(--brand); }
   box-shadow: 0 0 0 2px var(--brand);
 }
 
-.zt-chair-media {
-  display: block;
+.zt-chair img {
   width: 100%;
   aspect-ratio: 1;
-  overflow: hidden;
-  background: #f5f5f5;
-}
-
-.zt-chair-media img {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
   object-position: center;
-  display: block;
 }
 
-/* Scarcity / map */
-.zt-center {
-  text-align: center;
+.zt-gratis {
+  font-size: 15px;
+  font-weight: 600;
+  color: #6b7280;
 }
 
-.zt-maar {
-  margin: 28px 0 10px;
-  color: #555;
-  font-size: 18px;
+.zt-grey {
+  background: var(--grey);
+  padding: 28px 18px 32px;
 }
 
-.zt-letop {
-  font-size: 21px;
-  line-height: 1.55;
-  margin-bottom: 22px;
-  max-width: 34em;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-}
-
-.zt-check-label {
-  margin-bottom: 6px;
-  font-size: 19px;
-}
-
-.zt-select-prov {
+.zt-grey h2 {
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 800;
+  margin-bottom: 18px;
+  line-height: 1.3;
+}
+
+.zt-stap {
+  margin-bottom: 16px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.zt-stap a {
+  color: var(--brand-deep);
+  font-weight: 600;
+}
+
+.zt-regions {
+  padding: 32px 16px 28px;
+  text-align: center;
+}
+
+.zt-regions h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--brand-deep);
   margin-bottom: 8px;
+  line-height: 1.25;
+}
+
+.zt-regions-sub {
+  color: #777;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+.zt-region-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.zt-region-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 58px;
+  padding: 14px 10px;
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 0 var(--brand-deep);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.zt-region-btn:hover { background: var(--brand-dark); }
+.zt-region-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--brand-deep);
+}
+
+.zt-howto {
+  padding: 8px 18px 28px;
+}
+
+.zt-howto h2 {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.zt-howto p {
+  margin-bottom: 14px;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.zt-features {
+  background: var(--brand);
+  color: #fff;
+  padding: 28px 20px 24px;
+}
+
+.zt-features h2 {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 18px;
+  line-height: 1.3;
+  color: #fff;
+}
+
+.zt-features ul { list-style: none; }
+
+.zt-features li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.zt-features li:last-child { margin-bottom: 0; }
+
+.zt-check {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 800;
+  margin-top: 1px;
+}
+
+.zt-features-img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  max-height: 400px;
+  object-fit: cover;
+  background: #eee;
+}
+
+.zt-map-band {
+  background: var(--map-bg);
+  padding: 32px 18px 40px;
+}
+
+.zt-map-band h2 {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 18px;
+}
+
+.zt-map-band .zt-stap a {
+  color: #7c2d12;
 }
 
 .zt-map-wrap {
-  margin: 12px auto 18px;
-  max-width: 420px;
+  max-width: 380px;
+  margin: 24px auto 0;
   color: var(--brand);
 }
 
@@ -303,264 +397,35 @@ a { color: var(--brand); }
   display: block;
 }
 
-.zt-map .zt-prov {
+.zt-map .zt-prov,
+.zt-map [data-provincie] {
   fill: var(--brand);
   cursor: pointer;
   transition: fill 0.12s, opacity 0.12s;
 }
 
 .zt-map .zt-prov:hover,
-.zt-map .zt-prov.is-active {
+.zt-map .zt-prov.is-active,
+.zt-map [data-provincie]:hover,
+.zt-map [data-provincie].is-active {
   fill: var(--brand-dark);
 }
 
-.zt-map .zt-prov.is-dim {
-  opacity: 0.4;
-}
-
-/* How it works */
-.zt-howto {
-  background: var(--box);
-  border-radius: 10px;
-  padding: 18px 16px;
-  margin: 8px 0;
-  text-align: left;
-}
-
-.zt-howto h3 {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-
-.zt-howto p {
-  margin-bottom: 10px;
-  font-size: 16px;
-  line-height: 1.55;
-}
-
-.zt-howto p:last-child { margin-bottom: 0; }
-
-/* Proefzit */
-.zt-proefzit {
-  margin-top: 40px;
-}
-
-.zt-proefzit h2 {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 14px;
-  text-align: left;
-}
-
-.zt-proefzit p {
-  margin-bottom: 14px;
-  font-size: 18px;
-  line-height: 1.7;
-}
-
-/* Benefits box */
-.zt-voordelen {
-  margin: 28px 0 16px;
-  background: var(--brand);
-  color: #fff;
-  border-radius: 16px;
-  padding: 22px 20px 20px;
-}
-
-.zt-voordelen h2 {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 14px;
-  color: #fff;
-  text-align: left;
-}
-
-.zt-voordelen ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.zt-voordelen li {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: 18px;
-  line-height: 1.5;
-  margin-bottom: 10px;
-  color: #fff;
-}
-
-.zt-voordelen li:last-child { margin-bottom: 0; }
-
-.zt-voordelen-note {
-  margin: 0 0 28px;
-  font-size: 17px;
-  line-height: 1.55;
-  color: #333;
-}
-
-/* Region buttons — big brand style, 2-col */
-.zt-regions {
-  margin-top: 40px;
-}
-
-.zt-regions .zt-section-title {
-  font-size: 26px;
-  font-weight: 700;
-  margin-bottom: 10px;
-  text-align: center;
-  text-decoration: none;
-  line-height: 1.3;
-}
-
-.zt-regions-sub {
-  text-align: center;
-  color: #9ca3af;
-  font-size: 15px;
-  margin-bottom: 18px;
-  line-height: 1.45;
-}
-
-.zt-region-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.zt-region-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 56px;
-  padding: 16px 12px;
-  background: var(--brand);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s;
-  text-align: center;
-  font-family: inherit;
-  line-height: 1.2;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.zt-region-btn--tall {
-  min-height: 110px;
-  font-size: 20px;
-}
-
-.zt-region-btn:hover { background: var(--brand-dark); }
-
-.zt-region-btn.is-selected {
-  box-shadow: inset 0 0 0 3px #fff, 0 0 0 2px var(--brand-dark);
-}
-
-/* Reviews — Amplifon-style card */
-.zt-reviews {
-  margin-top: 48px;
-  text-align: center;
-  background: transparent;
-}
-
-.zt-reviews h2 {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  line-height: 1.35;
-  color: #111;
-}
-
-.zt-review-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 28px 24px 20px;
-  max-width: 420px;
-  margin: 0 auto;
-  text-align: left;
-  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
-  border: none;
-}
-
-.zt-review-name {
-  font-weight: 800;
-  font-size: 18px;
-  margin-bottom: 6px;
-  color: #111;
-  line-height: 1.2;
-}
-
-.zt-review-stars {
-  display: flex;
-  gap: 2px;
-  margin-bottom: 14px;
-  line-height: 1;
-}
-
-.zt-review-stars span {
-  color: #f5b400;
-  font-size: 18px;
-}
-
-.zt-review-text {
-  font-style: italic;
-  color: #1a1a1a;
-  margin: 0;
-  line-height: 1.55;
-  font-size: 16px;
-}
-
-.zt-review-divider {
-  border: none;
-  border-top: 1px solid #e5e7eb;
-  margin: 20px 0 14px;
-}
-
-.zt-review-nav {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-.zt-review-nav button {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: #e5e7eb;
-  font-size: 20px;
-  cursor: pointer;
-  color: #333;
-  line-height: 1;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  transition: background 0.15s;
-}
-
-.zt-review-nav button:hover {
-  background: #d1d5db;
-  border-color: transparent;
-  color: #333;
-}
-
-.zt-review-counter {
-  font-size: 14px;
-  color: #555;
-  min-width: 2.2em;
-  text-align: center;
+.zt-map .zt-prov.is-dim,
+.zt-map [data-provincie].is-dim {
+  opacity: 0.45;
 }
 
 @media (min-width: 640px) {
-  .zt-wrap { padding: 24px 24px 80px; }
-  .zt-title { font-size: 26px; }
-  .zt-stoel-heading { font-size: 24px; }
-  .zt-chair-grid { gap: 14px; }
-  .zt-map-wrap { max-width: 480px; }
+  .zt-title { padding: 12px 24px 22px; }
+  .zt-body { padding: 32px 24px 12px; }
+  .zt-mid { padding: 16px 24px 36px; }
+  .zt-grey { padding: 36px 24px; }
+  .zt-howto { padding: 12px 24px 36px; }
+  .zt-features { padding: 36px 28px 28px; }
+  .zt-map-band { padding: 40px 28px 48px; }
+  .zt-hero-img {
+    min-height: 360px;
+    max-height: 560px;
+  }
 }

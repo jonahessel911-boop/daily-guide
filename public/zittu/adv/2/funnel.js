@@ -175,11 +175,30 @@ function buildLeadForm() {
   `;
 }
 
+function resolveZittuLander() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    let lander = params.get('l');
+    if (!lander && window.FunnelTrack) {
+      lander = window.FunnelTrack.getAttribution().lander;
+    }
+    if (!lander) {
+      const from = params.get('from');
+      if (from === 'adv1') lander = 'adv-1';
+      else if (from === 'adv3') lander = 'adv-3';
+    }
+    if (!lander) lander = document.body?.dataset?.trackLander || 'adv-2';
+    return lander;
+  } catch (_) {
+    return document.body?.dataset?.trackLander || 'adv-2';
+  }
+}
+
 function bindLeadForm() {
   const form = document.getElementById('lead-form');
   if (!form) return;
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const errorEl = document.getElementById('lead-error');
     const data = {
@@ -210,10 +229,32 @@ function bindLeadForm() {
 
     errorEl.textContent = '';
     answers.contact = data;
+    const lander = resolveZittuLander();
+
+    try {
+      sessionStorage.setItem('zittu_lead', JSON.stringify(answers));
+    } catch (_) { /* ignore */ }
+
+    try {
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productSlug: 'zittu',
+          country: 'NL',
+          landerSlug: lander,
+          ...data,
+          provincie: answers.provincie || null,
+          stoel: answers.stoel || null,
+          source: 'adv-2-funnel',
+        }),
+        keepalive: true,
+      });
+    } catch (_) { /* ignore network */ }
 
     if (typeof window.trackEvent === 'function') {
       try {
-        window.trackEvent('Lead', { content_name: 'zittu-proefzit', lander: 'adv-2' });
+        window.trackEvent('Lead', { content_name: 'zittu-proefzit', lander });
       } catch (_) { /* ignore */ }
     }
 
